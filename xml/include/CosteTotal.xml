@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="includeCosteTotal">
+
+	<sql id="SELECT_LIST_DESCRIPTIVO">
+		SELECT
+			codigo_hospital as "codigo_hospital",
+			codigo_hospital as "codigo_hospital_desc",
+			ALTAS as "numero_altas_i",
+			ESTANCIA_MEDIA as "estancia_media_f",
+			ESTANCIA_MEDIA_AJUSTADA as "estancia_media_ajustada_f",
+			SEVERIDAD_MEDIA as "severidad_media_f",
+			ROM_MEDIO  as "rom_medio_f",
+			PESO_P20 as "peso20_f",
+			PESO_P70 as "peso70_f",
+			PESO_P80 as "peso80_f",
+			PESO_P90 as "peso90_f",
+			COSTE_MEDIO as "coste_f",
+			ERROR_COSTE+COSTE_MEDIO as "coste_estimado_f",
+			100*ERROR_RELATIVO as "error_rel_coste_p"
+		FROM
+			GASTO altas
+		WHERE Anio=$anio$
+			<include refid="includes.WHERE_DESCRIPTIVO"/>
+		ORDER BY "codigo_hospital" asc
+	</sql>
+
+</sqlMap>

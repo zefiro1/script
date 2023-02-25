@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><mapper namespace="includeTasaRealizacion">
+	<sql id="SELECT_LIST_DESCRIPTIVO">
+		SELECT 
+		<include refid="includes.SELECT_DES_DESCRIPTIVO"/>	    
+		denominador_i as "denominador_i", numerador_i as "numerador_procedure_i", tasa_p as "tasa_p"
+		FROM(
+			SELECT
+					<include refid="includes.SELECT_COD_DESCRIPTIVO"/>	    
+				    numero_altas AS denominador_i,
+				    numero_altas_realizacion AS numerador_i,
+				    100.0*(numero_altas_realizacion)/NULLIF(1.0*numero_altas,0) AS tasa_p
+				FROM (
+					SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_G"/> 
+					    SUM(numero_altas) as numero_altas,
+					    SUM(CASE WHEN realizacion=1 THEN numero_altas ELSE 0.0 END) as numero_altas_realizacion
+					FROM (
+						SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_CCAA"/> 
+						    $indicadorEtiqueta$ AS realizacion,
+						    COUNT(*) as numero_altas
+						FROM
+								    REALIZACION altas
+						WHERE Anio=$anio$ AND $indicadorEtiqueta$ IS NOT NULL
+							<include refid="includes.GROPY_BY_COMMA_DESCRIPTIVO"/>
+								$indicadorEtiqueta$ 
+					) altas <include refid="includes.GROUP_BY_LIST"/>
+				) altas <include refid="includes.WHERE_ALLCOD_NULL"/>
+		) altas 
+		<include refid="includes.INNER_JOIN_DESCRIPTIVO"/>	    
+	</sql>
+	<sql id="SELECT_LIST_SERIE_TEMPORAL">
+				<include refid="includes.INICIAL_SERIE_TEMPORAL"/>
+						SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_G"/> 
+						    Anio,
+						    SUM(numero_altas) as numero_altas,
+						    SUM(CASE WHEN realizacion=1 THEN numero_altas ELSE 0.0 END) as numero_altas_ind
+						FROM(
+							SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_CCAA"/> 
+							    Anio,$indicadorEtiqueta$ AS realizacion,
+							    COUNT(*) as numero_altas
+							FROM
+								    REALIZACION altas
+							WHERE (1=1) AND $indicadorEtiqueta$ IS NOT NULL
+								<include refid="includes.FILTRO_ANIOS_SERIE_TEMPORAL"/>
+								<include refid="includes.GROPY_BY_COMMA_DESCRIPTIVO"/>
+								Anio,$indicadorEtiqueta$
+						) altas <include refid="includes.GROPY_BY_LIST2"/>
+								Anio
+					<include refid="includes.FINAL_SERIE_TEMPORAL"/>	    
+	</sql>
+</mapper>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="includeMortalidadTotal">
+	<sql id="SELECT_LIST_DESCRIPTIVO">
+		SELECT 
+			<include refid="includes.SELECT_DES_DESCRIPTIVO"/>
+			numero_altas as "numero_altas_i",
+			estancia_num/NULLIF(1.0*numero_altas,0) as "estancia_media_f",
+			edad_num/NULLIF(1.0*numero_altas,0) as "edad_media_f",
+ 			peso_num/NULLIF(1.0*numero_altas,0) as "peso_medio_f",
+ 			numero_altas_mortal as "mortalidad_numero_altas_i",
+ 			estancia_mortal_num/NULLIF(1.0*numero_altas_mortal,0) as "mortalidad_estancia_media_f",
+ 			edad_mortal_num/NULLIF(1.0*numero_altas_mortal,0) as "mortalidad_edad_media_f",
+ 			peso_mortal_num/NULLIF(1.0*numero_altas_mortal,0) as "mortalidadpeso_medio_f",
+			numero_altas_mortal/NULLIF(1.0*numero_altas,0) as "tasa_mortalidad_q"
+			<isEqual property="mortalityAdjustment" compareValue="true" prepend=",">
+   				edad_adj, sexo_adj
+   			</isEqual>
+		FROM(
+   			SELECT
+   				<include refid="includes.SELECT_COD_DESCRIPTIVO_CCAA"/>
+			    COUNT(*) as numero_altas,
+			    SUM(CASE WHEN Mortal=1 THEN 1 ELSE 0.0 END) as numero_altas_mortal,
+			    SUM(Estancia) as estancia_num,
+			    SUM(CASE WHEN Mortal=1 THEN Estancia ELSE 0.0 END) as estancia_mortal_num,
+			    SUM(Edad) as edad_num,
+			    SUM(CASE WHEN Mortal=1 THEN Edad ELSE 0.0 END) as edad_mortal_num,    
+			    SUM(cast(peso as DOUBLE PRECISION)) as peso_num,
+			    SUM(CASE WHEN Mortal=1 THEN cast(peso as DOUBLE PRECISION) ELSE 0.0 END) as peso_mortal_num
+			    <isEqual property="mortalityAdjustment" compareValue="true" prepend=",">
+	   				FLOOR(EDAD/5) as edad_adj,
+	   				SEXO sexo_adj
+	   			</isEqual>
+			FROM
+				<include refid="includes.FROM_TABLE_CLAUSE"/>
+			WHERE altas.Mortal IS NOT NULL AND Anio=$anio$
+				<include refid="includes.WHERE_DESCRIPTIVO"/>		
+				<dynamic prepend="GROUP BY CUBE (" close=")">
+		     	    <iterate property="groupByList" conjunction=",">
+		     	    	<isNotEmpty property="groupByList[].mappedVariable">
+					 		(CASE WHEN altas.$groupByList[].mappedVariable.label$=$groupByList[].mappedVariable.value$ THEN codigo_hospital ELSE 0 END) 
+					 	</isNotEmpty>
+					 	<isEmpty property="groupByList[].mappedVariable">
+			 				NVL($groupByList[].nombre$,999999)
+						</isEmpty>
+					 </iterate>
+					 <isEqual property="mortalityAdjustment" compareValue="true">
+					 	,FLOOR(altas.EDAD/5),altas.SEXO
+					 </isEqual>
+				</dynamic>
+		)altas
+		<include refid="includes.INNER_JOIN_DESCRIPTIVO"/>
+	</sql>
+	
+	<sql id="SELECT_LIST_SERIE_TEMPORAL">
+				<include refid="includes.INICIAL_SERIE_TEMPORAL"/>
+						SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_G"/> 
+						    Anio,
+						    <isEqual property="temporalSerieColumn.column" compareValue="DEFAULT">
+						    	SUM(numero_altas) as numero_altas,
+						    	SUM(CASE WHEN Mortal=1 THEN numero_altas ELSE 0.0 END) as numero_altas_ind
+						    </isEqual>
+						    <isEqual property="temporalSerieColumn.column" compareValue="RECORDS_EXITUS">
+								SUM(CASE WHEN Mortal=1 THEN numero_altas ELSE 0.0 END) as numero_altas,
+						    	SUM(CASE WHEN Mortal=1 THEN numero_altas ELSE 0.0 END) as numero_altas_ind
+						    </isEqual>
+						FROM(
+							SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_CCAA"/> 
+							    Anio,Mortal,
+							    COUNT(*) as numero_altas
+							FROM
+								<include refid="includes.FROM_TABLE_CLAUSE"/>
+							WHERE Mortal IS NOT NULL 
+								<include refid="includes.FILTRO_ANIOS_SERIE_TEMPORAL"/>
+								<include refid="includes.GROPY_BY_COMMA_DESCRIPTIVO"/>
+								Anio,Mortal
+						) altas <include refid="includes.GROPY_BY_LIST2"/>
+								Anio
+					<include refid="includes.FINAL_SERIE_TEMPORAL"/>	    
+	</sql>
+</sqlMap>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="includeDistribucionContactos">
+	<sql id="SELECT_LIST_DESCRIPTIVO">
+		SELECT 
+			<include refid="includes.SELECT_DES_DESCRIPTIVO"/>
+			altas_total_i as "altas_total_i",
+			percentage_p as "percentage_p"
+		FROM(
+	        SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO"/> 
+	             COUNT(*) AS altas_total_i,
+	             RATIO_TO_REPORT(COUNT(*)) over (PARTITION BY GROUPING(
+					<iterate property="groupByList" conjunction=",">
+						$groupByList[].nombreDeprefixed$
+					</iterate>
+	             ))*100 as percentage_p
+	         FROM <include refid="includes.FROM_TABLE_CLAUSE"/> 
+	         WHERE Anio=$anio$
+			<isEqual property="indicadorEtiqueta" compareValue="DistribucionAltasDomicilio">
+			    AND TIPO_ASISTENCIA=2
+			</isEqual>
+			<isEqual property="indicadorEtiqueta" compareValue="DistribucionAltasHospitalDiaMedico">
+			    AND TIPO_ASISTENCIA=3
+			</isEqual>
+			<isEqual property="indicadorEtiqueta" compareValue="DistribucionAltasProcedimientosEspecialComplejidad">
+			    AND TIPO_ASISTENCIA=5
+			</isEqual>
+			<isEqual property="indicadorEtiqueta" compareValue="DistribucionIntervencionesQuirurgicasAmbulatorias">
+			    AND TIPO_ASISTENCIA=4
+			</isEqual>
+			<isEqual property="indicadorEtiqueta" compareValue="DistribucionAltasUrgenciasHospitalarias">
+			    AND TIPO_ASISTENCIA=6
+			</isEqual>
+	         <include refid="includes.WHERE_AND_GROUPBY_ROLLUP_DESCRIPTIVO"/>
+		) altas
+		<include refid="includes.INNER_JOIN_DESCRIPTIVO"/>
+	</sql>
+
+	<sql id="SELECT_LIST_SERIE_TEMPORAL">
+		<include refid="includes.INICIAL_SERIE_TEMPORAL"/>
+		SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_G"/> 
+			Anio,
+			SUM(numero_altas) as numero_altas,
+			SUM(numero_altas) as numero_altas_ind
+			FROM(
+				SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_CCAA"/> 
+				    Anio,COUNT(*) as numero_altas
+				FROM
+					<include refid="includes.FROM_TABLE_CLAUSE"/>
+				WHERE (1=1)
+					<isEqual property="indicadorEtiqueta" compareValue="DistribucionAltasDomicilio">
+					    AND TIPO_ASISTENCIA=2
+					</isEqual>
+					<isEqual property="indicadorEtiqueta" compareValue="DistribucionAltasHospitalDiaMedico">
+					    AND TIPO_ASISTENCIA=3
+					</isEqual>
+					<isEqual property="indicadorEtiqueta" compareValue="DistribucionAltasProcedimientosEspecialComplejidad">
+					    AND TIPO_ASISTENCIA=5
+					</isEqual>
+					<isEqual property="indicadorEtiqueta" compareValue="DistribucionIntervencionesQuirurgicasAmbulatorias">
+					    AND TIPO_ASISTENCIA=4
+					</isEqual>
+					<isEqual property="indicadorEtiqueta" compareValue="DistribucionAltasUrgenciasHospitalarias">
+					    AND TIPO_ASISTENCIA=6
+					</isEqual>
+					<include refid="includes.FILTRO_ANIOS_SERIE_TEMPORAL"/>
+					<include refid="includes.GROPY_BY_COMMA_DESCRIPTIVO"/>
+					Anio
+			) altas <include refid="includes.GROPY_BY_LIST2"/> anio
+		<include refid="includes.FINAL_SERIE_TEMPORAL"/>	    
+	</sql>
+	
+</sqlMap>
+
+

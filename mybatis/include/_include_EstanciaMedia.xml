@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><mapper namespace="includeEstanciaMedia">
+
+	<sql id="SELECT_LIST">
+		<if test="indicadorEtiqueta == 'estancia'">
+			<if test="ejeAnalisisEtiqueta == 'descriptivo_basico'">
+				<include refid="includeEstanciaMediaTotal.SELECT_LIST_DESCRIPTIVO"/>
+			</if>
+		</if>
+		<if test="ejeAnalisisEtiqueta == 'serie_temporal'">
+				<include refid="includeEstanciaMediaTotal.SELECT_LIST_SERIE_TEMPORAL"/>
+			</if>
+			<if test="ejeAnalisisEtiqueta == 'valor_base'">
+				<include refid="includeEstanciaMediaTotal.SELECT_LIST_SERIE_TEMPORAL"/>
+			</if>
+			<if test="ejeAnalisisEtiqueta == 'estandar_intraserie'">
+				<include refid="includeEstanciaMediaTotal.SELECT_LIST_DESCRIPTIVO"/>
+			</if>
+		
+	</sql>
+	
+</mapper>

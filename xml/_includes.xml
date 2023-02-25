@@ -1,0 +1,571 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="includes">
+
+	<sql id="WHERE_ALLCOD_NULL">	    
+		<dynamic prepend="WHERE ((">
+			<isNotNull property="groupByExceptFirstList">
+		 	<iterate property="groupByExceptFirstList" conjunction="AND" close=")">
+				$groupByExceptFirstList[].nombre$ IS NULL 
+			</iterate>
+			</isNotNull>
+		</dynamic>
+		<dynamic prepend="OR ("> 	
+			<isNotNull property="groupByExceptFirstList">
+		 	<iterate property="groupByExceptFirstList" conjunction="AND" close=")">
+				$groupByExceptFirstList[].nombre$ IS NOT NULL 
+			</iterate>
+			</isNotNull>
+		</dynamic>
+		<isNotEmpty property="groupByExceptFirstList">)</isNotEmpty>
+	</sql>	
+	<sql id="SELECT_DES_DESCRIPTIVO">	    
+		<dynamic>			
+		<isNotEmpty property="selectList">
+		 <iterate property="selectList" conjunction="," close=",">
+				$selectList[]$
+		 </iterate>
+		</isNotEmpty>
+		 <isEmpty property="selectList">
+		  NULL AS total_desc,
+		 </isEmpty>
+		</dynamic>
+		<isEqual property="hospitalCount" compareValue="true" close="," >HOSPITALES_COUNT</isEqual>	
+	</sql>
+	<sql id="FROM_TABLE_CLAUSE">
+		
+		<isEqual property="grupoIndicadorEtiqueta" compareValue="estanciaMedia">
+		     complicaciones altas	    
+		</isEqual>
+		<isEqual property="grupoIndicadorEtiqueta" compareValue="frecuentacion">
+		    <isEqual property="indicadorEtiqueta" compareValue="FrecuentacionTotal">
+		     	complicaciones altas
+		     </isEqual>
+		     <isEqual property="indicadorEtiqueta" compareValue="DistribucionAltas">
+		         complicaciones altas
+		     </isEqual>
+		     <isNotEqual property="indicadorEtiqueta" compareValue="FrecuentacionTotal">
+		         <isNotEqual property="indicadorEtiqueta" compareValue="DistribucionAltas">
+		             CMBD altas
+		         </isNotEqual>
+		     </isNotEqual>
+		</isEqual>
+		<isEqual property="grupoIndicadorEtiqueta" compareValue="frecuentacion_np">
+		     complicaciones altas	    
+		</isEqual>
+		<isEqual property="grupoIndicadorEtiqueta" compareValue="nosocomial">
+		     complicaciones altas	    
+		</isEqual>
+	    <isEqual property="grupoIndicadorEtiqueta" compareValue="mortalidad">
+		     <isEqual property="indicadorEtiqueta" compareValue="MORTAL">
+		         complicaciones altas
+		     </isEqual>
+		     <isNotEqual property="indicadorEtiqueta" compareValue="MORTAL">
+	     	    $indicadorEtiqueta$ altas
+		     </isNotEqual>
+		</isEqual>
+		<isEqual property="grupoIndicadorEtiqueta" compareValue="complicaciones">
+		     <isEqual property="indicadorEtiqueta" compareValue="COMPLICACIONMEDICA">
+		         complicaciones altas
+		     </isEqual>    
+		     <isNotEqual property="indicadorEtiqueta" compareValue="COMPLICACIONMEDICA">
+		         $indicadorEtiqueta$ altas
+		     </isNotEqual>    
+		</isEqual>
+		<isEqual property="grupoIndicadorEtiqueta" compareValue="em_preoperatoria">
+		     em_preoperatoria altas	    
+		</isEqual>
+		<isEqual property="grupoIndicadorEtiqueta" compareValue="ambulatorizacion_quirurgica">
+		     ambulatorizacion altas	    
+		</isEqual>
+		<isEqual property="grupoIndicadorEtiqueta" compareValue="reingresos">
+		    <isEqual property="indicadorEtiqueta" compareValue="reingreso">
+		     	REINGRESO altas
+		     </isEqual>
+		     <isEqual property="indicadorEtiqueta" compareValue="reingresomental">
+		     	REINGRESOMENTAL altas
+		     </isEqual>	    
+		</isEqual>
+		<isEqual property="grupoIndicadorEtiqueta" compareValue="cesareas">
+		     cesareas altas	    
+		</isEqual>
+		<isEqual property="grupoIndicadorEtiqueta" compareValue="estrategiaCronicidad">
+			estrategia altas
+		</isEqual>
+		<isEqual property="grupoIndicadorEtiqueta" compareValue="estrategiaInfarto">
+			estrategia altas
+		</isEqual>
+		<isEqual property="grupoIndicadorEtiqueta" compareValue="estrategiaDiabetes">
+			estrategia altas
+		</isEqual>		
+		<isEqual property="grupoIndicadorEtiqueta" compareValue="realizacion">
+		     realizacion altas	    
+		</isEqual>
+		<isEqual property="grupoIndicadorEtiqueta" compareValue="realizacion_np">
+		     realizacion altas	    
+		</isEqual>
+		<isEqual property="grupoIndicadorEtiqueta" compareValue="avoidable_admission">
+		     AVOIDABLEADMISSION altas	    
+		</isEqual>
+	</sql>
+	<sql id="SELECT_COD_DESCRIPTIVO_CCAA">
+		<dynamic>
+			<isEqual property="hospitalCount" compareValue="true" close="," >
+				count(distinct CODIGO_HOSPITAL) as HOSPITALES_COUNT
+			</isEqual> 	
+			<include refid="includes.SELECT_COD_DESCRIPTIVO_CCAA_NO_HOSP"/>
+		</dynamic>
+	</sql>
+	<sql id="SELECT_COD_DESCRIPTIVO_CCAA_NO_HOSP">
+		<iterate property="groupByList" conjunction="," close=",">
+			<isNotEmpty property="groupByList[].mappedValoresList">
+     	   		(
+     	   			CASE
+     	   				<iterate property="groupByList[].mappedValoresList">
+     	   					WHEN $groupByList[].nombre$=$groupByList[].mappedValoresList[].value$ THEN $groupByList[].mappedValoresList[].label$
+     	   				</iterate> 
+     	   			ELSE $groupByList[].nombre$ 
+     	   			END
+     	   		) as $groupByList[].etiqueta$
+     	   	</isNotEmpty>
+     	   	<isEmpty property="groupByList[].mappedValoresList">
+	    	   	<isNotEmpty property="groupByList[].mappedVariable">
+					(CASE WHEN altas.$groupByList[].mappedVariable.label$=$groupByList[].mappedVariable.value$ THEN codigo_hospital ELSE 0 END) AS $groupByList[].etiqueta$
+				</isNotEmpty>
+				<isEmpty property="groupByList[].mappedVariable">
+					NVL($groupByList[].nombre$,999999) as $groupByList[].nombreDeprefixed$
+				</isEmpty>
+			</isEmpty>
+		</iterate>
+	</sql>
+	<sql id="SELECT_COD_DESCRIPTIVO">	    
+		<dynamic> 	
+		 	<iterate property="groupByList" conjunction="," close=",">
+			 		$groupByList[].nombre$
+			</iterate>
+		</dynamic>
+		<isEqual property="hospitalCount" compareValue="true" close="," >HOSPITALES_COUNT</isEqual>
+	</sql>
+	<sql id="SELECT_COD_DESCRIPTIVO_G">	    
+		<dynamic> 	
+		 	<iterate property="groupByList" conjunction="," close=",">
+			 		$groupByList[].nombre$
+			</iterate>
+		</dynamic>
+		<isEqual property="hospitalCount" compareValue="true" close="," >
+			max(HOSPITALES_COUNT) keep (DENSE_RANK last order by HOSPITALES_COUNT) as HOSPITALES_COUNT
+		</isEqual>
+	</sql>
+	
+	<sql id="SELECT_COUNT_COD_DESCRIPTIVO">	    
+		<dynamic>			
+			<iterate property="groupByList" conjunction=",">
+				$groupByList[].nombre$
+			</iterate>
+		</dynamic>   		
+	</sql>
+
+	<sql id="WHERE_DESCRIPTIVO">
+		<dynamic prepend="AND" open="(" close=")">
+			<iterate property="filtersList" conjunction="AND">
+				<isEqual property="filtersList[].excluye" compareValue="true">
+					<iterate property="filtersList[].valoresList" conjunction="AND" open="(" close=")">
+						<isEqual property="filtersList[].nombre" compareValue="mes_ingreso">
+							month($filtersList[].nombre$) != $filtersList[].valoresList[].value$
+						</isEqual>
+						<isNotEqual property="filtersList[].nombre" compareValue="mes_ingreso">
+							<isNotEqual property="filtersList[].nombre" compareValue="codigo_hospital_an">
+								$filtersList[].nombre$ != $filtersList[].valoresList[].value$
+							</isNotEqual>
+							<isEqual property="filtersList[].nombre" compareValue="codigo_hospital_an">
+								(codigo_hospital+21841)*23+2151 = $filtersList[].valoresList[].value$
+							</isEqual>
+						</isNotEqual>
+					 </iterate>
+				</isEqual>
+				<isEqual property="filtersList[].excluye" compareValue="false">
+					<iterate property="filtersList[].valoresList" conjunction="OR" open="(" close=")">
+						<isEqual property="filtersList[].nombre" compareValue="mes_ingreso">
+							month($filtersList[].nombre$) = $filtersList[].valoresList[].value$
+						</isEqual>
+						<isNotEqual property="filtersList[].nombre" compareValue="mes_ingreso">
+							<isNotEqual property="filtersList[].nombre" compareValue="codigo_hospital_an">
+								$filtersList[].nombre$ = $filtersList[].valoresList[].value$
+							</isNotEqual>
+							<isEqual property="filtersList[].nombre" compareValue="codigo_hospital_an">
+								(codigo_hospital+21841)*23+2151 = $filtersList[].valoresList[].value$
+							</isEqual>
+						</isNotEqual>
+					 </iterate>				
+				</isEqual>
+			</iterate>
+		</dynamic>
+	</sql>
+	
+	<sql id="WHERE_DESCRIPTIVO_PREFIXED">
+		<dynamic prepend="AND" open="(" close=")">
+			<iterate property="filtersList" conjunction="AND">
+				<isEqual property="filtersList[].excluye" compareValue="true">
+					<iterate property="filtersList[].valoresList" conjunction="AND" open="(" close=")">
+						<isEqual property="filtersList[].nombre" compareValue="mes_ingreso">
+							month(altas.$filtersList[].nombre$) != $filtersList[].valoresList[].value$
+						</isEqual>
+						<isNotEqual property="filtersList[].nombre" compareValue="mes_ingreso">
+							altas.$filtersList[].nombre$ != $filtersList[].valoresList[].value$
+						</isNotEqual>
+					 </iterate>
+				</isEqual>
+				<isEqual property="filtersList[].excluye" compareValue="false">
+					<iterate property="filtersList[].valoresList" conjunction="OR" open="(" close=")">
+						<isEqual property="filtersList[].nombre" compareValue="mes_ingreso">
+							month(altas.$filtersList[].nombre$) = $filtersList[].valoresList[].value$
+						</isEqual>
+						<isNotEqual property="filtersList[].nombre" compareValue="mes_ingreso">
+							altas.$filtersList[].nombre$ = $filtersList[].valoresList[].value$
+						</isNotEqual>
+					 </iterate>				
+				</isEqual>
+			</iterate>
+		</dynamic>
+	</sql>
+	
+	<sql id="WHERE_AND_GROUPBY_DESCRIPTIVO">
+		<include refid="includes.WHERE_DESCRIPTIVO"/>		
+		<dynamic prepend="GROUP BY">
+     	    <iterate property="groupByList" conjunction=",">
+     	    	<isNotEmpty property="groupByList[].mappedVariable">
+			 			(CASE WHEN altas.$groupByList[].mappedVariable.label$=$groupByList[].mappedVariable.value$ THEN codigo_hospital ELSE 0 END) 
+			 	</isNotEmpty>
+			 	<isEmpty property="groupByList[].mappedVariable">
+			 			$groupByList[].nombre$
+				</isEmpty>
+			 </iterate>
+		</dynamic>
+	</sql>
+	<sql id="WHERE_AND_GROUPBY_ROLLUP_DESCRIPTIVO">
+		<include refid="includes.WHERE_DESCRIPTIVO"/>		
+		<dynamic prepend="GROUP BY ROLLUP (" close=")">
+     	    <iterate property="groupByList" conjunction=",">
+     	    	<isNotEmpty property="groupByList[].mappedVariable">
+			 			(CASE WHEN altas.$groupByList[].mappedVariable.label$=$groupByList[].mappedVariable.value$ THEN codigo_hospital ELSE 0 END) 
+			 	</isNotEmpty>
+			 	<isEmpty property="groupByList[].mappedVariable">
+			 			$groupByList[].nombre$
+				</isEmpty>
+			 </iterate>
+		</dynamic>
+	</sql>
+	<sql id="GROPY_BY_COMMA_DESCRIPTIVO">
+	<include refid="includes.WHERE_AND_GROUPBY_DESCRIPTIVO"/>	
+		<isNotEmpty property="groupByList">,</isNotEmpty>
+		<isEmpty property="groupByList">GROUP BY </isEmpty>
+	</sql>
+
+	<sql id="GROUP_BY_LIST">
+		<dynamic prepend="GROUP BY ROLLUP(" close=")">
+			<iterate property="groupByList" conjunction=",">
+				$groupByList[].nombre$
+			</iterate>
+		</dynamic> 	
+	</sql>
+	<sql id="GROUP_BY_LIST_NOROLLUP">
+		<dynamic prepend="GROUP BY ">
+			<iterate property="groupByList" conjunction=",">
+				$groupByList[].nombre$
+			</iterate>
+		</dynamic> 	
+	</sql>
+	<sql id="GROPY_BY_LIST2">
+		<dynamic prepend="GROUP BY">
+			<iterate property="groupByList" conjunction=",">
+				$groupByList[].nombre$
+			</iterate>
+		</dynamic> 	
+		<isNotEmpty property="groupByList">,</isNotEmpty>
+		<isEmpty property="groupByList">GROUP BY </isEmpty>
+	</sql>
+	
+	<sql id="ORDER_BY">
+		<dynamic prepend="ORDER BY">
+			<iterate property="groupByList" conjunction=",">
+				COALESCE($groupByList[].nombre$,-1)
+			</iterate>
+		</dynamic> 	
+	</sql>
+	<sql id="GROUP_BY_LIST_POB">
+		<dynamic prepend="GROUP BY ROLLUP(" close=")">
+			<iterate property="labelList" conjunction=",">
+				<isEqual property="labelList[]" compareValue="codigo_ccaa_hospital">
+					pb.codigo_ccaa
+				</isEqual>
+				<isEqual property="labelList[]" compareValue="sexo">
+					pb.codigo_sexo
+				</isEqual>
+				<isEqual property="labelList[]" compareValue="codigo_grupo_edad">
+					pb.codigo_grupo_edad
+				</isEqual>
+			</iterate>
+		</dynamic> 	
+	</sql>
+	<sql id="GROUP_BY_LIST_POB2">
+		<dynamic>
+			<iterate property="labelList" prepend="," conjunction=",">
+				<isEqual property="labelList[]" compareValue="codigo_ccaa_hospital">
+					pb.codigo_ccaa
+				</isEqual>
+				<isEqual property="labelList[]" compareValue="sexo">
+					pb.codigo_sexo
+				</isEqual>
+				<isEqual property="labelList[]" compareValue="codigo_grupo_edad">
+					pb.codigo_grupo_edad
+				</isEqual>
+			</iterate>
+		</dynamic> 	
+	</sql>
+	<sql id="SELECT_POB">	    
+		<dynamic> 	
+			<iterate property="labelList" conjunction="," close=",">
+				<isEqual property="labelList[]" compareValue="codigo_ccaa_hospital">
+					pb.codigo_ccaa
+				</isEqual>
+				<isEqual property="labelList[]" compareValue="sexo">
+					pb.codigo_sexo AS sexo
+				</isEqual>
+				<isEqual property="labelList[]" compareValue="codigo_grupo_edad">
+					pb.codigo_grupo_edad AS codigo_grupo_edad
+				</isEqual>
+			</iterate>
+		</dynamic>
+	</sql>
+	
+	<sql id="WHERE_POB">
+		<dynamic prepend="AND">
+		<iterate property="filtersList" conjunction="AND">
+			<isEqual property="filtersList[].nombre" compareValue="codigo_ccaa_hospital">
+				<iterate property="filtersList[].valoresList" conjunction="OR" open="(" close=")">
+					pb.codigo_ccaa = $filtersList[].valoresList[].value$
+				</iterate>
+			</isEqual>
+			<isEqual property="filtersList[].nombre" compareValue="sexo">
+				<iterate property="filtersList[].valoresList" conjunction="OR" open="(" close=")">
+					pb.codigo_sexo = $filtersList[].valoresList[].value$
+				</iterate>
+			</isEqual>
+			<isEqual property="filtersList[].nombre" compareValue="codigo_grupo_edad">
+				<iterate property="filtersList[].valoresList" conjunction="OR" open="(" close=")">
+					pb.codigo_grupo_edad = $filtersList[].valoresList[].value$
+				</iterate>
+			</isEqual>
+		</iterate>
+		</dynamic>
+	</sql>
+	
+	<sql id="WHERE_POB2">
+		<dynamic prepend="WHERE">
+ 	    <iterate property="filtersList" conjunction="AND">
+			<isEqual property="filtersList[].nombre" compareValue="codigo_ccaa_hospital">
+				<iterate property="filtersList[].valoresList" conjunction="OR" open="(" close=")">
+					pb.codigo_ccaa = $filtersList[].valoresList[].value$
+				</iterate>
+			</isEqual>
+			<isEqual property="filtersList[].nombre" compareValue="sexo">
+				<iterate property="filtersList[].valoresList" conjunction="OR" open="(" close=")">
+					pb.codigo_sexo = $filtersList[].valoresList[].value$
+				</iterate>
+			</isEqual>
+			<isEqual property="filtersList[].nombre" compareValue="codigo_grupo_edad">
+				<iterate property="filtersList[].valoresList" conjunction="OR" open="(" close=")">
+					pb.codigo_grupo_edad = $filtersList[].valoresList[].value$
+				</iterate>
+			</isEqual>
+		</iterate>
+		</dynamic>
+	</sql>
+	<sql id="INNER_JOIN_POB">
+		<dynamic>
+		(1=1)
+		<iterate property="labelList" conjunction="AND" prepend=" AND ((" close=") ">
+				<isEqual property="labelList[]" compareValue="codigo_ccaa_hospital">
+					altas.codigo_ccaa_hospital=pob.codigo_ccaa
+				</isEqual>
+				<isEqual property="labelList[]" compareValue="sexo">
+					altas.sexo=pob.sexo
+				</isEqual>
+				<isEqual property="labelList[]" compareValue="codigo_grupo_edad">
+					altas.codigo_grupo_edad=pob.codigo_grupo_edad
+				</isEqual>
+		</iterate>
+		<isEmpty property="groupByList">1=1</isEmpty>
+		<iterate property="labelList" conjunction="AND" prepend=" OR (" close="))">
+				<isEqual property="labelList[]" compareValue="codigo_ccaa_hospital">
+					altas.codigo_ccaa_hospital IS NULL AND pob.codigo_ccaa IS NULL
+				</isEqual>
+				<isEqual property="labelList[]" compareValue="sexo">
+					altas.sexo IS NULL AND pob.sexo IS NULL
+				</isEqual>
+				<isEqual property="labelList[]" compareValue="codigo_grupo_edad">
+					altas.codigo_grupo_edad IS NULL AND pob.codigo_grupo_edad IS NULL
+				</isEqual>
+		</iterate>
+		<isEmpty property="groupByList">1=1</isEmpty>
+		</dynamic>
+	</sql>
+	<sql id="INNER_JOIN_POB2">
+		<dynamic>
+		(1=1) AND ((altas.Anio=pob.Anio
+		<iterate property="labelList" conjunction="AND" prepend=" AND ">
+				<isEqual property="labelList[]" compareValue="codigo_ccaa_hospital">
+					altas.codigo_ccaa_hospital=pob.codigo_ccaa
+				</isEqual>
+				<isEqual property="labelList[]" compareValue="sexo">
+					altas.sexo=pob.sexo
+				</isEqual>
+				<isEqual property="labelList[]" compareValue="codigo_grupo_edad">
+					altas.codigo_grupo_edad=pob.codigo_grupo_edad
+				</isEqual>
+		</iterate>
+		) OR ( altas.Anio IS NULL AND pob.Anio IS NULL
+		<iterate property="labelList" conjunction="AND" prepend=" AND ">
+				<isEqual property="labelList[]" compareValue="codigo_ccaa_hospital">
+					altas.codigo_ccaa_hospital IS NULL AND pob.codigo_ccaa IS NULL
+				</isEqual>
+				<isEqual property="labelList[]" compareValue="sexo">
+					altas.sexo IS NULL AND pob.sexo IS NULL
+				</isEqual>
+				<isEqual property="labelList[]" compareValue="codigo_grupo_edad">
+					altas.codigo_grupo_edad IS NULL AND pob.codigo_grupo_edad IS NULL
+				</isEqual>
+		</iterate>
+		))
+		</dynamic>
+	</sql>
+	
+	<sql id="INNER_JOIN_DESCRIPTIVO">
+		
+		<dynamic>
+			<include refid="includes.ORDER_BY"/>
+		</dynamic>	
+		
+	</sql>
+
+	<sql id="FILTRO_ANIOS_SERIE_TEMPORAL">
+		AND ANIO in <iterate property="anios" conjunction="," open="(" close=")">$anios[]$</iterate>
+	</sql>
+
+	<sql id="INICIAL_SERIE_TEMPORAL">
+		<dynamic>
+		SELECT 
+		<include refid="includes.SELECT_DES_DESCRIPTIVO"/>	
+			<isEqual property="distribucionAltas" compareValue="true">    
+				<iterate property="anios" conjunction=",">
+					tasaind_$anios[]$_f as "tasaind_$anios[]$_i"
+				</iterate>
+			</isEqual>
+			<isNotEqual property="distribucionAltas" compareValue="true">
+				<iterate property="anios" conjunction=",">
+				    <isEqual property="temporalSerieColumn.rate" compareValue="true">
+						tasaind_$anios[]$_f as "tasaind_$anios[]$_f"
+					</isEqual>
+					<isNotEqual property="temporalSerieColumn.rate" compareValue="true">
+					    tasaind_$anios[]$_f as "tasaind_$anios[]$_i"
+					</isNotEqual>
+				</iterate>
+			</isNotEqual>
+		FROM(
+		<isEqual property="ejeAnalisisEtiqueta" compareValue="valor_base">
+			<isEqual property="grupoIndicadorEtiqueta" compareValue="ambulatorizacion_quirurgica">
+			SELECT 
+				<include refid="includes.SELECT_COD_DESCRIPTIVO"/>
+					<iterate property="anios" conjunction=",">
+						tasaind_$anios[]$_f/NULLIF(tasaind_$anioBase$_f,0) AS tasaind_$anios[]$_f
+					</iterate>
+			FROM (
+			</isEqual>
+			<isNotEqual property="grupoIndicadorEtiqueta" compareValue="ambulatorizacion_quirurgica">
+			SELECT 
+				<include refid="includes.SELECT_COD_DESCRIPTIVO"/>
+					<iterate property="anios" conjunction=",">
+						tasaind_$anios[]$_f/NULLIF(tasaind_$anioBase$_f,0) AS tasaind_$anios[]$_f
+					</iterate>
+			FROM (
+			</isNotEqual>
+		</isEqual>
+		<isEqual property="ejeAnalisisEtiqueta" compareValue="estandar_intraserie">
+		SELECT 
+			<include refid="includes.SELECT_COD_DESCRIPTIVO"/>
+				<iterate property="anios" conjunction=",">
+					tasaind_$anios[]$_f/NULLIF(tasa_ind_total_f,0) AS tasaind_$anios[]$_f
+				</iterate>
+		FROM (
+		</isEqual>
+			SELECT
+					<include refid="includes.SELECT_COD_DESCRIPTIVO"/>	    
+					<isEqual property="grupoIndicadorEtiqueta" compareValue="realizacion_np">
+					    (numero_altas_ind_total) AS tasa_ind_total_f,
+					    <iterate property="anios" conjunction=",">
+							(numero_altas_ind_$anios[]$) AS tasaind_$anios[]$_f
+						</iterate>
+				    </isEqual>
+					<isEqual property="distribucionAltas" compareValue="true">
+					    (numero_altas_ind_total) AS tasa_ind_total_f,
+					    <iterate property="anios" conjunction=",">
+							(numero_altas_ind_$anios[]$) AS tasaind_$anios[]$_f
+						</iterate>				    
+				    </isEqual>   
+					<isNotEqual property="grupoIndicadorEtiqueta" compareValue="realizacion_np">
+					<isNotEqual property="distribucionAltas" compareValue="true">
+					    <isEqual property="temporalSerieColumn.rate" compareValue="true">
+						    100.0*(numero_altas_ind_total)/NULLIF(1.0*numero_altas_total,0) AS tasa_ind_total_f,
+						    <iterate property="anios" conjunction=",">
+								100.0*(numero_altas_ind_$anios[]$)/NULLIF(1.0*numero_altas_$anios[]$,0) AS tasaind_$anios[]$_f
+							</iterate>
+						</isEqual>
+						<isNotEqual property="temporalSerieColumn.rate" compareValue="true">
+						    numero_altas_ind_total AS tasa_ind_total_f,
+						    <iterate property="anios" conjunction=",">
+								numero_altas_ind_$anios[]$ AS tasaind_$anios[]$_f
+							</iterate>
+						</isNotEqual>
+				    </isNotEqual>
+				    </isNotEqual>
+				FROM (
+					SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_G"/> 
+					    SUM(1.0*numero_altas) AS numero_altas_total,
+    					SUM(1.0*numero_altas_ind) AS numero_altas_ind_total,
+					    <iterate property="anios" conjunction=",">
+							SUM(CASE WHEN Anio=$anios[]$ THEN 1.0*numero_altas ELSE 0.0 END) as numero_altas_$anios[]$,
+					    	SUM(CASE WHEN Anio=$anios[]$ THEN 1.0*numero_altas_ind ELSE 0.0 END) as numero_altas_ind_$anios[]$
+						</iterate>
+					FROM (
+		</dynamic>
+	</sql>
+	
+	<sql id="FINAL_SERIE_TEMPORAL">
+		<dynamic>
+						) altas <include refid="includes.GROUP_BY_LIST"/>
+					) altas
+				<isEqual property="ejeAnalisisEtiqueta" compareValue="valor_base">
+					) altas
+				</isEqual>
+				<isEqual property="ejeAnalisisEtiqueta" compareValue="estandar_intraserie">
+					) altas
+				</isEqual>
+			) altas
+			<include refid="includes.INNER_JOIN_DESCRIPTIVO"/>	 
+		</dynamic>   
+	</sql>
+	<sql id="FINAL_SERIE_TEMPORAL2">
+		<dynamic>
+				<isEqual property="ejeAnalisisEtiqueta" compareValue="valor_base">
+					) altas
+				</isEqual>
+				<isEqual property="ejeAnalisisEtiqueta" compareValue="estandar_intraserie">
+					) altas
+				</isEqual>
+			) altas
+			<include refid="includes.INNER_JOIN_DESCRIPTIVO"/>	 
+		</dynamic>   
+	</sql>
+</sqlMap>

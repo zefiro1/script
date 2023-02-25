@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="distribucionGRD">
+	<sql id="SELECT_LIST_DESCRIPTIVO">
+		SELECT 
+			<dynamic>			
+				<isNotEmpty property="selectList">
+		 			<iterate property="selectList" conjunction="," close=",">$selectList[]$ </iterate>
+				</isNotEmpty>
+		 		<isEmpty property="selectList">
+		  			NULL AS total_desc,
+		 		</isEmpty>
+			</dynamic>
+			null AS HOSPITALES_COUNT,	
+			SUM(CASE WHEN (frecuencia >= 0.10) THEN 1 ELSE 0 END) AS "procedimientos10_i",
+			SUM(CASE WHEN (frecuencia >= 0.20) THEN 1 ELSE 0 END) AS "procedimientos20_i",
+			SUM(CASE WHEN (frecuencia >= 0.40) THEN 1 ELSE 0 END) AS "procedimientos40_i",
+			SUM(CASE WHEN (frecuencia >= 0.60) THEN 1 ELSE 0 END) AS "procedimientos60_i",
+			SUM(CASE WHEN (frecuencia >= 0.80) THEN 1 ELSE 0 END) AS "procedimientos80_i",
+			SUM(CASE WHEN (frecuencia >= 0.90) THEN 1 ELSE 0 END) AS "procedimientos90_i"
+		FROM casemix altas
+		WHERE Anio=$anio$ 
+			<isEqual property="indicadorEtiqueta" compareValue="ProcedimientosGRDApr">
+			    AND codigo_grd_apr is not null
+			</isEqual>
+			<isEqual property="indicadorEtiqueta" compareValue="ProcedimientosGRD">
+			    AND codigo_grd is not null
+			</isEqual>
+		<include refid="includes.WHERE_DESCRIPTIVO"/>
+		GROUP BY ROLLUP(<include refid="includes.SELECT_COUNT_COD_DESCRIPTIVO"/>)
+		<include refid="includes.ORDER_BY"/>
+	</sql>
+
+	<sql id="SELECT_LIST_SERIE_TEMPORAL">
+   
+	</sql>
+	
+</sqlMap>

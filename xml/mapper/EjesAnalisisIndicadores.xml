@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="EjesAnalisisIndicadores">
+
+	<typeAlias alias="EjesAnalisisIndicadores" type="es.msc.aemsc.business.vo.EjesAnalisisIndicadoresVO"/>
+
+	<!--
+	<cacheModel id="EjesAnalisisIndicadoresCache" type="LRU">
+		<flushInterval hours="24"/>
+		<flushOnExecute statement="EjesAnalisisIndicadores.Insert"/>
+		<flushOnExecute statement="EjesAnalisisIndicadores.Update"/>
+		<flushOnExecute statement="EjesAnalisisIndicadores.Delete"/>
+		<flushOnExecute statement="EjesAnalisisIndicadores.DeleteAll"/>
+		<property name="size" value="1000" />
+	</cacheModel>
+	-->
+
+	<resultMap id="EjesAnalisisIndicadoresMapping" class="EjesAnalisisIndicadores">
+		<result property="indicadorId"       column="INDICADOR_ID"      jdbcType="INTEGER"   javaType="java.lang.Integer" />
+		<result property="ejeAnalisisId"     column="EJE_ANALISIS_ID"   jdbcType="TINYINT"   javaType="java.lang.Short"   />
+		<result property="anio"              column="ANIO"              jdbcType="TINYINT"   javaType="java.lang.Integer"   />
+	</resultMap>
+	
+	<resultMap id="EjesAnalisisRangeMapping" class="EjesAnalisisIndicadores">
+		<result property="ejeAnalisisId"     	column="EJE_ANALISIS_ID"   jdbcType="TINYINT"		javaType="java.lang.Short"   />
+		<result property="anioMax"              column="ANIO_MAX"			jdbcType="TINYINT"  	javaType="java.lang.Integer"   />
+		<result property="anioMin"              column="ANIO_MIN"			jdbcType="TINYINT"  	javaType="java.lang.Integer"   />
+	</resultMap>
+
+
+	<!-- ====== SelectAll ====== -->
+
+	<select id="SelectAll"  resultMap="EjesAnalisisIndicadoresMapping">
+		SELECT
+			INDICADOR_ID,
+			EJE_ANALISIS_ID,
+			ANIO
+		FROM
+			MD_EJES_ANALISIS_INDICADORES
+	</select>
+
+	<!-- ====== CountAll ====== -->
+
+	<select id="CountAll"  resultClass="java.lang.Integer">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_EJES_ANALISIS_INDICADORES
+	</select>
+
+	<!-- ====== SelectById ====== -->
+
+	<select id="SelectById"  resultMap="EjesAnalisisIndicadoresMapping"  parameterClass="EjesAnalisisIndicadores">
+		SELECT
+			INDICADOR_ID,
+			EJE_ANALISIS_ID,
+			ANIO
+		FROM
+			MD_EJES_ANALISIS_INDICADORES
+		WHERE
+			INDICADOR_ID = #indicadorId#
+		AND
+			EJE_ANALISIS_ID = #ejeAnalisisId#
+	</select>
+
+	<!-- ====== SelectList ====== -->
+
+	<select id="SelectList"  resultMap="EjesAnalisisIndicadoresMapping"  parameterClass="EjesAnalisisIndicadores">
+		SELECT
+			INDICADOR_ID,
+			EJE_ANALISIS_ID,
+			MD_EJES_ANALISIS_INDICADORES.ANIO AS ANIO
+		FROM
+			MD_EJES_ANALISIS_INDICADORES INNER JOIN MD_ANIOS ON MD_EJES_ANALISIS_INDICADORES.ANIO=MD_ANIOS.ANIO
+		<dynamic prepend="WHERE">
+			MD_ANIOS.ACTIVO = 1 AND
+			<isNotNull prepend="AND" property="indicadorId">
+				INDICADOR_ID = #indicadorId#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="ejeAnalisisId">
+				EJE_ANALISIS_ID = #ejeAnalisisId#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="anio">
+				ANIO = #anio#
+			</isNotNull>
+		</dynamic>
+		ORDER BY MD_EJES_ANALISIS_INDICADORES.ANIO
+	</select>
+	
+	<select id="SelectListAdmin"  resultMap="EjesAnalisisIndicadoresMapping"  parameterClass="EjesAnalisisIndicadores">
+		SELECT
+			INDICADOR_ID,
+			EJE_ANALISIS_ID,
+			ANIO AS ANIO
+		FROM
+			MD_EJES_ANALISIS_INDICADORES
+		<dynamic prepend="WHERE">
+			<isNotNull prepend="AND" property="indicadorId">
+				INDICADOR_ID = #indicadorId#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="ejeAnalisisId">
+				EJE_ANALISIS_ID = #ejeAnalisisId#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="anio">
+				ANIO = #anio#
+			</isNotNull>
+		</dynamic>
+		ORDER BY ANIO
+	</select>
+	
+	<!-- ====== CountList ====== -->
+
+	<select id="CountList"  resultClass="java.lang.Integer"  parameterClass="EjesAnalisisIndicadores">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_EJES_ANALISIS_INDICADORES
+		<dynamic prepend="WHERE">
+
+			<isNotNull prepend="AND" property="indicadorId">
+				INDICADOR_ID = #indicadorId#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="ejeAnalisisId">
+				EJE_ANALISIS_ID = #ejeAnalisisId#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="anio">
+				ANIO = #anio#
+			</isNotNull>
+		</dynamic>
+	</select>
+
+	<!-- ====== Insert ====== -->
+
+	<insert id="Insert"  parameterClass="EjesAnalisisIndicadores">
+		INSERT INTO MD_EJES_ANALISIS_INDICADORES
+			(
+				INDICADOR_ID,
+				EJE_ANALISIS_ID,
+				ANIO
+			)
+		VALUES
+			(
+				#indicadorId:INTEGER#,
+				#ejeAnalisisId:TINYINT#,
+				#anio:TINYINT#
+			)
+	</insert>
+
+	<!-- ====== Update ====== -->
+
+	<update id="Update"  parameterClass="EjesAnalisisIndicadores">
+		UPDATE MD_EJES_ANALISIS_INDICADORES
+		SET
+			INDICADOR_ID = #indicadorId:INTEGER#,
+			EJE_ANALISIS_ID = #ejeAnalisisId:TINYINT#,
+			ANIO = #anio:TINYINT#
+		WHERE
+			INDICADOR_ID = #indicadorId#
+		AND
+			EJE_ANALISIS_ID = #ejeAnalisisId#
+		AND
+			ANIO = #anio:TINYINT#
+	</update>
+
+	<!-- ====== Delete ====== -->
+
+	<delete id="Delete"  parameterClass="EjesAnalisisIndicadores">
+		DELETE FROM MD_EJES_ANALISIS_INDICADORES
+		WHERE (1=1)
+		<isNotNull prepend="AND" property="indicadorId">
+			INDICADOR_ID = #indicadorId#
+		</isNotNull>
+
+		<isNotNull prepend="AND" property="ejeAnalisisId">
+			EJE_ANALISIS_ID = #ejeAnalisisId#
+		</isNotNull>
+
+		<isNotNull prepend="AND" property="anio">
+			ANIO = #anio#
+		</isNotNull>
+	</delete>
+
+	<!-- ====== DeleteAll ====== -->
+
+	<delete id="DeleteAll">
+		DELETE FROM MD_EJES_ANALISIS_INDICADORES
+	</delete>
+	
+	<!-- ====== Rango de Anios por Eje ====== -->
+	
+	<select id="SelectAniosRangeByEje"  resultMap="EjesAnalisisRangeMapping">
+		SELECT
+			MIN(ANIO) as ANIO_MIN, MAX(ANIO) as ANIO_MAX, EJE_ANALISIS_ID
+		FROM MD_EJES_ANALISIS_INDICADORES
+		GROUP BY EJE_ANALISIS_ID
+	</select>
+
+</sqlMap>
+

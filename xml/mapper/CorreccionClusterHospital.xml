@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="CorreccionClusterHospital">
+
+	<typeAlias alias="CorreccionClusterHospital" type="es.msc.aemsc.business.vo.CorreccionClusterHospitalVO"/>
+
+	<!--
+	<cacheModel id="CorreccionClusterHospitalCache" type="LRU">
+		<flushInterval hours="24"/>
+		<flushOnExecute statement="CorreccionClusterHospital.Insert"/>
+		<flushOnExecute statement="CorreccionClusterHospital.Update"/>
+		<flushOnExecute statement="CorreccionClusterHospital.Delete"/>
+		<flushOnExecute statement="CorreccionClusterHospital.DeleteAll"/>
+		<property name="size" value="1000" />
+	</cacheModel>
+	-->
+
+	<resultMap id="CorreccionClusterHospitalMapping" class="CorreccionClusterHospital">
+		<result property="indicadorId"                  column="INDICADOR_ID"                 jdbcType="INTEGER"   javaType="java.lang.Integer" />
+		<result property="clusterHospital"              column="CLUSTER_HOSPITAL"             jdbcType="INTEGER"   javaType="java.lang.Integer" />
+		<result property="numHospitales"                column="NUM_HOSPITALES"               jdbcType="INTEGER"   javaType="java.lang.Integer" />
+		<result property="numAltas"                     column="NUM_ALTAS"                    jdbcType="INTEGER"   javaType="java.lang.Integer" />
+		<result property="valorMedio"                   column="VALOR_MEDIO"                  jdbcType="DOUBLE"    javaType="java.lang.Double"  />
+		<result property="valorMedioAjustado"           column="VALOR_MEDIO_AJUSTADO"         jdbcType="DOUBLE"    javaType="java.lang.Double"  />
+		<result property="numHospitalesPrc25"           column="NUM_HOSPITALES_PRC25"         jdbcType="INTEGER"   javaType="java.lang.Integer" />
+		<result property="numAltasPrc25"                column="NUM_ALTAS_PRC25"              jdbcType="INTEGER"   javaType="java.lang.Integer" />
+		<result property="valorMedioPrc25"              column="VALOR_MEDIO_PRC25"            jdbcType="DOUBLE"    javaType="java.lang.Double"  />
+		<result property="valorMedioAjustadoPrc25"      column="VALOR_MEDIO_AJUSTADO_PRC25"   jdbcType="DOUBLE"    javaType="java.lang.Double"  />
+		<result property="clusterHospitalDesc"          column="CLUSTER_HOSPITAL_DESC"        jdbcType="VARCHAR"   javaType="java.lang.String"  />
+		<result property="anio"              			column="ANIO"           			  jdbcType="INTEGER"   javaType="java.lang.Integer" />
+	</resultMap>
+
+	<!-- ====== CORRECCION POR CLUSTER DE HOSPITAL para un indicador ====== -->
+
+	<select id="SelectAllByIndicadorId"  resultMap="CorreccionClusterHospitalMapping" parameterClass="java.lang.String">
+		SELECT 
+			CCH.INDICADOR_ID AS INDICADOR_ID,
+			NVL(CCH.CLUSTER_HOSPITAL,0) AS CLUSTER_HOSPITAL,
+			CCH.NUM_HOSPITALES AS NUM_HOSPITALES, 
+			CCH.NUM_ALTAS AS NUM_ALTAS, 
+			CCH.VALOR_MEDIO AS VALOR_MEDIO,
+			CCH.NUM_HOSPITALES_PRC25 AS NUM_HOSPITALES_PRC25, 
+			CCH.NUM_ALTAS_PRC25 AS NUM_ALTAS_PRC25, 
+			CCH.VALOR_MEDIO_PRC25 VALOR_MEDIO_PRC25,
+			CCH.VALOR_MEDIO_AJUSTADO VALOR_MEDIO_AJUSTADO, 
+			CCH.VALOR_MEDIO_AJUSTADO_PRC25 VALOR_MEDIO_AJUSTADO_PRC25,
+			'variable'||VIC.VARIABLE_INFLUENCIA_ID||'.codigo'||VIC.CODIGO AS CLUSTER_HOSPITAL_DESC,
+			CCH.ANIO AS ANIO
+		FROM MD_CORRECCION_CLUSTER_HOSPITAL CCH
+			LEFT JOIN MD_VARS_INF_CODIGOS VIC
+			ON CCH.CLUSTER_HOSPITAL = VIC.CODIGO
+			AND VIC.VARIABLE_INFLUENCIA_ID = 12
+		WHERE CCH.INDICADOR_ID = #indicadorId# AND CCH.ANIO=#anio#
+		ORDER BY CLUSTER_HOSPITAL
+	</select>
+
+	<!-- ====== SelectAll ====== -->
+
+	<select id="SelectAll"  resultMap="CorreccionClusterHospitalMapping">
+		SELECT
+			INDICADOR_ID,
+			CLUSTER_HOSPITAL,
+			NUM_HOSPITALES,
+			NUM_ALTAS,
+			VALOR_MEDIO,
+			VALOR_MEDIO_AJUSTADO,
+			NUM_HOSPITALES_PRC25,
+			NUM_ALTAS_PRC25,
+			VALOR_MEDIO_PRC25,
+			VALOR_MEDIO_AJUSTADO_PRC25,
+			'' as CLUSTER_HOSPITAL_DESC,
+			ANIO
+		FROM
+			MD_CORRECCION_CLUSTER_HOSPITAL
+	</select>
+
+	<!-- ====== CountAll ====== -->
+
+	<select id="CountAll"  resultClass="java.lang.Integer">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_CORRECCION_CLUSTER_HOSPITAL
+	</select>
+
+	<!-- ====== SelectList ====== -->
+
+	<select id="SelectList"  resultMap="CorreccionClusterHospitalMapping"  parameterClass="CorreccionClusterHospital">
+		SELECT
+			CCH.INDICADOR_ID AS INDICADOR_ID,
+			NVL(CCH.CLUSTER_HOSPITAL,0) AS CLUSTER_HOSPITAL,
+			CCH.NUM_HOSPITALES AS NUM_HOSPITALES, 
+			CCH.NUM_ALTAS AS NUM_ALTAS, 
+			CCH.VALOR_MEDIO AS VALOR_MEDIO,
+			CCH.NUM_HOSPITALES_PRC25 AS NUM_HOSPITALES_PRC25, 
+			CCH.NUM_ALTAS_PRC25 AS NUM_ALTAS_PRC25, 
+			CCH.VALOR_MEDIO_PRC25 VALOR_MEDIO_PRC25,
+			CCH.VALOR_MEDIO_AJUSTADO VALOR_MEDIO_AJUSTADO, 
+			CCH.VALOR_MEDIO_AJUSTADO_PRC25 VALOR_MEDIO_AJUSTADO_PRC25,
+			'variable'||VIC.VARIABLE_INFLUENCIA_ID||'.codigo'||VIC.CODIGO AS CLUSTER_HOSPITAL_DESC,
+			CCH.ANIO AS ANIO
+		FROM MD_CORRECCION_CLUSTER_HOSPITAL CCH
+			LEFT JOIN MD_VARS_INF_CODIGOS VIC
+			ON CCH.CLUSTER_HOSPITAL = VIC.CODIGO
+			AND VIC.VARIABLE_INFLUENCIA_ID = 12
+		<dynamic prepend="WHERE">
+
+			<isNotNull prepend="AND" property="indicadorId">
+				INDICADOR_ID = #indicadorId#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="clusterHospital">
+				CLUSTER_HOSPITAL = #clusterHospital#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="numHospitales">
+				NUM_HOSPITALES = #numHospitales#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="numAltas">
+				NUM_ALTAS = #numAltas#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="valorMedio">
+				VALOR_MEDIO = #valorMedio#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="valorMedioAjustado">
+				VALOR_MEDIO_AJUSTADO = #valorMedioAjustado#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="numHospitalesPrc25">
+				NUM_HOSPITALES_PRC25 = #numHospitalesPrc25#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="numAltasPrc25">
+				NUM_ALTAS_PRC25 = #numAltasPrc25#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="valorMedioPrc25">
+				VALOR_MEDIO_PRC25 = #valorMedioPrc25#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="valorMedioAjustadoPrc25">
+				VALOR_MEDIO_AJUSTADO_PRC25 = #valorMedioAjustadoPrc25#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="anio">
+				ANIO = #anio#
+			</isNotNull>
+		</dynamic>
+		ORDER BY CLUSTER_HOSPITAL
+	</select>
+
+	<!-- ====== CountList ====== -->
+
+	<select id="CountList"  resultClass="java.lang.Integer"  parameterClass="CorreccionClusterHospital">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_CORRECCION_CLUSTER_HOSPITAL
+		<dynamic prepend="WHERE">
+
+			<isNotNull prepend="AND" property="indicadorId">
+				INDICADOR_ID = #indicadorId#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="clusterHospital">
+				CLUSTER_HOSPITAL = #clusterHospital#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="numHospitales">
+				NUM_HOSPITALES = #numHospitales#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="numAltas">
+				NUM_ALTAS = #numAltas#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="valorMedio">
+				VALOR_MEDIO = #valorMedio#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="valorMedioAjustado">
+				VALOR_MEDIO_AJUSTADO = #valorMedioAjustado#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="numHospitalesPrc25">
+				NUM_HOSPITALES_PRC25 = #numHospitalesPrc25#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="numAltasPrc25">
+				NUM_ALTAS_PRC25 = #numAltasPrc25#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="valorMedioPrc25">
+				VALOR_MEDIO_PRC25 = #valorMedioPrc25#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="valorMedioAjustadoPrc25">
+				VALOR_MEDIO_AJUSTADO_PRC25 = #valorMedioAjustadoPrc25#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="anio">
+				ANIO = #anio#
+			</isNotNull>
+		</dynamic>
+	</select>
+
+	<!-- ====== Insert ====== -->
+
+	<insert id="Insert"  parameterClass="CorreccionClusterHospital">
+		INSERT INTO MD_CORRECCION_CLUSTER_HOSPITAL
+			(
+				INDICADOR_ID,
+				CLUSTER_HOSPITAL,
+				NUM_HOSPITALES,
+				NUM_ALTAS,
+				VALOR_MEDIO,
+				VALOR_MEDIO_AJUSTADO,
+				NUM_HOSPITALES_PRC25,
+				NUM_ALTAS_PRC25,
+				VALOR_MEDIO_PRC25,
+				VALOR_MEDIO_AJUSTADO_PRC25,
+				ANIO
+			)
+		VALUES
+			(
+				#indicadorId:INTEGER#,
+				#clusterHospital:INTEGER#,
+				#numHospitales:INTEGER#,
+				#numAltas:INTEGER#,
+				#valorMedio:DOUBLE#,
+				#valorMedioAjustado:DOUBLE#,
+				#numHospitalesPrc25:INTEGER#,
+				#numAltasPrc25:INTEGER#,
+				#valorMedioPrc25:DOUBLE#,
+				#valorMedioAjustadoPrc25:DOUBLE#,
+				#anio:INTEGER#
+			)
+	</insert>
+
+	<!-- ====== Update ====== -->
+
+	<update id="Update"  parameterClass="CorreccionClusterHospital">
+		UPDATE MD_CORRECCION_CLUSTER_HOSPITAL
+		SET
+			INDICADOR_ID = #indicadorId:INTEGER#,
+			CLUSTER_HOSPITAL = #clusterHospital:INTEGER#,
+			NUM_HOSPITALES = #numHospitales:INTEGER#,
+			NUM_ALTAS = #numAltas:INTEGER#,
+			VALOR_MEDIO = #valorMedio:DOUBLE#,
+			VALOR_MEDIO_AJUSTADO = #valorMedioAjustado:DOUBLE#,
+			NUM_HOSPITALES_PRC25 = #numHospitalesPrc25:INTEGER#,
+			NUM_ALTAS_PRC25 = #numAltasPrc25:INTEGER#,
+			VALOR_MEDIO_PRC25 = #valorMedioPrc25:DOUBLE#,
+			VALOR_MEDIO_AJUSTADO_PRC25 = #valorMedioAjustadoPrc25:DOUBLE#,
+			ANIO = #anio:INTEGER#
+		WHERE
+			INDICADOR_ID = #indicadorId#
+		<isNotEmpty property="clusterHospital" prepend="AND">
+			CLUSTER_HOSPITAL = #clusterHospital#
+		</isNotEmpty>
+		<isNotEmpty property="anio" prepend="AND">
+			ANIO = #anio#
+		</isNotEmpty>
+	</update>
+
+	<!-- ====== Delete ====== -->
+
+	<delete id="Delete"  parameterClass="CorreccionClusterHospital">
+		DELETE FROM MD_CORRECCION_CLUSTER_HOSPITAL
+		WHERE
+			INDICADOR_ID = #indicadorId#
+		<isNotEmpty property="clusterHospital" prepend="AND">
+			CLUSTER_HOSPITAL = #clusterHospital#
+		</isNotEmpty>
+		<isNotEmpty property="anio" prepend="AND">
+			ANIO = #anio#
+		</isNotEmpty>
+	</delete>
+
+	<!-- ====== DeleteAll ====== -->
+
+	<delete id="DeleteAll">
+		DELETE FROM MD_CORRECCION_CLUSTER_HOSPITAL
+	</delete>
+
+</sqlMap>
+

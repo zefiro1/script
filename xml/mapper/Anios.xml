@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+
+<sqlMap namespace="Anios">
+
+	<typeAlias alias="Anios" type="es.msc.aemsc.business.vo.AniosVO"/>
+
+	<!--
+	<cacheModel id="AniosCache" type="LRU">
+		<flushInterval hours="24"/>
+		<flushOnExecute statement="Anios.Insert"/>
+		<flushOnExecute statement="Anios.Update"/>
+		<flushOnExecute statement="Anios.Delete"/>
+		<flushOnExecute statement="Anios.DeleteAll"/>
+		<property name="size" value="1000" />
+	</cacheModel>
+	-->
+
+	<resultMap id="AniosMapping" class="Anios">
+		<result property="anio"          column="ANIO"          jdbcType="SMALLINT"    javaType="java.lang.Short"    />
+		<result property="fechaCarga"    column="FECHA_CARGA"   jdbcType="TIMESTAMP"   javaType="java.sql.Timestamp" />
+		<result property="activo"        column="ACTIVO"        jdbcType="BIT"         javaType="java.lang.Boolean"  />
+	</resultMap>
+
+
+	<!-- ====== SelectAll ====== -->
+
+	<select id="SelectAll"  resultMap="AniosMapping">
+		SELECT
+			ANIO,
+			FECHA_CARGA,
+			ACTIVO
+		FROM
+			MD_ANIOS
+	</select>
+
+	<!-- ====== CountAll ====== -->
+
+	<select id="CountAll"  resultClass="java.lang.Integer">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_ANIOS
+	</select>
+
+	<!-- ====== SelectById ====== -->
+
+	<select id="SelectById"  resultMap="AniosMapping"  parameterClass="Anios">
+		SELECT
+			ANIO,
+			FECHA_CARGA,
+			ACTIVO
+		FROM
+			MD_ANIOS
+		WHERE
+			ANIO = #anio#
+	</select>
+
+	<!-- ====== SelectList ====== -->
+
+	<select id="SelectList"  resultMap="AniosMapping"  parameterClass="Anios">
+		SELECT
+			ANIO,
+			FECHA_CARGA,
+			ACTIVO
+		FROM
+			MD_ANIOS
+		<dynamic prepend="WHERE">
+
+			<isNotNull prepend="AND" property="anio">
+				ANIO = #anio#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="fechaCarga">
+				FECHA_CARGA = #fechaCarga#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="activo">
+				ACTIVO = #activo#
+			</isNotNull>
+
+		</dynamic>
+		<include refid="includes.ORDER_BY" />
+	</select>
+
+	<!-- ====== CountList ====== -->
+
+	<select id="CountList"  resultClass="java.lang.Integer"  parameterClass="Anios">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_ANIOS
+		<dynamic prepend="WHERE">
+
+			<isNotNull prepend="AND" property="anio">
+				ANIO = #anio#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="fechaCarga">
+				FECHA_CARGA = #fechaCarga#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="activo">
+				ACTIVO = #activo#
+			</isNotNull>
+
+		</dynamic>
+	</select>
+
+	<!-- ====== Insert ====== -->
+
+	<insert id="Insert"  parameterClass="Anios">
+		INSERT INTO MD_ANIOS
+			(
+				ANIO,
+				FECHA_CARGA,
+				ACTIVO
+			)
+		VALUES
+			(
+				#anio:SMALLINT#,
+				#fechaCarga:TIMESTAMP#,
+				#activo:BIT#
+			)
+	</insert>
+
+	<!-- ====== Update ====== -->
+
+	<update id="Update"  parameterClass="Anios">
+		UPDATE MD_ANIOS
+		SET
+			ANIO = #anio:SMALLINT#,
+			FECHA_CARGA = #fechaCarga:TIMESTAMP#,
+			ACTIVO = #activo:BIT#
+		WHERE
+			ANIO = #anio#
+	</update>
+
+	<!-- ====== Delete ====== -->
+
+	<delete id="Delete"  parameterClass="Anios">
+		DELETE FROM MD_ANIOS
+		WHERE
+			ANIO = #anio#
+	</delete>
+
+	<!-- ====== DeleteAll ====== -->
+
+	<delete id="DeleteAll">
+		DELETE FROM MD_ANIOS
+	</delete>
+
+</sqlMap>
+

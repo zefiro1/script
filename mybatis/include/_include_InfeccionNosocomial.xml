@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><mapper namespace="includeInfeccionNosocomial">
+
+	<sql id="SELECT_LIST">
+		<if test="indicadorEtiqueta == 'INFECCIONNOSOCOMIAL'">
+			<if test="ejeAnalisisEtiqueta == 'descriptivo_basico'">
+				<include refid="includeInfeccionNosocomialTotal.SELECT_LIST_DESCRIPTIVO"/>
+			</if>
+			<if test="ejeAnalisisEtiqueta == 'serie_temporal'">
+				<include refid="includeInfeccionNosocomialTotal.SELECT_LIST_SERIE_TEMPORAL"/>
+			</if>
+			<if test="ejeAnalisisEtiqueta == 'valor_base'">
+				<include refid="includeInfeccionNosocomialTotal.SELECT_LIST_SERIE_TEMPORAL"/>
+			</if>
+			<if test="ejeAnalisisEtiqueta == 'estandar_intraserie'">
+				<include refid="includeInfeccionNosocomialTotal.SELECT_LIST_DESCRIPTIVO"/>
+			</if>
+			
+		</if>
+	</sql>
+	
+</mapper>

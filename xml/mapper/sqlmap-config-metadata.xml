@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE sqlMapConfig PUBLIC  "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+
+<sqlMapConfig>
+
+	<settings
+	  lazyLoadingEnabled="true"
+	  cacheModelsEnabled="true"
+	  enhancementEnabled="true"
+	  useStatementNamespaces="true"
+	  maxSessions="64"
+	  maxTransactions="8"
+	  maxRequests="128"
+	  />
+
+	<!-- mapeos para el metadata de la app -->
+
+	<sqlMap resource="ibatis/aemsc/_includes.xml"/>
+	
+	<sqlMap resource="ibatis/aemsc/Anios.xml"/>
+	<sqlMap resource="ibatis/aemsc/EjesAnalisis.xml"/>
+	<sqlMap resource="ibatis/aemsc/EjesAnalisisIndicadores.xml"/>		
+	<sqlMap resource="ibatis/aemsc/Indicadores.xml"/>
+	<sqlMap resource="ibatis/aemsc/IndicadoresEjesAnalisisAnios.xml"/>	
+	<sqlMap resource="ibatis/aemsc/VariablesInfluencia.xml"/>
+	<sqlMap resource="ibatis/aemsc/VariablesInfluenciaIndicadores.xml"/>
+	<sqlMap resource="ibatis/aemsc/VariablesInfluenciaIndicadoresRoles.xml"/>
+	<sqlMap resource="ibatis/aemsc/VariablesInfluenciaCodigos.xml"/>
+	<sqlMap resource="ibatis/aemsc/GrupoIndicador.xml"/>
+	<sqlMap resource="ibatis/aemsc/Usuarios.xml"/>
+	<sqlMap resource="ibatis/aemsc/UsuariosRoles.xml"/>
+
+	<sqlMap resource="ibatis/aemsc/CorreccionClusterHospital.xml"/>
+	<sqlMap resource="ibatis/aemsc/CorreccionEstadisticas.xml"/>
+	<sqlMap resource="ibatis/aemsc/CorreccionIndividual.xml"/>
+	<sqlMap resource="ibatis/aemsc/CorreccionTipoHospital.xml"/>
+		
+	<sqlMap resource="ibatis/aemsc/RelevanciaVariables.xml"/>
+	<sqlMap resource="ibatis/aemsc/RelevanciaVariablesPares.xml"/>
+	<sqlMap resource="ibatis/aemsc/RelevanciaEstadosIncremento.xml"/>
+	<sqlMap resource="ibatis/aemsc/RelevanciaEstadosDecremento.xml"/>
+	<sqlMap resource="ibatis/aemsc/RelevanciaEstados.xml"/>
+
+	<!-- Logger -->
+	<sqlMap resource="ibatis/aemsc/Log.xml"/>
+	
+	<!-- el ultimo para poder usar las caches del resto --> 
+	<sqlMap resource="ibatis/aemsc/LookUp.xml"/>
+
+</sqlMapConfig>
+

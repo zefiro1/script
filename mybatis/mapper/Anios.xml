@@ -1,0 +1,142 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace="Anios">
+
+	
+
+	
+
+	<resultMap id="AniosMapping" type="Anios">
+		<result property="anio" column="ANIO"/>
+		<result property="fechaCarga" column="FECHA_CARGA"/>
+		<result property="activo" column="ACTIVO"/>
+	</resultMap>
+
+
+	
+
+	<select id="SelectAll" resultType="AniosMapping">
+		SELECT
+			ANIO,
+			FECHA_CARGA,
+			ACTIVO
+		FROM
+			MD_ANIOS
+	</select>
+
+	
+
+	<select id="CountAll">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_ANIOS
+	</select>
+
+	
+
+	<select id="SelectById" parameterType="Anios" resultType="AniosMapping">
+		SELECT
+			ANIO,
+			FECHA_CARGA,
+			ACTIVO
+		FROM
+			MD_ANIOS
+		WHERE
+			ANIO = #{anio}
+	</select>
+
+	
+
+	<select id="SelectList" parameterType="Anios" resultType="AniosMapping">
+		SELECT
+			ANIO,
+			FECHA_CARGA,
+			ACTIVO
+		FROM
+			MD_ANIOS
+		<where>
+
+			<if test="anio != null">AND 
+				ANIO = #{anio}
+			</if>
+
+			<if test="fechaCarga != null">AND 
+				FECHA_CARGA = #{fechaCarga}
+			</if>
+
+			<if test="activo != null">AND 
+				ACTIVO = #{activo}
+			</if>
+
+		</where>
+		<include refid="includes.ORDER_BY"/>
+	</select>
+
+	
+
+	<select id="CountList" parameterType="Anios">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_ANIOS
+		<where>
+
+			<if test="anio != null">AND 
+				ANIO = #{anio}
+			</if>
+
+			<if test="fechaCarga != null">AND 
+				FECHA_CARGA = #{fechaCarga}
+			</if>
+
+			<if test="activo != null">AND 
+				ACTIVO = #{activo}
+			</if>
+
+		</where>
+	</select>
+
+	
+
+	<insert id="Insert" parameterType="Anios">
+		INSERT INTO MD_ANIOS
+			(
+				ANIO,
+				FECHA_CARGA,
+				ACTIVO
+			)
+		VALUES
+			(
+				#{anio},
+				#{fechaCarga},
+				#{activo}
+			)
+	</insert>
+
+	
+
+	<update id="Update" parameterType="Anios">
+		UPDATE MD_ANIOS
+		SET
+			ANIO = #{anio},
+			FECHA_CARGA = #{fechaCarga},
+			ACTIVO = #{activo}
+		WHERE
+			ANIO = #{anio}
+	</update>
+
+	
+
+	<delete id="Delete" parameterType="Anios">
+		DELETE FROM MD_ANIOS
+		WHERE
+			ANIO = #{anio}
+	</delete>
+
+	
+
+	<delete id="DeleteAll">
+		DELETE FROM MD_ANIOS
+	</delete>
+
+</mapper>

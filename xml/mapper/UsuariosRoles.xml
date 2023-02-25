@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="UsuariosRoles">
+
+	<typeAlias alias="UsuariosRoles" type="es.msc.aemsc.business.vo.UsuariosRolesVO"/>
+	<typeAlias alias="Usuarios" type="es.msc.aemsc.business.vo.UsuariosVO"/>
+
+	<resultMap id="UsuariosRolesMapping" class="UsuariosRoles">
+		<result property="uid"           column="U_ID"       jdbcType="INTEGER"     javaType="java.lang.Integer" />
+		<result property="rid"           column="RID"        jdbcType="INTEGER"     javaType="java.lang.Integer"  />
+		<result property="userName"      column="UNAME"      jdbcType="STRING"      javaType="java.lang.String"  />
+		<result property="roleName"      column="RNAME"      jdbcType="STRING"      javaType="java.lang.String"  />
+		<result property="inherit"       column="INHERIT"    jdbcType="BIT"         javaType="java.lang.Boolean" />
+	</resultMap>
+	
+	<resultMap id="RolesMapping" class="UsuariosRoles">
+		<result property="rid"           column="RID"        jdbcType="INTEGER"     javaType="java.lang.Integer"  />
+		<result property="roleName"      column="RNAME"      jdbcType="STRING"      javaType="java.lang.String"  />
+	</resultMap>
+
+
+	<!-- ====== SelectAll ====== -->
+
+	<select id="SelectAll"  resultMap="UsuariosRolesMapping">
+		SELECT
+			UR.U_ID,
+			UR.RID,
+			UR.INHERIT,
+			R.RNAME,
+			U.UNAME
+		FROM
+			MD_USUARIOSROLES UR, MD_USUARIOS U, MD_ROLES R
+		WHERE
+			UR.RID = R.RID AND
+			UR.U_ID = U.U_ID
+	</select>
+
+	<!-- ====== CountAll ====== -->
+
+	<select id="CountAll"  resultClass="java.lang.Integer">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_USUARIOSROLES
+	</select>
+
+	<!-- ====== SelectById ====== -->
+
+	<select id="SelectById"  resultMap="UsuariosRolesMapping"  parameterClass="UsuariosRoles">
+		SELECT
+			UR.U_ID,
+			UR.RID,
+			UR.INHERIT,
+			R.RNAME,
+			U.UNAME
+		FROM
+			MD_USUARIOSROLES UR, MD_USUARIOS U, MD_ROLES R
+		WHERE
+			U.U_ID = #uid# AND
+			R.RID = #rid# AND
+			UR.RID = R.RID AND
+			UR.U_ID = U.U_ID
+	</select>
+
+	<select id="SelectRoleList"  resultMap="RolesMapping"  parameterClass="UsuariosRoles">
+		SELECT
+			R.RID,
+			R.RNAME
+		FROM
+			MD_ROLES R
+		WHERE
+			1=1
+			<isNotNull prepend="AND" property="rid">
+				R.RID = #rid#
+			</isNotNull>
+			<isNotNull prepend="AND" property="roleName">
+				R.RNAME LIKE #roleName#
+			</isNotNull>						
+
+	</select>
+
+	<!-- ====== SelectList ====== -->
+
+	<select id="SelectList"  resultMap="UsuariosRolesMapping"  parameterClass="UsuariosRoles">
+		SELECT
+			UR.U_ID,
+			UR.RID,
+			UR.INHERIT,
+			R.RNAME,
+			U.UNAME
+		FROM
+			MD_USUARIOSROLES UR, MD_USUARIOS U, MD_ROLES R
+		WHERE
+			UR.RID = R.RID AND
+			UR.U_ID = U.U_ID
+
+			<isNotNull prepend="AND" property="uid">
+				U.U_ID = #uid#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="rid">
+				R.RID = #rid#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="inherit">
+				UR.INHERIT = #inherit#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="userName">
+				U.UNAME LIKE #userName#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="roleName">
+				R.RNAME LIKE #roleName#
+			</isNotNull>						
+
+	</select>
+
+	<!-- ====== CountList ====== -->
+
+	<select id="CountList"  resultClass="java.lang.Integer"  parameterClass="UsuariosRoles">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_USUARIOSROLES
+		<dynamic prepend="WHERE">
+
+			<isNotNull prepend="AND" property="uid">
+				U_ID = #uid#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="inherit">
+				INHERIT = #inherit#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="rid">
+				RID LIKE #rid#
+			</isNotNull>
+			
+		</dynamic>
+	</select>
+
+	<!-- ====== Insert ====== -->
+
+	<insert id="Insert"  parameterClass="UsuariosRoles">
+		INSERT INTO MD_USUARIOSROLES
+			(
+				U_ID,
+				RID,
+				INHERIT
+			)
+		VALUES
+			(
+				#uid:INTEGER#,
+				#rid:INTEGER#,
+				#inherit:BIT#
+			)
+	</insert>
+
+	<!-- ====== Update ====== -->
+
+	<update id="Update"  parameterClass="UsuariosRoles">
+		UPDATE MD_USUARIOSROLES
+		SET
+			U_ID     = #uid:INTEGER#,
+			RID      = #rid:INTEGER#,
+			INHERIT  = #inherit:BIT#
+		WHERE
+			U_ID = #uid# AND
+			RID = #rid#
+	</update>
+
+	<!-- ====== Delete ====== -->
+
+	<delete id="Delete"  parameterClass="UsuariosRoles">
+		DELETE FROM MD_USUARIOSROLES
+		WHERE
+			U_ID = #uid# AND
+			RID = #rid#
+	</delete>
+	
+	<delete id="DeleteByUsuariosList"  parameterClass="Usuarios">
+		DELETE FROM MD_USUARIOSROLES
+		WHERE
+			U_ID IN(
+				SELECT
+					U_ID
+					FROM MD_USUARIOS
+					
+					<dynamic prepend="WHERE">
+			
+						<isNotNull prepend="AND" property="id">
+							U_ID = #id#
+						</isNotNull>
+			
+						<isNotNull prepend="AND" property="name">
+							UNAME LIKE #name#
+						</isNotNull>
+						
+						<isNotNull prepend="AND" property="mail">
+							MAIL LIKE #mail#
+						</isNotNull>
+						
+						<isNotNull prepend="AND" property="password">
+							PASSWORD LIKE #password#
+						</isNotNull>						
+			
+						<isNotNull prepend="AND" property="padreId">
+							PADRE_ID = #padreId#
+						</isNotNull>
+			
+						<isNotNull prepend="AND" property="active">
+							ACTIVE = #active#
+						</isNotNull>
+			
+					</dynamic>
+			)
+	</delete>
+
+	<!-- ====== DeleteAll ====== -->
+
+	<delete id="DeleteAll">
+		DELETE FROM MD_USUARIOSROLES
+	</delete>
+
+</sqlMap>
+

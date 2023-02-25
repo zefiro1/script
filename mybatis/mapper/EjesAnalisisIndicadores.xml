@@ -1,0 +1,194 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace="EjesAnalisisIndicadores">
+
+	
+
+	
+
+	<resultMap id="EjesAnalisisIndicadoresMapping" type="EjesAnalisisIndicadores">
+		<result property="indicadorId" column="INDICADOR_ID"/>
+		<result property="ejeAnalisisId" column="EJE_ANALISIS_ID"/>
+		<result property="anio" column="ANIO"/>
+	</resultMap>
+	
+	<resultMap id="EjesAnalisisRangeMapping" type="EjesAnalisisIndicadores">
+		<result property="ejeAnalisisId" column="EJE_ANALISIS_ID"/>
+		<result property="anioMax" column="ANIO_MAX"/>
+		<result property="anioMin" column="ANIO_MIN"/>
+	</resultMap>
+
+
+	
+
+	<select id="SelectAll" resultType="EjesAnalisisIndicadoresMapping">
+		SELECT
+			INDICADOR_ID,
+			EJE_ANALISIS_ID,
+			ANIO
+		FROM
+			MD_EJES_ANALISIS_INDICADORES
+	</select>
+
+	
+
+	<select id="CountAll">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_EJES_ANALISIS_INDICADORES
+	</select>
+
+	
+
+	<select id="SelectById" parameterType="EjesAnalisisIndicadores" resultType="EjesAnalisisIndicadoresMapping">
+		SELECT
+			INDICADOR_ID,
+			EJE_ANALISIS_ID,
+			ANIO
+		FROM
+			MD_EJES_ANALISIS_INDICADORES
+		WHERE
+			INDICADOR_ID = #{indicadorId}
+		AND
+			EJE_ANALISIS_ID = #{ejeAnalisisId}
+	</select>
+
+	
+
+	<select id="SelectList" parameterType="EjesAnalisisIndicadores" resultType="EjesAnalisisIndicadoresMapping">
+		SELECT
+			INDICADOR_ID,
+			EJE_ANALISIS_ID,
+			MD_EJES_ANALISIS_INDICADORES.ANIO AS ANIO
+		FROM
+			MD_EJES_ANALISIS_INDICADORES INNER JOIN MD_ANIOS ON MD_EJES_ANALISIS_INDICADORES.ANIO=MD_ANIOS.ANIO
+		<where>
+			MD_ANIOS.ACTIVO = 1 AND
+			<if test="indicadorId != null">AND 
+				INDICADOR_ID = #{indicadorId}
+			</if>
+
+			<if test="ejeAnalisisId != null">AND 
+				EJE_ANALISIS_ID = #{ejeAnalisisId}
+			</if>
+
+			<if test="anio != null">AND 
+				ANIO = #{anio}
+			</if>
+		</where>
+		ORDER BY MD_EJES_ANALISIS_INDICADORES.ANIO
+	</select>
+	
+	<select id="SelectListAdmin" parameterType="EjesAnalisisIndicadores" resultType="EjesAnalisisIndicadoresMapping">
+		SELECT
+			INDICADOR_ID,
+			EJE_ANALISIS_ID,
+			ANIO AS ANIO
+		FROM
+			MD_EJES_ANALISIS_INDICADORES
+		<where>
+			<if test="indicadorId != null">AND 
+				INDICADOR_ID = #{indicadorId}
+			</if>
+
+			<if test="ejeAnalisisId != null">AND 
+				EJE_ANALISIS_ID = #{ejeAnalisisId}
+			</if>
+
+			<if test="anio != null">AND 
+				ANIO = #{anio}
+			</if>
+		</where>
+		ORDER BY ANIO
+	</select>
+	
+	
+
+	<select id="CountList" parameterType="EjesAnalisisIndicadores">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_EJES_ANALISIS_INDICADORES
+		<where>
+
+			<if test="indicadorId != null">AND 
+				INDICADOR_ID = #{indicadorId}
+			</if>
+
+			<if test="ejeAnalisisId != null">AND 
+				EJE_ANALISIS_ID = #{ejeAnalisisId}
+			</if>
+			
+			<if test="anio != null">AND 
+				ANIO = #{anio}
+			</if>
+		</where>
+	</select>
+
+	
+
+	<insert id="Insert" parameterType="EjesAnalisisIndicadores">
+		INSERT INTO MD_EJES_ANALISIS_INDICADORES
+			(
+				INDICADOR_ID,
+				EJE_ANALISIS_ID,
+				ANIO
+			)
+		VALUES
+			(
+				#{indicadorId},
+				#{ejeAnalisisId},
+				#{anio}
+			)
+	</insert>
+
+	
+
+	<update id="Update" parameterType="EjesAnalisisIndicadores">
+		UPDATE MD_EJES_ANALISIS_INDICADORES
+		SET
+			INDICADOR_ID = #{indicadorId},
+			EJE_ANALISIS_ID = #{ejeAnalisisId},
+			ANIO = #{anio}
+		WHERE
+			INDICADOR_ID = #{indicadorId}
+		AND
+			EJE_ANALISIS_ID = #{ejeAnalisisId}
+		AND
+			ANIO = #{anio}
+	</update>
+
+	
+
+	<delete id="Delete" parameterType="EjesAnalisisIndicadores">
+		DELETE FROM MD_EJES_ANALISIS_INDICADORES
+		WHERE (1=1)
+		<if test="indicadorId != null">AND 
+			INDICADOR_ID = #{indicadorId}
+		</if>
+
+		<if test="ejeAnalisisId != null">AND 
+			EJE_ANALISIS_ID = #{ejeAnalisisId}
+		</if>
+
+		<if test="anio != null">AND 
+			ANIO = #{anio}
+		</if>
+	</delete>
+
+	
+
+	<delete id="DeleteAll">
+		DELETE FROM MD_EJES_ANALISIS_INDICADORES
+	</delete>
+	
+	
+	
+	<select id="SelectAniosRangeByEje" resultType="EjesAnalisisRangeMapping">
+		SELECT
+			MIN(ANIO) as ANIO_MIN, MAX(ANIO) as ANIO_MAX, EJE_ANALISIS_ID
+		FROM MD_EJES_ANALISIS_INDICADORES
+		GROUP BY EJE_ANALISIS_ID
+	</select>
+
+</mapper>

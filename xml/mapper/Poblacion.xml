@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Poblacion">
+
+	<typeAlias alias="Poblacion" type="es.msc.aemsc.business.vo.PoblacionVO"/>
+
+	<!--
+	<cacheModel id="PoblacionCache" type="LRU">
+		<flushInterval hours="24"/>
+		<flushOnExecute statement="Poblacion.Insert"/>
+		<flushOnExecute statement="Poblacion.Update"/>
+		<flushOnExecute statement="Poblacion.Delete"/>
+		<flushOnExecute statement="Poblacion.DeleteAll"/>
+		<property name="size" value="1000" />
+	</cacheModel>
+	-->
+
+	<resultMap id="PoblacionMapping" class="Poblacion">
+		<result property="codigoProvincia"    column="CODIGO_PROVINCIA"   jdbcType="SMALLINT"   javaType="java.lang.Short"   />
+		<result property="total"              column="TOTAL"              jdbcType="INTEGER"    javaType="java.lang.Integer" />
+		<result property="varones"            column="VARONES"            jdbcType="INTEGER"    javaType="java.lang.Integer" />
+		<result property="mujeres"            column="MUJERES"            jdbcType="INTEGER"    javaType="java.lang.Integer" />
+		<result property="anio"               column="ANIO"               jdbcType="INTEGER"    javaType="java.lang.Integer" />
+	</resultMap>
+
+
+	<!-- ====== SelectAll ====== -->
+
+	<select id="SelectAll"  resultMap="PoblacionMapping">
+		SELECT
+			CODIGO_PROVINCIA,
+			TOTAL,
+			VARONES,
+			MUJERES,
+			ANIO
+		FROM
+			POBLACION
+	</select>
+
+	<!-- ====== CountAll ====== -->
+
+	<select id="CountAll"  resultClass="java.lang.Integer">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			POBLACION
+	</select>
+
+	<!-- ====== SelectById ====== -->
+
+	<select id="SelectById"  resultMap="PoblacionMapping"  parameterClass="Poblacion">
+		SELECT
+			CODIGO_PROVINCIA,
+			TOTAL,
+			VARONES,
+			MUJERES,
+			ANIO
+		FROM
+			POBLACION
+		WHERE
+			CODIGO_PROVINCIA = #codigoProvincia#
+		AND
+			ANIO = #anio#
+	</select>
+
+	<!-- ====== SelectList ====== -->
+
+	<select id="SelectList"  resultMap="PoblacionMapping"  parameterClass="Poblacion">
+		SELECT
+			CODIGO_PROVINCIA,
+			TOTAL,
+			VARONES,
+			MUJERES,
+			ANIO
+		FROM
+			POBLACION
+		<dynamic prepend="WHERE">
+
+			<isNotNull prepend="AND" property="codigoProvincia">
+				CODIGO_PROVINCIA = #codigoProvincia#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="total">
+				TOTAL = #total#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="varones">
+				VARONES = #varones#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="mujeres">
+				MUJERES = #mujeres#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="anio">
+				ANIO = #anio#
+			</isNotNull>
+
+		</dynamic>
+		<include refid="includes.ORDER_BY" />
+	</select>
+
+	<!-- ====== CountList ====== -->
+
+	<select id="CountList"  resultClass="java.lang.Integer"  parameterClass="Poblacion">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			POBLACION
+		<dynamic prepend="WHERE">
+
+			<isNotNull prepend="AND" property="codigoProvincia">
+				CODIGO_PROVINCIA = #codigoProvincia#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="total">
+				TOTAL = #total#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="varones">
+				VARONES = #varones#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="mujeres">
+				MUJERES = #mujeres#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="anio">
+				ANIO = #anio#
+			</isNotNull>
+
+		</dynamic>
+	</select>
+
+	<!-- ====== Insert ====== -->
+
+	<insert id="Insert"  parameterClass="Poblacion">
+		INSERT INTO POBLACION
+			(
+				CODIGO_PROVINCIA,
+				TOTAL,
+				VARONES,
+				MUJERES,
+				ANIO
+			)
+		VALUES
+			(
+				#codigoProvincia:SMALLINT#,
+				#total:INTEGER#,
+				#varones:INTEGER#,
+				#mujeres:INTEGER#,
+				#anio:INTEGER#
+			)
+	</insert>
+
+	<!-- ====== Update ====== -->
+
+	<update id="Update"  parameterClass="Poblacion">
+		UPDATE POBLACION
+		SET
+			CODIGO_PROVINCIA = #codigoProvincia:SMALLINT#,
+			TOTAL = #total:INTEGER#,
+			VARONES = #varones:INTEGER#,
+			MUJERES = #mujeres:INTEGER#,
+			ANIO = #anio:INTEGER#
+		WHERE
+			CODIGO_PROVINCIA = #codigoProvincia#
+		AND
+			ANIO = #anio#
+	</update>
+
+	<!-- ====== Delete ====== -->
+
+	<delete id="Delete"  parameterClass="Poblacion">
+		DELETE FROM POBLACION
+		WHERE
+			CODIGO_PROVINCIA = #codigoProvincia#
+		AND
+			ANIO = #anio#
+	</delete>
+
+	<!-- ====== DeleteAll ====== -->
+
+	<delete id="DeleteAll">
+		DELETE FROM POBLACION
+	</delete>
+
+</sqlMap>
+

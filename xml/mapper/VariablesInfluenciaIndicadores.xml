@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="VariablesInfluenciaIndicadores">
+
+	<typeAlias alias="VariablesInfluenciaIndicadores" type="es.msc.aemsc.business.vo.VariablesInfluenciaIndicadoresVO"/>
+
+	<!--
+	<cacheModel id="VariablesInfluenciaIndicadoresCache" type="LRU">
+		<flushInterval hours="24"/>
+		<flushOnExecute statement="VariablesInfluenciaIndicadores.Insert"/>
+		<flushOnExecute statement="VariablesInfluenciaIndicadores.Update"/>
+		<flushOnExecute statement="VariablesInfluenciaIndicadores.Delete"/>
+		<flushOnExecute statement="VariablesInfluenciaIndicadores.DeleteAll"/>
+		<property name="size" value="1000" />
+	</cacheModel>
+	-->
+
+	<resultMap id="VariablesInfluenciaIndicadoresMapping" class="VariablesInfluenciaIndicadores">
+		<result property="indicadorId"              column="INDICADOR_ID"             jdbcType="INTEGER"   javaType="java.lang.Integer" />
+		<result property="variableInfluenciaId"     column="VARIABLE_INFLUENCIA_ID"   jdbcType="TINYINT"   javaType="java.lang.Short"   />
+		<result property="aplicaFiltro"             column="APLICA_FILTRO"            jdbcType="BIT"       javaType="java.lang.Boolean" />
+		<result property="aplicaAgrupacion"         column="APLICA_AGRUPACION"        jdbcType="BIT"       javaType="java.lang.Boolean" />
+		<result property="influyeBayes"             column="INFLUYE_BAYES"            jdbcType="BIT"       javaType="java.lang.Boolean" />
+		<result property="corrigeBayes"             column="CORRIGE_BAYES"            jdbcType="BIT"       javaType="java.lang.Boolean" />
+		<result property="peso"                     column="PESO"                     jdbcType="FLOAT"     javaType="java.lang.Float" />
+		<result property="orden"                    column="ORDEN"                    jdbcType="INTEGER"   javaType="java.lang.Integer" />
+		<result property="indicadorDesc"            column="INDICADOR_DESC"           jdbcType="STRING"    javaType="java.lang.String" />
+		<result property="variableInfluenciaDesc"   column="VARIABLE_INFLUENCIA_DESC" jdbcType="STRING"    javaType="java.lang.String" />
+	</resultMap>
+
+
+	<!-- ====== SelectAll ====== -->
+
+	<select id="SelectAll"  resultMap="VariablesInfluenciaIndicadoresMapping">
+		SELECT
+			VI.INDICADOR_ID,
+			VI.VARIABLE_INFLUENCIA_ID,
+			VI.APLICA_FILTRO,
+			VI.APLICA_AGRUPACION,
+			VI.INFLUYE_BAYES,
+			VI.CORRIGE_BAYES,
+			VI.PESO,
+			VI.ORDEN,
+			I.NOMBRE_COMPLETO AS INDICADOR_DESC,
+			V.NOMBRE AS VARIABLE_INFLUENCIA_DESC
+		FROM
+			MD_VARS_INF_INDICADORES VI,
+			MD_INDICADORES I,
+			MD_VARS_INF V
+		WHERE
+			V.VARIABLE_INFLUENCIA_ID = VI.VARIABLE_INFLUENCIA_ID AND
+			I.INDICADOR_ID = VI.INDICADOR_ID  
+	</select>
+
+	<!-- ====== CountAll ====== -->
+
+	<select id="CountAll"  resultClass="java.lang.Integer">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_VARS_INF_INDICADORES
+	</select>
+
+	<!-- ====== SelectById ====== -->
+
+	<select id="SelectById"  resultMap="VariablesInfluenciaIndicadoresMapping"  parameterClass="VariablesInfluenciaIndicadores">
+		SELECT
+			VI.INDICADOR_ID,
+			VI.VARIABLE_INFLUENCIA_ID,
+			VI.APLICA_FILTRO,
+			VI.APLICA_AGRUPACION,
+			VI.INFLUYE_BAYES,
+			VI.CORRIGE_BAYES,
+			VI.PESO,
+			VI.ORDEN,
+			I.NOMBRE_COMPLETO AS INDICADOR_DESC,
+			V.NOMBRE AS VARIABLE_INFLUENCIA_DESC
+		FROM
+			MD_VARS_INF_INDICADORES VI,
+			MD_INDICADORES I,
+			MD_VARS_INF V
+		WHERE
+			VI.INDICADOR_ID = #indicadorId#
+		AND
+			VI.VARIABLE_INFLUENCIA_ID = #variableInfluenciaId# AND
+			V.VARIABLE_INFLUENCIA_ID = VI.VARIABLE_INFLUENCIA_ID AND
+			I.INDICADOR_ID = VI.INDICADOR_ID
+	</select>
+
+	<!-- ====== SelectList ====== -->
+
+	<select id="SelectList"  resultMap="VariablesInfluenciaIndicadoresMapping"  parameterClass="VariablesInfluenciaIndicadores">
+		SELECT
+			VI.INDICADOR_ID,
+			VI.VARIABLE_INFLUENCIA_ID,
+			VI.APLICA_FILTRO,
+			VI.APLICA_AGRUPACION,
+			VI.INFLUYE_BAYES,
+			VI.CORRIGE_BAYES,
+			VI.PESO,
+			VI.ORDEN,
+			I.NOMBRE_COMPLETO AS INDICADOR_DESC,
+			V.NOMBRE AS VARIABLE_INFLUENCIA_DESC
+		FROM
+			MD_VARS_INF_INDICADORES VI,
+			MD_INDICADORES I,
+			MD_VARS_INF V
+			
+		WHERE
+			V.VARIABLE_INFLUENCIA_ID = VI.VARIABLE_INFLUENCIA_ID AND
+			I.INDICADOR_ID = VI.INDICADOR_ID
+			
+			<isNotNull prepend="AND" property="indicadorId">
+				VI.INDICADOR_ID = #indicadorId#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="variableInfluenciaId">
+				VI.VARIABLE_INFLUENCIA_ID = #variableInfluenciaId#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="aplicaFiltro">
+				VI.APLICA_FILTRO = #aplicaFiltro#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="aplicaAgrupacion">
+				VI.APLICA_AGRUPACION = #aplicaAgrupacion#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="influyeBayes">
+				VI.INFLUYE_BAYES = #influyeBayes#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="corrigeBayes">
+				VI.CORRIGE_BAYES = #corrigeBayes#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="peso">
+				VI.PESO = #peso#
+			</isNotNull>
+			
+	</select>
+
+	<!-- ====== CountList ====== -->
+
+	<select id="CountList"  resultClass="java.lang.Integer"  parameterClass="VariablesInfluenciaIndicadores">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_VARS_INF_INDICADORES
+		<dynamic prepend="WHERE">
+
+			<isNotNull prepend="AND" property="indicadorId">
+				INDICADOR_ID = #indicadorId#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="variableInfluenciaId">
+				VARIABLE_INFLUENCIA_ID = #variableInfluenciaId#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="aplicaFiltro">
+				APLICA_FILTRO = #aplicaFiltro#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="influyeBayes">
+				INFLUYE_BAYES = #influyeBayes#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="corrigeBayes">
+				CORRIGE_BAYES = #corrigeBayes#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="peso">
+				PESO = #peso#
+			</isNotNull>			
+		</dynamic>
+	</select>
+
+	<!-- ====== Insert ====== -->
+
+	<insert id="Insert"  parameterClass="VariablesInfluenciaIndicadores">
+		INSERT INTO MD_VARS_INF_INDICADORES
+			(
+				INDICADOR_ID,
+				VARIABLE_INFLUENCIA_ID,
+				APLICA_FILTRO,
+				APLICA_AGRUPACION,
+				INFLUYE_BAYES,
+				CORRIGE_BAYES,
+				PESO,
+				ORDEN
+			)
+		VALUES
+			(
+				#indicadorId:INTEGER#,
+				#variableInfluenciaId:TINYINT#,
+				#aplicaFiltro:BIT#,
+				#aplicaAgrupacion:BIT#,
+				#influyeBayes:BIT#,
+				#corrigeBayes:BIT#,
+				#peso:FLOAT#,
+				#orden:INTEGER#
+			)
+	</insert>
+
+	<!-- ====== Update ====== -->
+
+	<update id="Update"  parameterClass="VariablesInfluenciaIndicadores">
+		UPDATE MD_VARS_INF_INDICADORES
+		SET
+			INDICADOR_ID = #indicadorId:INTEGER#,
+			VARIABLE_INFLUENCIA_ID = #variableInfluenciaId:TINYINT#,
+			APLICA_FILTRO = #aplicaFiltro:BIT#,
+			APLICA_AGRUPACION = #aplicaAgrupacion:BIT#,
+			INFLUYE_BAYES = #influyeBayes:BIT#,
+			CORRIGE_BAYES = #corrigeBayes:BIT#,
+			PESO = #peso:FLOAT#,
+			ORDEN = #orden:INTEGER#
+		WHERE
+			INDICADOR_ID = #indicadorId#
+		AND
+			VARIABLE_INFLUENCIA_ID = #variableInfluenciaId#
+	</update>
+
+	<!-- ====== Delete ====== -->
+
+	<delete id="Delete"  parameterClass="VariablesInfluenciaIndicadores">
+		DELETE FROM MD_VARS_INF_INDICADORES
+		WHERE
+			INDICADOR_ID = #indicadorId#
+		AND
+			VARIABLE_INFLUENCIA_ID = #variableInfluenciaId#
+	</delete>
+
+	<!-- ====== DeleteAll ====== -->
+
+	<delete id="DeleteAll">
+		DELETE FROM MD_VARS_INF_INDICADORES
+	</delete>
+
+</sqlMap>
+

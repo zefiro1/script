@@ -1,0 +1,279 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace="CorreccionClusterHospital">
+
+	
+
+	
+
+	<resultMap id="CorreccionClusterHospitalMapping" type="CorreccionClusterHospital">
+		<result property="indicadorId" column="INDICADOR_ID"/>
+		<result property="clusterHospital" column="CLUSTER_HOSPITAL"/>
+		<result property="numHospitales" column="NUM_HOSPITALES"/>
+		<result property="numAltas" column="NUM_ALTAS"/>
+		<result property="valorMedio" column="VALOR_MEDIO"/>
+		<result property="valorMedioAjustado" column="VALOR_MEDIO_AJUSTADO"/>
+		<result property="numHospitalesPrc25" column="NUM_HOSPITALES_PRC25"/>
+		<result property="numAltasPrc25" column="NUM_ALTAS_PRC25"/>
+		<result property="valorMedioPrc25" column="VALOR_MEDIO_PRC25"/>
+		<result property="valorMedioAjustadoPrc25" column="VALOR_MEDIO_AJUSTADO_PRC25"/>
+		<result property="clusterHospitalDesc" column="CLUSTER_HOSPITAL_DESC"/>
+		<result property="anio" column="ANIO"/>
+	</resultMap>
+
+	
+
+	<select id="SelectAllByIndicadorId" parameterType="java.lang.String" resultType="CorreccionClusterHospitalMapping">
+		SELECT 
+			CCH.INDICADOR_ID AS INDICADOR_ID,
+			NVL(CCH.CLUSTER_HOSPITAL,0) AS CLUSTER_HOSPITAL,
+			CCH.NUM_HOSPITALES AS NUM_HOSPITALES, 
+			CCH.NUM_ALTAS AS NUM_ALTAS, 
+			CCH.VALOR_MEDIO AS VALOR_MEDIO,
+			CCH.NUM_HOSPITALES_PRC25 AS NUM_HOSPITALES_PRC25, 
+			CCH.NUM_ALTAS_PRC25 AS NUM_ALTAS_PRC25, 
+			CCH.VALOR_MEDIO_PRC25 VALOR_MEDIO_PRC25,
+			CCH.VALOR_MEDIO_AJUSTADO VALOR_MEDIO_AJUSTADO, 
+			CCH.VALOR_MEDIO_AJUSTADO_PRC25 VALOR_MEDIO_AJUSTADO_PRC25,
+			'variable'||VIC.VARIABLE_INFLUENCIA_ID||'.codigo'||VIC.CODIGO AS CLUSTER_HOSPITAL_DESC,
+			CCH.ANIO AS ANIO
+		FROM MD_CORRECCION_CLUSTER_HOSPITAL CCH
+			LEFT JOIN MD_VARS_INF_CODIGOS VIC
+			ON CCH.CLUSTER_HOSPITAL = VIC.CODIGO
+			AND VIC.VARIABLE_INFLUENCIA_ID = 12
+		WHERE CCH.INDICADOR_ID = #{indicadorId} AND CCH.ANIO=#{anio}
+		ORDER BY CLUSTER_HOSPITAL
+	</select>
+
+	
+
+	<select id="SelectAll" resultType="CorreccionClusterHospitalMapping">
+		SELECT
+			INDICADOR_ID,
+			CLUSTER_HOSPITAL,
+			NUM_HOSPITALES,
+			NUM_ALTAS,
+			VALOR_MEDIO,
+			VALOR_MEDIO_AJUSTADO,
+			NUM_HOSPITALES_PRC25,
+			NUM_ALTAS_PRC25,
+			VALOR_MEDIO_PRC25,
+			VALOR_MEDIO_AJUSTADO_PRC25,
+			'' as CLUSTER_HOSPITAL_DESC,
+			ANIO
+		FROM
+			MD_CORRECCION_CLUSTER_HOSPITAL
+	</select>
+
+	
+
+	<select id="CountAll">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_CORRECCION_CLUSTER_HOSPITAL
+	</select>
+
+	
+
+	<select id="SelectList" parameterType="CorreccionClusterHospital" resultType="CorreccionClusterHospitalMapping">
+		SELECT
+			CCH.INDICADOR_ID AS INDICADOR_ID,
+			NVL(CCH.CLUSTER_HOSPITAL,0) AS CLUSTER_HOSPITAL,
+			CCH.NUM_HOSPITALES AS NUM_HOSPITALES, 
+			CCH.NUM_ALTAS AS NUM_ALTAS, 
+			CCH.VALOR_MEDIO AS VALOR_MEDIO,
+			CCH.NUM_HOSPITALES_PRC25 AS NUM_HOSPITALES_PRC25, 
+			CCH.NUM_ALTAS_PRC25 AS NUM_ALTAS_PRC25, 
+			CCH.VALOR_MEDIO_PRC25 VALOR_MEDIO_PRC25,
+			CCH.VALOR_MEDIO_AJUSTADO VALOR_MEDIO_AJUSTADO, 
+			CCH.VALOR_MEDIO_AJUSTADO_PRC25 VALOR_MEDIO_AJUSTADO_PRC25,
+			'variable'||VIC.VARIABLE_INFLUENCIA_ID||'.codigo'||VIC.CODIGO AS CLUSTER_HOSPITAL_DESC,
+			CCH.ANIO AS ANIO
+		FROM MD_CORRECCION_CLUSTER_HOSPITAL CCH
+			LEFT JOIN MD_VARS_INF_CODIGOS VIC
+			ON CCH.CLUSTER_HOSPITAL = VIC.CODIGO
+			AND VIC.VARIABLE_INFLUENCIA_ID = 12
+		<where>
+
+			<if test="indicadorId != null">AND 
+				INDICADOR_ID = #{indicadorId}
+			</if>
+
+			<if test="clusterHospital != null">AND 
+				CLUSTER_HOSPITAL = #{clusterHospital}
+			</if>
+
+			<if test="numHospitales != null">AND 
+				NUM_HOSPITALES = #{numHospitales}
+			</if>
+
+			<if test="numAltas != null">AND 
+				NUM_ALTAS = #{numAltas}
+			</if>
+
+			<if test="valorMedio != null">AND 
+				VALOR_MEDIO = #{valorMedio}
+			</if>
+
+			<if test="valorMedioAjustado != null">AND 
+				VALOR_MEDIO_AJUSTADO = #{valorMedioAjustado}
+			</if>
+
+			<if test="numHospitalesPrc25 != null">AND 
+				NUM_HOSPITALES_PRC25 = #{numHospitalesPrc25}
+			</if>
+
+			<if test="numAltasPrc25 != null">AND 
+				NUM_ALTAS_PRC25 = #{numAltasPrc25}
+			</if>
+
+			<if test="valorMedioPrc25 != null">AND 
+				VALOR_MEDIO_PRC25 = #{valorMedioPrc25}
+			</if>
+
+			<if test="valorMedioAjustadoPrc25 != null">AND 
+				VALOR_MEDIO_AJUSTADO_PRC25 = #{valorMedioAjustadoPrc25}
+			</if>
+			
+			<if test="anio != null">AND 
+				ANIO = #{anio}
+			</if>
+		</where>
+		ORDER BY CLUSTER_HOSPITAL
+	</select>
+
+	
+
+	<select id="CountList" parameterType="CorreccionClusterHospital">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_CORRECCION_CLUSTER_HOSPITAL
+		<where>
+
+			<if test="indicadorId != null">AND 
+				INDICADOR_ID = #{indicadorId}
+			</if>
+
+			<if test="clusterHospital != null">AND 
+				CLUSTER_HOSPITAL = #{clusterHospital}
+			</if>
+
+			<if test="numHospitales != null">AND 
+				NUM_HOSPITALES = #{numHospitales}
+			</if>
+
+			<if test="numAltas != null">AND 
+				NUM_ALTAS = #{numAltas}
+			</if>
+
+			<if test="valorMedio != null">AND 
+				VALOR_MEDIO = #{valorMedio}
+			</if>
+
+			<if test="valorMedioAjustado != null">AND 
+				VALOR_MEDIO_AJUSTADO = #{valorMedioAjustado}
+			</if>
+
+			<if test="numHospitalesPrc25 != null">AND 
+				NUM_HOSPITALES_PRC25 = #{numHospitalesPrc25}
+			</if>
+
+			<if test="numAltasPrc25 != null">AND 
+				NUM_ALTAS_PRC25 = #{numAltasPrc25}
+			</if>
+
+			<if test="valorMedioPrc25 != null">AND 
+				VALOR_MEDIO_PRC25 = #{valorMedioPrc25}
+			</if>
+
+			<if test="valorMedioAjustadoPrc25 != null">AND 
+				VALOR_MEDIO_AJUSTADO_PRC25 = #{valorMedioAjustadoPrc25}
+			</if>
+
+			<if test="anio != null">AND 
+				ANIO = #{anio}
+			</if>
+		</where>
+	</select>
+
+	
+
+	<insert id="Insert" parameterType="CorreccionClusterHospital">
+		INSERT INTO MD_CORRECCION_CLUSTER_HOSPITAL
+			(
+				INDICADOR_ID,
+				CLUSTER_HOSPITAL,
+				NUM_HOSPITALES,
+				NUM_ALTAS,
+				VALOR_MEDIO,
+				VALOR_MEDIO_AJUSTADO,
+				NUM_HOSPITALES_PRC25,
+				NUM_ALTAS_PRC25,
+				VALOR_MEDIO_PRC25,
+				VALOR_MEDIO_AJUSTADO_PRC25,
+				ANIO
+			)
+		VALUES
+			(
+				#{indicadorId},
+				#{clusterHospital},
+				#{numHospitales},
+				#{numAltas},
+				#{valorMedio},
+				#{valorMedioAjustado},
+				#{numHospitalesPrc25},
+				#{numAltasPrc25},
+				#{valorMedioPrc25},
+				#{valorMedioAjustadoPrc25},
+				#{anio}
+			)
+	</insert>
+
+	
+
+	<update id="Update" parameterType="CorreccionClusterHospital">
+		UPDATE MD_CORRECCION_CLUSTER_HOSPITAL
+		SET
+			INDICADOR_ID = #{indicadorId},
+			CLUSTER_HOSPITAL = #{clusterHospital},
+			NUM_HOSPITALES = #{numHospitales},
+			NUM_ALTAS = #{numAltas},
+			VALOR_MEDIO = #{valorMedio},
+			VALOR_MEDIO_AJUSTADO = #{valorMedioAjustado},
+			NUM_HOSPITALES_PRC25 = #{numHospitalesPrc25},
+			NUM_ALTAS_PRC25 = #{numAltasPrc25},
+			VALOR_MEDIO_PRC25 = #{valorMedioPrc25},
+			VALOR_MEDIO_AJUSTADO_PRC25 = #{valorMedioAjustadoPrc25},
+			ANIO = #{anio}
+		WHERE
+			INDICADOR_ID = #{indicadorId}
+		
+			CLUSTER_HOSPITAL = #{clusterHospital}
+		
+		
+			ANIO = #{anio}
+		
+	</update>
+
+	
+
+	<delete id="Delete" parameterType="CorreccionClusterHospital">
+		DELETE FROM MD_CORRECCION_CLUSTER_HOSPITAL
+		WHERE
+			INDICADOR_ID = #{indicadorId}
+		
+			CLUSTER_HOSPITAL = #{clusterHospital}
+		
+		
+			ANIO = #{anio}
+		
+	</delete>
+
+	
+
+	<delete id="DeleteAll">
+		DELETE FROM MD_CORRECCION_CLUSTER_HOSPITAL
+	</delete>
+
+</mapper>

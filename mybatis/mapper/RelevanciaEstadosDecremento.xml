@@ -1,0 +1,238 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace="RelevanciaEstadosDecremento">
+
+	
+
+	
+
+	<resultMap id="RelevanciaEstadosDecrementoMapping" type="RelevanciaEstadosDecremento">
+		<result property="valorIndicador" column="VALOR_INDICADOR"/>
+		<result property="variacionAbsoluta" column="VARIACION_ABSOLUTA"/>
+		<result property="variacionRelativa" column="VARIACION_RELATIVA"/>
+		<result property="frecuencia" column="FRECUENCIA"/>
+		<result property="indicadorId" column="INDICADOR_ID"/>
+		<result property="variableId" column="VARIABLE_ID"/>
+		<result property="estado" column="ESTADO"/>
+		<result property="variableDesc" column="VARIABLE_DESC"/>
+		<result property="estadoDesc" column="ESTADO_DESC"/>
+	</resultMap>
+
+
+	
+	<select id="SelectAllByIndicadorId" parameterType="java.lang.String" resultType="RelevanciaEstadosDecrementoMapping">
+		SELECT 
+			RED.VALOR_INDICADOR AS VALOR_INDICADOR, 
+			RED.VARIACION_ABSOLUTA AS VARIACION_ABSOLUTA, 
+			RED.VARIACION_RELATIVA AS VARIACION_RELATIVA, 
+			RED.FRECUENCIA AS FRECUENCIA,
+			RED.INDICADOR_ID AS INDICADOR_ID,
+			RED.VARIABLE_ID AS VARIABLE_ID,
+			RED.ESTADO AS ESTADO,
+			'variable'||VIC.VARIABLE_INFLUENCIA_ID AS VARIABLE_DESC,
+			'variable'||VIC.VARIABLE_INFLUENCIA_ID||'.codigo'||VIC.CODIGO AS ESTADO_DESC
+		FROM 
+			MD_RELEVANCIA_ESTADOS_DEC RED
+		INNER JOIN MD_VARS_INF VI
+		ON VI.VARIABLE_INFLUENCIA_ID = RED.VARIABLE_ID
+		INNER JOIN MD_VARS_INF_CODIGOS VIC
+		ON VIC.CODIGO = RED.ESTADO
+		AND VIC.VARIABLE_INFLUENCIA_ID = VI.VARIABLE_INFLUENCIA_ID
+		AND RED.INDICADOR_ID = #{indicadorId}  
+	</select>
+
+	
+
+	<select id="SelectAll" resultType="RelevanciaEstadosDecrementoMapping">
+		SELECT
+			VALOR_INDICADOR,
+			VARIACION_ABSOLUTA,
+			VARIACION_RELATIVA,
+			FRECUENCIA,
+			INDICADOR_ID,
+			VARIABLE_ID,
+			ESTADO
+		FROM
+			MD_RELEVANCIA_ESTADOS_DEC
+	</select>
+
+	
+
+	<select id="CountAll">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_RELEVANCIA_ESTADOS_DEC
+	</select>
+
+	
+
+	<select id="SelectById" parameterType="RelevanciaEstadosDecremento" resultType="RelevanciaEstadosDecrementoMapping">
+		SELECT
+			VALOR_INDICADOR,
+			VARIACION_ABSOLUTA,
+			VARIACION_RELATIVA,
+			FRECUENCIA,
+			INDICADOR_ID,
+			VARIABLE_ID,
+			ESTADO
+		FROM
+			MD_RELEVANCIA_ESTADOS_DEC
+		WHERE
+			INDICADOR_ID = #{indicadorId}
+		AND
+			VARIABLE_ID = #{variableId}
+		AND
+			ESTADO = #{estado}
+	</select>
+
+	
+
+	<select id="SelectList" parameterType="RelevanciaEstadosDecremento" resultType="RelevanciaEstadosDecrementoMapping">
+		SELECT
+			VALOR_INDICADOR,
+			VARIACION_ABSOLUTA,
+			VARIACION_RELATIVA,
+			FRECUENCIA,
+			INDICADOR_ID,
+			VARIABLE_ID,
+			ESTADO
+		FROM
+			MD_RELEVANCIA_ESTADOS_DEC
+		<where>
+
+			<if test="valorIndicador != null">AND 
+				VALOR_INDICADOR = #{valorIndicador}
+			</if>
+
+			<if test="variacionAbsoluta != null">AND 
+				VARIACION_ABSOLUTA = #{variacionAbsoluta}
+			</if>
+
+			<if test="variacionRelativa != null">AND 
+				VARIACION_RELATIVA = #{variacionRelativa}
+			</if>
+
+			<if test="frecuencia != null">AND 
+				FRECUENCIA = #{frecuencia}
+			</if>
+
+			<if test="indicadorId != null">AND 
+				INDICADOR_ID = #{indicadorId}
+			</if>
+
+			<if test="variableId != null">AND 
+				VARIABLE_ID = #{variableId}
+			</if>
+
+			<if test="estado != null">AND 
+				ESTADO LIKE #{estado}
+			</if>
+
+		</where>
+		<include refid="includes.ORDER_BY"/>
+	</select>
+
+	
+
+	<select id="CountList" parameterType="RelevanciaEstadosDecremento">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_RELEVANCIA_ESTADOS_DEC
+		<where>
+
+			<if test="valorIndicador != null">AND 
+				VALOR_INDICADOR = #{valorIndicador}
+			</if>
+
+			<if test="variacionAbsoluta != null">AND 
+				VARIACION_ABSOLUTA = #{variacionAbsoluta}
+			</if>
+
+			<if test="variacionRelativa != null">AND 
+				VARIACION_RELATIVA = #{variacionRelativa}
+			</if>
+
+			<if test="frecuencia != null">AND 
+				FRECUENCIA = #{frecuencia}
+			</if>
+
+			<if test="indicadorId != null">AND 
+				INDICADOR_ID = #{indicadorId}
+			</if>
+
+			<if test="variableId != null">AND 
+				VARIABLE_ID = #{variableId}
+			</if>
+
+			<if test="estado != null">AND 
+				ESTADO LIKE #{estado}
+			</if>
+
+		</where>
+	</select>
+
+	
+
+	<insert id="Insert" parameterType="RelevanciaEstadosDecremento">
+		INSERT INTO MD_RELEVANCIA_ESTADOS_DEC
+			(
+				VALOR_INDICADOR,
+				VARIACION_ABSOLUTA,
+				VARIACION_RELATIVA,
+				FRECUENCIA,
+				INDICADOR_ID,
+				VARIABLE_ID,
+				ESTADO
+			)
+		VALUES
+			(
+				#{valorIndicador},
+				#{variacionAbsoluta},
+				#{variacionRelativa},
+				#{frecuencia},
+				#{indicadorId},
+				#{variableId},
+				#{estado}
+			)
+	</insert>
+
+	
+
+	<update id="Update" parameterType="RelevanciaEstadosDecremento">
+		UPDATE MD_RELEVANCIA_ESTADOS_DEC
+		SET
+			VALOR_INDICADOR = #{valorIndicador},
+			VARIACION_ABSOLUTA = #{variacionAbsoluta},
+			VARIACION_RELATIVA = #{variacionRelativa},
+			FRECUENCIA = #{frecuencia},
+			INDICADOR_ID = #{indicadorId},
+			VARIABLE_ID = #{variableId},
+			ESTADO = #{estado}
+		WHERE
+			INDICADOR_ID = #{indicadorId}
+		AND
+			VARIABLE_ID = #{variableId}
+		AND
+			ESTADO = #{estado}
+	</update>
+
+	
+
+	<delete id="Delete" parameterType="RelevanciaEstadosDecremento">
+		DELETE FROM MD_RELEVANCIA_ESTADOS_DEC
+		WHERE
+			INDICADOR_ID = #{indicadorId}
+		AND
+			VARIABLE_ID = #{variableId}
+		AND
+			ESTADO = #{estado}
+	</delete>
+
+	
+
+	<delete id="DeleteAll">
+		DELETE FROM MD_RELEVANCIA_ESTADOS_DEC
+	</delete>
+
+</mapper>

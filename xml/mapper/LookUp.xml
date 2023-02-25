@@ -1,0 +1,451 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="LookUp">
+
+	<typeAlias alias="LookUp" type="es.msc.aemsc.business.vo.LookUpVO"/>
+	<typeAlias alias="IndicadoresUsuarioVO" type="es.msc.aemsc.business.vo.IndicadoresUsuarioVO"/>
+
+	<resultMap id="LookUpMapping" class="LookUp">
+		<result property="value"  column="VALUE"  jdbcType="VARCHAR"  javaType="java.lang.String" />
+		<result property="label"  column="LABEL"  jdbcType="VARCHAR"  javaType="java.lang.String" />
+	</resultMap>
+
+	<resultMap id="IndicadoresMapping" class="Indicadores">
+		<result property="indicadorId"          column="INDICADOR_ID"         jdbcType="INTEGER"   javaType="java.lang.Integer" />
+		<result property="nombre"               column="NOMBRE"               jdbcType="VARCHAR"   javaType="java.lang.String"  />
+		<result property="grupoIndicadorId"     column="GRUPO_INDICADOR_ID"   jdbcType="TINYINT"   javaType="java.lang.Short"   />
+		<result property="nombreCompleto"       column="NOMBRE_COMPLETO"      jdbcType="VARCHAR"   javaType="java.lang.String"  />
+		<result property="descripcion"          column="DESCRIPCION"          jdbcType="VARCHAR"   javaType="java.lang.String"  />
+		<result property="activo"               column="ACTIVO"               jdbcType="BIT"       javaType="java.lang.Boolean" />
+	</resultMap>
+	
+	<select id="Altas"  resultMap="LookUpMapping">
+		SELECT
+			ID_ALTA as VALUE,
+			ID_ALTA as LABEL
+		FROM
+			MD_ALTAS
+		ORDER BY
+			LABEL
+	</select>
+
+	<select id="Anios"  resultMap="LookUpMapping">
+		SELECT
+			ANIO as VALUE,
+			ANIO as LABEL
+		FROM
+			MD_ANIOS
+		WHERE
+			ACTIVO = 1
+		ORDER BY
+			LABEL DESC
+	</select>
+	
+	<select id="Capitulos"  resultMap="LookUpMapping">
+		SELECT
+			CODIGO_CAPITULO as VALUE,
+			DESCRIPCION as LABEL
+		FROM
+			MD_CAPITULOS
+		ORDER BY
+			LABEL
+	</select>
+	
+	<select id="Ccaa"  resultMap="LookUpMapping">
+		SELECT
+			CODIGO_CCAA as VALUE,
+			DESCRIPCION as LABEL
+		FROM
+			MD_CCAA
+		ORDER BY
+			LABEL
+	</select>
+	
+	<select id="Cdm"  resultMap="LookUpMapping">
+		SELECT
+			CODIGO_CDM as VALUE,
+			DESCRIPCION as LABEL
+		FROM
+			MD_CDM
+		ORDER BY
+			LABEL
+	</select>
+
+	<select id="EjesAnalisis"  resultMap="LookUpMapping">
+		SELECT
+			EJE_ANALISIS_ID as VALUE,
+			NOMBRE as LABEL
+		FROM
+			MD_EJES_ANALISIS
+		WHERE
+			ACTIVO = 1
+		ORDER BY
+			LABEL
+	</select>
+	
+	<select id="EjesAnalisisByIndicador"  resultMap="LookUpMapping" parameterClass="java.lang.String">	
+		SELECT DISTINCT
+			EJES_ANALISIS.EJE_ANALISIS_ID as VALUE,
+			NOMBRE as LABEL
+		FROM
+			MD_EJES_ANALISIS EJES_ANALISIS,
+			MD_EJES_ANALISIS_INDICADORES EJES_ANALISIS_INDICADORES
+		WHERE
+			EJES_ANALISIS_INDICADORES.INDICADOR_ID= #indicadorId# AND
+			EJES_ANALISIS_INDICADORES.EJE_ANALISIS_ID = EJES_ANALISIS.EJE_ANALISIS_ID AND
+			EJES_ANALISIS.ACTIVO = 1
+		ORDER BY
+			VALUE
+	</select>
+
+	<select id="Grd"  resultMap="LookUpMapping">
+		SELECT
+			CODIGO_GRD as VALUE,
+			DESCRIPCION as LABEL
+		FROM
+			MD_GRD
+		ORDER BY
+			LABEL
+	</select>
+	
+	<select id="GrupoAsistencial"  resultMap="LookUpMapping">
+		SELECT
+			CODIGO_GRUPO_ASISTENCIAL as VALUE,
+			DESCRIPCION as LABEL
+		FROM
+			MD_GRUPO_ASISTENCIAL
+		ORDER BY
+			LABEL
+	</select>
+	
+	<select id="GrupoEdad"  resultMap="LookUpMapping">
+		SELECT
+			CODIGO as VALUE,
+			DESCRIPCION as LABEL
+		FROM
+			MD_GRUPO_EDAD
+		ORDER BY
+			LABEL
+	</select>
+	
+	<select id="GrupoHospital"  resultMap="LookUpMapping">
+		SELECT
+			CODIGO as VALUE,
+			DESCRIPCION as LABEL
+		FROM
+			MD_GRUPO_HOSPITAL
+		ORDER BY
+			LABEL
+	</select>
+	
+	<select id="GrupoIndicador"  resultMap="LookUpMapping">
+		SELECT
+			T1.GRUPO_INDICADOR_ID as VALUE,
+			NOMBRE as LABEL
+		FROM
+			MD_GRUPO_INDICADOR T1, MD_GRUPO_INDICADOR_ROLES T2
+		WHERE 
+			T1.GRUPO_INDICADOR_ID = T2.GRUPO_INDICADOR_ID
+			AND T2.RID is null
+		ORDER BY
+			LABEL
+	</select>
+	
+	<select id="GrupoIndicadorTodos"  resultMap="LookUpMapping">
+		SELECT
+			T1.GRUPO_INDICADOR_ID as VALUE,
+			NOMBRE as LABEL
+		FROM
+			MD_GRUPO_INDICADOR T1
+		ORDER BY
+			LABEL
+	</select>
+	
+	<select id="GrupoIndicadorActivo"  resultMap="LookUpMapping" parameterClass="java.lang.String">
+		SELECT
+		    T1.GRUPO_INDICADOR_ID as VALUE, NOMBRE as LABEL
+		FROM MD_GRUPO_INDICADOR T1, MD_GRUPO_INDICADOR_ROLES T2
+		WHERE
+		    T1.GRUPO_INDICADOR_ID = T2.GRUPO_INDICADOR_ID
+		    AND (
+		        T2.RID is null
+		        OR
+		        T2.RID in (
+		            SELECT RID FROM MD_USUARIOSROLES TT1, MD_USUARIOS TT2
+		            WHERE TT1.U_ID = TT2.U_ID AND TT2.UNAME = #user#
+		        )
+		    )
+		    AND ACTIVO = 1
+		ORDER BY T1.GRUPO_INDICADOR_ID
+	</select>
+
+	<select id="GrupoIndicadorActivoOrdered"  resultMap="LookUpMapping" parameterClass="java.lang.String">
+		SELECT
+		    T1.GRUPO_INDICADOR_ID as VALUE, ETIQUETA as LABEL
+		FROM MD_GRUPO_INDICADOR T1, MD_GRUPO_INDICADOR_ROLES T2
+		WHERE
+		    T1.GRUPO_INDICADOR_ID = T2.GRUPO_INDICADOR_ID
+		    AND (
+		        T2.RID is null
+		        OR
+		        T2.RID in (
+		            SELECT RID FROM MD_USUARIOSROLES TT1, MD_USUARIOS TT2
+		            WHERE TT1.U_ID = TT2.U_ID AND TT2.UNAME = #user#
+		        )
+		    )
+		    AND ACTIVO = 1
+		ORDER BY T1.PESO ASC
+	</select>
+	
+	<select id="Indicadores"  resultMap="LookUpMapping">
+		SELECT
+			INDICADOR_ID as VALUE,
+			NOMBRE as LABEL
+		FROM
+			MD_INDICADORES
+		ORDER BY
+			LABEL
+	</select>
+
+	<select id="IndicadoresWithName"  resultMap="LookUpMapping">
+		SELECT
+			INDICADOR_ID as VALUE,
+			NOMBRE_COMPLETO as LABEL
+		FROM
+			MD_INDICADORES
+		ORDER BY
+			LABEL
+	</select>
+
+	<select id="IndicadoresFilter"  resultMap="LookUpMapping"  parameterClass="Indicadores">
+		SELECT
+			INDICADOR_ID as VALUE,
+			NOMBRE as LABEL
+		FROM
+			MD_INDICADORES
+		WHERE ACTIVO = 1
+		<dynamic>
+
+			<isNotNull prepend="AND" property="indicadorId">
+				INDICADOR_ID = #indicadorId#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="nombre">
+				NOMBRE LIKE #nombre#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="grupoIndicadorId">
+				GRUPO_INDICADOR_ID = #grupoIndicadorId#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="nombreCompleto">
+				NOMBRE_COMPLETO LIKE #nombreCompleto#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="descripcion">
+				DESCRIPCION LIKE #descripcion#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="activo">
+				ACTIVO = #activo#
+			</isNotNull>
+
+		</dynamic>
+		ORDER BY PESO,INDICADOR_ID ASC
+	</select>
+		
+	<select id="Provincias"  resultMap="LookUpMapping">
+		SELECT
+			CODIGO_PROVINCIA as VALUE,
+			DESCRIPCION as LABEL
+		FROM
+			MD_PROVINCIAS
+		ORDER BY
+			LABEL
+	</select>
+	
+	<select id="Secciones"  resultMap="LookUpMapping">
+		SELECT
+			CODIGO_SECCION as VALUE,
+			DESCRIPCION as LABEL
+		FROM
+			MD_SECCIONES
+		ORDER BY
+			LABEL
+	</select>
+	
+	<select id="UserCcaa"  resultMap="LookUpMapping" parameterClass="java.lang.String">
+		SELECT 
+			C.CODIGO_CCAA AS VALUE,
+			'CCAA' AS LABEL
+    	FROM 
+    		MD_CCAAROLES C 
+    	WHERE C.RID IN (
+        	SELECT R.RID FROM 
+               	MD_USUARIOSROLES UR,
+               	MD_USUARIOS U,
+               	MD_ROLES R
+           	WHERE 
+               	U.U_ID = UR.U_ID AND
+               	R.RID = UR.RID AND
+               	U.UNAME = #userName#
+    	)
+	</select>
+	
+	<select id="Sexo"  resultMap="LookUpMapping">
+		SELECT
+			CODIGO as VALUE,
+			DESCRIPCION as LABEL
+		FROM
+			MD_SEXO
+		ORDER BY
+			LABEL
+	</select>
+	
+	<select id="TipoAlta"  resultMap="LookUpMapping">
+		SELECT
+			CODIGO as VALUE,
+			DESCRIPCION as LABEL
+		FROM
+			MD_TIPO_ALTA
+		ORDER BY
+			LABEL
+	</select>
+	
+	<select id="TipoGrd"  resultMap="LookUpMapping">
+		SELECT
+			CODIGO_TIPO_GRD as VALUE,
+			DESCRIPCION as LABEL
+		FROM
+			MD_TIPO_GRD
+		ORDER BY
+			LABEL
+	</select>
+	
+	<select id="TipoIngreso"  resultMap="LookUpMapping">
+		SELECT
+			CODIGO as VALUE,
+			DESCRIPCION as LABEL
+		FROM
+			MD_TIPO_INGRESO
+		ORDER BY
+			LABEL
+	</select>
+	
+	<select id="VariablesInfluencia"  resultMap="LookUpMapping">
+		SELECT
+			VARIABLE_INFLUENCIA_ID as VALUE,
+			NOMBRE as LABEL
+		FROM
+			MD_VARS_INF
+		ORDER BY
+			LABEL
+	</select>
+
+	<select id="VariablesInfluenciaForGroupingByIndicadorId"  resultMap="LookUpMapping" parameterClass="java.lang.String">
+		SELECT 
+			VI.VARIABLE_INFLUENCIA_ID AS VALUE, 
+			NOMBRE AS LABEL
+		FROM 
+			MD_VARS_INF VI, 
+			MD_VARS_INF_INDICADORES VII
+		WHERE 
+			ACTIVO = 1  AND 
+			APLICA_AGRUPACION = 1	AND 
+			INDICADOR_ID = #indicadorId# AND 
+			VI.VARIABLE_INFLUENCIA_ID = VII.VARIABLE_INFLUENCIA_ID
+		ORDER BY PESO desc
+	</select>
+
+	<select id="VariablesInfluenciaForGroupingByIndicadorIdUserName"  resultMap="LookUpMapping" parameterClass="IndicadoresUsuarioVO">
+		SELECT 
+    		VI.VARIABLE_INFLUENCIA_ID AS VALUE, 
+    		NOMBRE AS LABEL
+		FROM 
+    		MD_VARS_INF VI,
+    		MD_VARS_INF_INDICADORES_ROLES VIR,
+    		MD_USUARIOSROLES UR,
+    		MD_USUARIOS U
+		WHERE 
+    		ACTIVO = 1  AND 
+    		APLICA_AGRUPACION = 1 AND
+    		U.U_ID = UR.U_ID AND
+    		U.UNAME = #userName# AND
+    		UR.RID = VIR.RID AND
+    		VIR.VARIABLE_INFLUENCIA_ID = VI.VARIABLE_INFLUENCIA_ID AND
+    		INDICADOR_ID = #indicadorId#
+		ORDER BY PESO desc
+	</select>
+
+	<select id="VariablesInfluenciaCodigos"  resultMap="LookUpMapping" parameterClass="java.lang.String">
+		SELECT
+			CODIGO as VALUE,
+			VALOR as LABEL
+		FROM
+			MD_VARS_INF_CODIGOS
+		WHERE
+			VARIABLE_INFLUENCIA_ID = #variableInfluenciaId#
+		ORDER BY
+			ORDEN
+	</select>
+
+	<select id="VariablesInfluenciaCodigosByLabel"  resultMap="LookUpMapping" parameterClass="java.lang.String">
+		SELECT
+			T1.CODIGO as VALUE,
+			T1.VALOR as LABEL
+		FROM
+			MD_VARS_INF_CODIGOS T1, MD_VARS_INF T2
+		WHERE
+			T2.ETIQUETA = #etiqueta#
+			AND T1.VARIABLE_INFLUENCIA_ID = T2.VARIABLE_INFLUENCIA_ID
+		ORDER BY
+			T1.ORDEN
+	</select>
+
+	<select id="VariablesInfluenciaDescripcionesByLabel"  resultMap="LookUpMapping" parameterClass="java.lang.String">
+		SELECT
+			T1.VALOR as VALUE,
+			T1.DESCRIPCION as LABEL
+		FROM
+			MD_VARS_INF_CODIGOS T1, MD_VARS_INF T2
+		WHERE
+			T2.ETIQUETA = #etiqueta#
+			AND T1.VARIABLE_INFLUENCIA_ID = T2.VARIABLE_INFLUENCIA_ID
+		ORDER BY
+			T1.ORDEN
+	</select>
+	
+	<select id="Usuarios"  resultMap="LookUpMapping">
+		SELECT
+			U_ID as VALUE,
+			UNAME as LABEL
+		FROM
+			MD_USUARIOS
+		ORDER BY
+			LABEL
+	</select>
+	
+	<select id="Roles"  resultMap="LookUpMapping">
+		SELECT
+			RID as VALUE,
+			RNAME as LABEL
+		FROM
+			MD_ROLES
+		ORDER BY
+			LABEL
+	</select>
+	
+	<select id="GrupoIndicadorRoles"  resultMap="LookUpMapping" parameterClass="java.lang.String">
+		SELECT
+			GRUPO_INDICADOR_ID as VALUE,
+			RID as LABEL
+		FROM
+			MD_GRUPO_INDICADOR_ROLES
+		WHERE
+			MD_GRUPO_INDICADOR_ROLES.GRUPO_INDICADOR_ID = #grupoIndicadorId#
+	</select>
+	
+</sqlMap>
+

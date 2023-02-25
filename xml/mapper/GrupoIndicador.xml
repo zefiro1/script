@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="GrupoIndicador">
+
+	<typeAlias alias="GrupoIndicador" type="es.msc.aemsc.business.vo.GrupoIndicadorVO"/>
+	<typeAlias alias="GrupoIndicadoresRolesVO" type="es.msc.aemsc.business.vo.GrupoIndicadoresRolesVO"/>
+	
+	<!--
+	<cacheModel id="GrupoIndicadorCache" type="LRU">
+		<flushInterval hours="24"/>
+		<flushOnExecute statement="GrupoIndicador.Insert"/>
+		<flushOnExecute statement="GrupoIndicador.Update"/>
+		<flushOnExecute statement="GrupoIndicador.Delete"/>
+		<flushOnExecute statement="GrupoIndicador.DeleteAll"/>
+		<property name="size" value="1000" />
+	</cacheModel>
+	-->
+
+	<resultMap id="GrupoIndicadorMapping" class="GrupoIndicador">
+		<result property="grupoIndicadorId"     column="GRUPO_INDICADOR_ID"   jdbcType="TINYINT"   javaType="java.lang.Short"   />
+		<result property="nombre"               column="NOMBRE"               jdbcType="VARCHAR"   javaType="java.lang.String"  />
+		<result property="descripcion"          column="DESCRIPCION"          jdbcType="VARCHAR"   javaType="java.lang.String"  />
+		<result property="activo"               column="ACTIVO"               jdbcType="BIT"       javaType="java.lang.Boolean" />
+		<result property="etiqueta"    			column="ETIQUETA"             jdbcType="VARCHAR"   javaType="java.lang.String"  />
+	</resultMap>
+
+
+	<!-- ====== SelectAll ====== -->
+
+	<select id="SelectAll"  resultMap="GrupoIndicadorMapping">
+		SELECT
+			GRUPO_INDICADOR_ID,
+			NOMBRE,
+			DESCRIPCION,
+			ACTIVO,
+			ETIQUETA
+		FROM
+			MD_GRUPO_INDICADOR
+	</select>
+
+	<!-- ====== CountAll ====== -->
+
+	<select id="CountAll"  resultClass="java.lang.Integer">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_GRUPO_INDICADOR
+	</select>
+
+	<!-- ====== SelectById ====== -->
+
+	<select id="SelectById"  resultMap="GrupoIndicadorMapping"  parameterClass="GrupoIndicador">
+		SELECT
+			GRUPO_INDICADOR_ID,
+			NOMBRE,
+			DESCRIPCION,
+			ACTIVO,
+			ETIQUETA
+		FROM
+			MD_GRUPO_INDICADOR
+		WHERE
+			GRUPO_INDICADOR_ID = #grupoIndicadorId#
+	</select>
+
+	<!-- ====== SelectList ====== -->
+
+	<select id="SelectList"  resultMap="GrupoIndicadorMapping"  parameterClass="GrupoIndicador">
+		SELECT
+			GRUPO_INDICADOR_ID,
+			NOMBRE,
+			DESCRIPCION,
+			ACTIVO,
+			ETIQUETA
+		FROM
+			MD_GRUPO_INDICADOR
+		<dynamic prepend="WHERE">
+
+			<isNotNull prepend="AND" property="grupoIndicadorId">
+				GRUPO_INDICADOR_ID = #grupoIndicadorId#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="nombre">
+				NOMBRE LIKE #nombre#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="descripcion">
+				DESCRIPCION LIKE #descripcion#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="activo">
+				ACTIVO = #activo#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="etiqueta">
+				ETIQUETA = #etiqueta#
+			</isNotNull>
+
+		</dynamic>
+		ORDER BY GRUPO_INDICADOR_ID
+	</select>
+
+	<!-- ====== CountList ====== -->
+
+	<select id="CountList"  resultClass="java.lang.Integer"  parameterClass="GrupoIndicador">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_GRUPO_INDICADOR
+		<dynamic prepend="WHERE">
+
+			<isNotNull prepend="AND" property="grupoIndicadorId">
+				GRUPO_INDICADOR_ID = #grupoIndicadorId#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="nombre">
+				NOMBRE LIKE #nombre#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="descripcion">
+				DESCRIPCION LIKE #descripcion#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="activo">
+				ACTIVO = #activo#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="etiqueta">
+				ETIQUETA = #etiqueta#
+			</isNotNull>
+
+		</dynamic>
+	</select>
+
+	<!-- ====== Insert ====== -->
+
+	<insert id="Insert"  parameterClass="GrupoIndicador">
+		INSERT INTO MD_GRUPO_INDICADOR
+			(
+				GRUPO_INDICADOR_ID,
+				NOMBRE,
+				DESCRIPCION,
+				ACTIVO,
+				ETIQUETA
+			)
+		VALUES
+			(
+				#grupoIndicadorId:TINYINT#,
+				#nombre:VARCHAR#,
+				#descripcion:VARCHAR#,
+				#activo:BIT#,
+				#etiqueta:VARCHAR#
+			)
+	</insert>
+
+	<!-- ====== Update ====== -->
+
+	<update id="Update"  parameterClass="GrupoIndicador">
+		UPDATE MD_GRUPO_INDICADOR
+		SET
+			GRUPO_INDICADOR_ID = #grupoIndicadorId:TINYINT#,
+			NOMBRE = #nombre:VARCHAR#,
+			DESCRIPCION = #descripcion:VARCHAR#,
+			ACTIVO = #activo:BIT#,
+			ETIQUETA = #etiqueta:VARCHAR#
+		WHERE
+			GRUPO_INDICADOR_ID = #grupoIndicadorId#
+	</update>
+
+	<!-- ====== Delete ====== -->
+
+	<delete id="Delete"  parameterClass="GrupoIndicador">
+		DELETE FROM MD_GRUPO_INDICADOR
+		WHERE
+			GRUPO_INDICADOR_ID = #grupoIndicadorId#
+	</delete>
+
+	<!-- ====== DeleteAll ====== -->
+
+	<delete id="DeleteAll">
+		DELETE FROM MD_GRUPO_INDICADOR
+	</delete>
+
+	<insert id="InsertGrupoIndicadorRoles"  parameterClass="GrupoIndicadoresRolesVO">
+		INSERT INTO MD_GRUPO_INDICADOR_ROLES
+			(
+				GRUPO_INDICADOR_ID,
+				RID
+			)
+		VALUES
+			(
+				#grupoIndicadorId:INTEGER#,
+				#rid:INTEGER#
+			)
+	</insert>
+	
+	<delete id="DeleteGrupoIndicadorRoles"  parameterClass="java.lang.String">
+		DELETE FROM MD_GRUPO_INDICADOR_ROLES
+		WHERE
+			MD_GRUPO_INDICADOR_ROLES.GRUPO_INDICADOR_ID = #grupoIndicadorId#
+	</delete>
+</sqlMap>
+

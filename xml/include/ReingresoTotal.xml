@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="includeReingresoTotal">
+	<sql id="SELECT_LIST_DESCRIPTIVO">
+		SELECT 
+		<include refid="includes.SELECT_DES_DESCRIPTIVO"/>	    
+		numero_altas_i as "numero_altas_i", estancia_media_f as "estancia_media_f", tasa_reingresos_p as "tasa_reingresos_p", estancia_media_reingresos_f as "estancia_media_reingresos_f", tasa_reingresos_7_p as "tasa_reingresos_7_p", tasa_reingresos_30_p as "tasa_reingresos_30_p" 
+		FROM(
+			SELECT
+					<include refid="includes.SELECT_COD_DESCRIPTIVO"/>	    
+				    numero_altas AS numero_altas_i,
+				    estancias/NULLIF(1.0*numero_altas,0) AS estancia_media_f,
+				    100.0*(altas_reingresos7+altas_reingresos30)/NULLIF(1.0*numero_altas,0) AS tasa_reingresos_p,
+				    (estancias_reingresos7+estancias_reingresos30)/NULLIF(1.0*(altas_reingresos7+altas_reingresos30),0) AS estancia_media_reingresos_f,
+				    100.0*(altas_reingresos7)/NULLIF(1.0*numero_altas,0) AS tasa_reingresos_7_p,
+				    100.0*(altas_reingresos30)/NULLIF(1.0*numero_altas,0) AS tasa_reingresos_30_p
+				FROM (
+					SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_G"/> 
+					    SUM(numero_altas) as numero_altas,
+					    SUM(altas.estancias) as estancias,
+					    SUM(CASE WHEN altas.Reingreso=1 THEN numero_altas ELSE 0.0 END) as altas_reingresos7,
+					    SUM(CASE WHEN altas.Reingreso=1 THEN estancias ELSE 0.0 END) as estancias_reingresos7,
+					    SUM(CASE WHEN altas.Reingreso=2 THEN numero_altas ELSE 0.0 END) as altas_reingresos30,
+					    SUM(CASE WHEN altas.Reingreso=2 THEN estancias ELSE 0.0 END) as estancias_reingresos30
+					FROM (
+						SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_CCAA"/> 
+							Reingreso, 
+						    COUNT(*) as numero_altas,
+						    SUM(altas.Estancia) as estancias
+						FROM
+							<include refid="includes.FROM_TABLE_CLAUSE"/>
+						WHERE Reingreso IS NOT NULL AND Anio=$anio$ AND tipo_alta != 4 
+							<include refid="includes.GROPY_BY_COMMA_DESCRIPTIVO"/>
+								Reingreso 
+					) altas <include refid="includes.GROUP_BY_LIST"/>
+				) altas <include refid="includes.WHERE_ALLCOD_NULL"/>
+		) altas 
+		<include refid="includes.INNER_JOIN_DESCRIPTIVO"/>	    
+	</sql>
+	<sql id="SELECT_LIST_SERIE_TEMPORAL">
+				<include refid="includes.INICIAL_SERIE_TEMPORAL"/>
+						SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_G"/> 
+						    Anio,
+						    SUM(numero_altas) as numero_altas,
+						    <isEqual property="temporalSerieColumn.column" compareValue="DEFAULT">
+						    	SUM(CASE WHEN Reingreso>=1 THEN numero_altas ELSE 0.0 END) as numero_altas_ind
+						    </isEqual>
+							<isEqual property="temporalSerieColumn.column" compareValue="RECORDS">
+								SUM(numero_altas) as numero_altas_ind
+						    </isEqual>
+						    <isEqual property="temporalSerieColumn.column" compareValue="RECORDS_REENTRY_8">
+						    	SUM(CASE WHEN Reingreso=1 THEN numero_altas ELSE 0.0 END) as numero_altas_ind
+						    </isEqual>
+						    <isEqual property="temporalSerieColumn.column" compareValue="RECORDS_REENTRY_30">
+						    	SUM(CASE WHEN Reingreso=2 THEN numero_altas ELSE 0.0 END) as numero_altas_ind
+						    </isEqual>
+						FROM(
+							SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_CCAA"/> 
+							    Anio,Reingreso,
+							    COUNT(*) as numero_altas
+							FROM
+								<include refid="includes.FROM_TABLE_CLAUSE"/>
+							WHERE Reingreso IS NOT NULL AND tipo_alta != 4
+								<include refid="includes.FILTRO_ANIOS_SERIE_TEMPORAL"/>
+								<include refid="includes.GROPY_BY_COMMA_DESCRIPTIVO"/>
+								Anio,Reingreso
+						) altas <include refid="includes.GROPY_BY_LIST2"/>
+								Anio
+					<include refid="includes.FINAL_SERIE_TEMPORAL"/>	    
+	</sql>
+		
+</sqlMap>

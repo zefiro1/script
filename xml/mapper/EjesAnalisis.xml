@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="EjesAnalisis">
+
+	<typeAlias alias="EjesAnalisis" type="es.msc.aemsc.business.vo.EjesAnalisisVO"/>
+
+	<!--
+	<cacheModel id="EjesAnalisisCache" type="LRU">
+		<flushInterval hours="24"/>
+		<flushOnExecute statement="EjesAnalisis.Insert"/>
+		<flushOnExecute statement="EjesAnalisis.Update"/>
+		<flushOnExecute statement="EjesAnalisis.Delete"/>
+		<flushOnExecute statement="EjesAnalisis.DeleteAll"/>
+		<property name="size" value="1000" />
+	</cacheModel>
+	-->
+
+	<resultMap id="EjesAnalisisMapping" class="EjesAnalisis">
+		<result property="ejeAnalisisId"     column="EJE_ANALISIS_ID"   jdbcType="TINYINT"   javaType="java.lang.Short"   />
+		<result property="nombre"            column="NOMBRE"            jdbcType="VARCHAR"   javaType="java.lang.String"  />
+		<result property="descripcion"       column="DESCRIPCION"       jdbcType="VARCHAR"   javaType="java.lang.String"  />
+		<result property="activo"            column="ACTIVO"            jdbcType="BIT"       javaType="java.lang.Boolean" />
+		<result property="etiqueta"          column="ETIQUETA"          jdbcType="VARCHAR"   javaType="java.lang.String"  />
+	</resultMap>
+
+
+	<!-- ====== SelectAll ====== -->
+
+	<select id="SelectAll"  resultMap="EjesAnalisisMapping">
+		SELECT
+			EJE_ANALISIS_ID,
+			NOMBRE,
+			DESCRIPCION,
+			ACTIVO,
+			ETIQUETA
+		FROM
+			MD_EJES_ANALISIS
+	</select>
+
+	<!-- ====== CountAll ====== -->
+
+	<select id="CountAll"  resultClass="java.lang.Integer">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_EJES_ANALISIS
+	</select>
+
+	<!-- ====== SelectById ====== -->
+
+	<select id="SelectById"  resultMap="EjesAnalisisMapping"  parameterClass="EjesAnalisis">
+		SELECT
+			EJE_ANALISIS_ID,
+			NOMBRE,
+			DESCRIPCION,
+			ACTIVO,
+			ETIQUETA
+		FROM
+			MD_EJES_ANALISIS
+		WHERE
+			EJE_ANALISIS_ID = #ejeAnalisisId#
+	</select>
+
+	<!-- ====== SelectList ====== -->
+
+	<select id="SelectList"  resultMap="EjesAnalisisMapping"  parameterClass="EjesAnalisis">
+		SELECT
+			EJE_ANALISIS_ID,
+			NOMBRE,
+			DESCRIPCION,
+			ACTIVO,
+			ETIQUETA
+		FROM
+			MD_EJES_ANALISIS
+		<dynamic prepend="WHERE">
+
+			<isNotNull prepend="AND" property="ejeAnalisisId">
+				EJE_ANALISIS_ID = #ejeAnalisisId#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="nombre">
+				NOMBRE LIKE #nombre#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="descripcion">
+				DESCRIPCION LIKE #descripcion#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="activo">
+				ACTIVO = #activo#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="etiqueta">
+				ETIQUETA LIKE #etiqueta#
+			</isNotNull>
+
+		</dynamic>
+		<include refid="includes.ORDER_BY" />
+	</select>
+
+	<!-- ====== CountList ====== -->
+
+	<select id="CountList"  resultClass="java.lang.Integer"  parameterClass="EjesAnalisis">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_EJES_ANALISIS
+		<dynamic prepend="WHERE">
+
+			<isNotNull prepend="AND" property="ejeAnalisisId">
+				EJE_ANALISIS_ID = #ejeAnalisisId#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="nombre">
+				NOMBRE LIKE #nombre#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="descripcion">
+				DESCRIPCION LIKE #descripcion#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="activo">
+				ACTIVO = #activo#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="etiqueta">
+				ETIQUETA LIKE #etiqueta#
+			</isNotNull>
+
+		</dynamic>
+	</select>
+
+	<!-- ====== Insert ====== -->
+
+	<insert id="Insert"  parameterClass="EjesAnalisis">
+		INSERT INTO MD_EJES_ANALISIS
+			(
+				EJE_ANALISIS_ID,
+				NOMBRE,
+				DESCRIPCION,
+				ACTIVO,
+				ETIQUETA
+			)
+		VALUES
+			(
+				#ejeAnalisisId:TINYINT#,
+				#nombre:VARCHAR#,
+				#descripcion:VARCHAR#,
+				#activo:BIT#,
+				#etiqueta:VARCHAR#
+			)
+	</insert>
+
+	<!-- ====== Update ====== -->
+
+	<update id="Update"  parameterClass="EjesAnalisis">
+		UPDATE MD_EJES_ANALISIS
+		SET
+			EJE_ANALISIS_ID = #ejeAnalisisId:TINYINT#,
+			NOMBRE = #nombre:VARCHAR#,
+			DESCRIPCION = #descripcion:VARCHAR#,
+			ACTIVO = #activo:BIT#,
+			ETIQUETA = #etiqueta:VARCHAR#
+		WHERE
+			EJE_ANALISIS_ID = #ejeAnalisisId#
+	</update>
+
+	<!-- ====== Delete ====== -->
+
+	<delete id="Delete"  parameterClass="EjesAnalisis">
+		DELETE FROM MD_EJES_ANALISIS
+		WHERE
+			EJE_ANALISIS_ID = #ejeAnalisisId#
+	</delete>
+
+	<!-- ====== DeleteAll ====== -->
+
+	<delete id="DeleteAll">
+		DELETE FROM MD_EJES_ANALISIS
+	</delete>
+
+<!-- ====== SelectFiltersByIndicadorId ====== -->
+	<select id="SelectEjesByIndicadorId"  resultMap="EjesAnalisisMapping"  parameterClass="java.lang.String">
+		SELECT
+			E.EJE_ANALISIS_ID,
+			NOMBRE,
+			DESCRIPCION,
+			ACTIVO,
+			ETIQUETA
+		FROM 
+			MD_EJES_ANALISIS E,
+			MD_EJES_ANALISIS_INDICADORES EAI
+		WHERE
+			ACTIVO = 1 AND
+			INDICADOR_ID = #indicadorId# AND
+			E.EJE_ANALISIS_ID = EAI.EJE_ANALISIS_ID
+	</select>
+
+</sqlMap>
+

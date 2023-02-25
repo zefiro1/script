@@ -1,0 +1,169 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace="IndicadoresEjesAnalisisAnios">
+
+	
+
+	<resultMap id="IndicadoresEjesAnalisisAniosMapping" type="IndicadoresEjesAnalisisAnios">
+		<result property="indicadorId" column="INDICADOR_ID"/>
+		<result property="ejeAnalisisId" column="EJE_ANALISIS_ID"/>
+		<result property="anio" column="ANIO"/>
+		<result property="indicadorDesc" column="INDICADOR_DESC"/>
+		<result property="ejeAnalisisDesc" column="EJE_ANALISIS_DESC"/>
+	</resultMap>
+
+
+	
+
+	<select id="SelectAll" resultType="IndicadoresEjesAnalisisAniosMapping">
+		SELECT
+			EJI.INDICADOR_ID,
+			EJI.EJE_ANALISIS_ID,
+			EJI.ANIO,
+			I.NOMBRE_COMPLETO AS INDICADOR_DESC,
+			EJ.NOMBRE AS EJE_ANALISIS_DESC
+		FROM
+			MD_EJES_ANALISIS_INDICADORES EJI,
+			MD_INDICADORES I,
+			MD_EJES_ANALISIS EJ
+		WHERE
+			EJ.EJE_ANALISIS_ID = EJI.EJE_ANALISIS_ID AND
+			I.INDICADOR_ID = EJI.INDICADOR_ID  
+	</select>
+
+	
+
+	<select id="CountAll">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_EJES_ANALISIS_INDICADORES
+	</select>
+
+	
+
+	<select id="SelectById" parameterType="IndicadoresEjesAnalisisAnios" resultType="IndicadoresEjesAnalisisAniosMapping">
+		SELECT
+			EJI.INDICADOR_ID,
+			EJI.EJE_ANALISIS_ID,
+			EJI.ANIO,
+			I.NOMBRE_COMPLETO AS INDICADOR_DESC,
+			EJ.NOMBRE AS EJE_ANALISIS_DESC
+		FROM
+			MD_EJES_ANALISIS_INDICADORES EJI,
+			MD_INDICADORES I,
+			MD_EJES_ANALISIS EJ
+		WHERE
+			EJ.EJE_ANALISIS_ID = EJI.EJE_ANALISIS_ID AND
+			I.INDICADOR_ID = EJI.INDICADOR_ID AND  
+			I.INDICADOR_ID = #{indicadorId} AND
+			EJ.EJE_ANALISIS_ID = #{ejeAnalisisId} AND
+			EJI.ANIO = #{anio}
+	</select>
+
+	
+
+	<select id="SelectList" parameterType="IndicadoresEjesAnalisisAnios" resultType="IndicadoresEjesAnalisisAniosMapping">
+		SELECT
+			EJI.INDICADOR_ID,
+			EJI.EJE_ANALISIS_ID,
+			EJI.ANIO,
+			I.NOMBRE_COMPLETO AS INDICADOR_DESC,
+			EJ.NOMBRE AS EJE_ANALISIS_DESC
+		FROM
+			MD_EJES_ANALISIS_INDICADORES EJI,
+			MD_INDICADORES I,
+			MD_EJES_ANALISIS EJ
+		WHERE
+			EJ.EJE_ANALISIS_ID = EJI.EJE_ANALISIS_ID AND
+			I.INDICADOR_ID = EJI.INDICADOR_ID  
+			
+			<if test="indicadorId != null">AND 
+				EJI.INDICADOR_ID = #{indicadorId}
+			</if>
+			
+			<if test="ejeAnalisisId != null">AND 
+				EJI.EJE_ANALISIS_ID = #{ejeAnalisisId}
+			</if>
+			
+			<if test="anio != null">AND 
+				EJI.ANIO = #{anio}
+			</if>
+			
+	</select>
+
+	
+
+	<select id="CountList" parameterType="IndicadoresEjesAnalisisAnios">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_EJES_ANALISIS_INDICADORES EJI
+
+		<where>
+
+			<if test="indicadorId != null">AND 
+				EJI.INDICADOR_ID = #{indicadorId}
+			</if>
+			
+			<if test="ejeAnalisisId != null">AND 
+				EJI.EJE_ANALISIS_ID = #{ejeAnalisisId}
+			</if>
+			
+			<if test="anio != null">AND 
+				EJI.ANIO = #{anio}
+			</if>
+					
+		</where>
+	</select>
+
+	
+
+	<insert id="Insert" parameterType="IndicadoresEjesAnalisisAnios">
+		INSERT INTO MD_EJES_ANALISIS_INDICADORES
+			(
+				INDICADOR_ID,
+				EJE_ANALISIS_ID,
+				ANIO
+			)
+		VALUES
+			(
+				#{indicadorId},
+				#{ejeAnalisisId},
+				#{anio}
+			)
+	</insert>
+
+	
+
+	<update id="Update" parameterType="IndicadoresEjesAnalisisAnios">
+		UPDATE MD_EJES_ANALISIS_INDICADORES
+		SET
+			INDICADOR_ID = #{indicadorId},
+			EJE_ANALISIS_ID = #{ejeAnalisisId},
+			ANIO = #{anio}
+		WHERE
+			INDICADOR_ID = #{indicadorId}
+		AND
+			EJE_ANALISIS_ID = #{ejeAnalisisId}
+		AND
+			ANIO = #{anio}
+	</update>
+
+	
+
+	<delete id="Delete" parameterType="IndicadoresEjesAnalisisAnios">
+		DELETE FROM MD_EJES_ANALISIS_INDICADORES
+		WHERE
+			INDICADOR_ID = #{indicadorId}
+		AND
+			EJE_ANALISIS_ID = #{ejeAnalisisId}
+		AND
+			ANIO = #{anio}	</delete>
+
+	
+
+	<delete id="DeleteAll">
+		DELETE FROM MD_EJES_ANALISIS_INDICADORES
+	</delete>
+
+</mapper>

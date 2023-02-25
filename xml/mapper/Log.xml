@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Log">
+
+	<typeAlias alias="Log" type="es.msc.aemsc.business.vo.LogVO"/>
+
+	<resultMap id="LogGroupMapping" class="Log">
+		<result property="total"			column="TOTAL"				jdbcType="INTEGER"		javaType="java.lang.Integer" />
+		<result property="agrupacion"		column="AGRUPACION_EL"		jdbcType="STRING"		javaType="java.lang.String" />
+	</resultMap>
+
+	<resultMap id="LogMapping" class="Log">
+		<result property="username"			column="USERNAME"			jdbcType="STRING"		javaType="java.lang.String" />
+		<result property="ip"				column="IP"					jdbcType="STRING"		javaType="java.lang.String"  />
+		<result property="fechaClick"		column="FECHA_CLICK"		jdbcType="TIMESTAMP"	javaType="java.sql.Timestamp" />
+		<result property="tiempoCarga"		column="TIEMPO_CARGA"		jdbcType="FLOAT"		javaType="java.lang.Float" />
+		<result property="ejeAnalisisId"	column="EJE_ANALISIS_ID"	jdbcType="INTEGER"		javaType="java.lang.Integer" />
+		<result property="indicadorId"		column="INDICADOR_ID"		jdbcType="INTEGER"		javaType="java.lang.Integer" />
+		<result property="anio"				column="ANIO"				jdbcType="STRING"		javaType="java.lang.String" />
+		<result property="agrupacion"		column="AGRUPACION"			jdbcType="STRING"		javaType="java.lang.String" />
+		<result property="filtrado"			column="FILTRADO"			jdbcType="STRING"		javaType="java.lang.String" />
+		<result property="metadata"			column="METADATA"			jdbcType="STRING"		javaType="java.lang.String" />
+	</resultMap>
+
+
+	<!-- ====== Includes ====== -->
+	
+	<sql id="WHERE_FILTER_FECHA">
+		<isNotNull prepend="AND" property="fechaClickMin" >
+			<isNotNull property="fechaClickMax" >
+				FECHA_CLICK BETWEEN #fechaClickMin# AND #fechaClickMax#
+			</isNotNull>
+			<isNull property="fechaClickMax" >
+				<![CDATA[
+				FECHA_CLICK > #fechaClickMin# 
+			   	]]>
+			</isNull>
+		</isNotNull>
+			
+		<isNotNull prepend="AND" property="fechaClickMax" >
+			<isNull property="fechaClickMin" >
+				<![CDATA[
+				FECHA_CLICK < #fechaClickMax# 
+		     	]]>
+			</isNull>
+		</isNotNull>
+	</sql>
+	
+	<sql id="WHERE_FILTER_ALL">
+		
+			<isNotNull prepend="AND" property="username">
+				USERNAME = #username#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="ip">
+				IP LIKE #ip#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="fechaClick">
+				FECHA_CLICK = #fechaClick#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="tiempoCarga">
+				TIEMPO_CARGA = #tiempoCarga#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="ejeAnalisisId">
+				EJE_ANALISIS_ID = #ejeAnalisisId#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="indicadorId">
+				INDICADOR_ID = #indicadorId#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="anio">
+				ANIO = #anio#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="agrupacion">
+				AGRUPACION LIKE #agrupacion#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="filtrado">
+				FILTRADO LIKE #filtrado#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="metadata">
+				METADATA LIKE #metadata#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="tiempoCargaMin" >
+				<isNotNull property="tiempoCargaMax" >
+					TIEMPO_CARGA BETWEEN #tiempoCargaMin# AND #tiempoCargaMax#
+				</isNotNull>
+				<isNull property="tiempoCargaMax" >
+					<![CDATA[
+					TIEMPO_CARGA > #tiempoCargaMin# 
+			     	]]>
+				</isNull>
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="tiempoCargaMax" >
+				<isNull property="tiempoCargaMin" >
+					<![CDATA[
+					TIEMPO_CARGA < #tiempoCargaMax# 
+			     	]]>
+				</isNull>
+			</isNotNull>
+
+			<include refid="Log.WHERE_FILTER_FECHA" />
+			
+			<isNotNull property="agrupacionList" >
+				<iterate prepend="AND" property="agrupacionList" open="(" close=")" conjunction="OR">
+					( AGRUPACION LIKE '$agrupacionList[]$' OR AGRUPACION LIKE '$agrupacionList[]$,%' OR AGRUPACION LIKE '%,$agrupacionList[]$,%' OR AGRUPACION LIKE '%,$agrupacionList[]$' )
+				</iterate>
+			</isNotNull>
+			
+			<isNotNull property="filtradoList" >
+				<iterate prepend="AND" property="filtradoList" open="(" close=")" conjunction="OR">
+					( FILTRADO LIKE '$filtradoList[]$ = %' OR FILTRADO LIKE '%;$filtradoList[]$ = %' )
+				</iterate>
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="grupoIndicador" >
+				SUBSTR(INDICADOR_ID, 0, 1) = #grupoIndicador# 
+			</isNotNull>
+						
+			<dynamic prepend="AND">
+				ROWNUM &lt; 500
+			</dynamic>			
+	</sql>
+
+	<!-- ====== SelectAll ====== -->
+
+	<select id="SelectAll"  resultMap="LogMapping">
+		SELECT
+			USERNAME,
+			IP,
+			FECHA_CLICK,
+			TIEMPO_CARGA,
+			EJE_ANALISIS_ID,
+			INDICADOR_ID,
+			ANIO,
+			AGRUPACION,
+			FILTRADO,
+			METADATA
+		FROM
+			MD_LOG
+	</select>
+
+	<!-- ====== CountAll ====== -->
+
+	<select id="CountAll"  resultClass="java.lang.Integer">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_LOG
+	</select>
+
+	<!-- ====== SelectList ====== -->
+
+	<select id="SelectList"  resultMap="LogMapping"  parameterClass="Log">
+		SELECT
+			USERNAME,
+			IP,
+			FECHA_CLICK,
+			TIEMPO_CARGA,
+			EJE_ANALISIS_ID,
+			INDICADOR_ID,
+			ANIO,
+			AGRUPACION,
+			FILTRADO,
+			METADATA
+		FROM
+			MD_LOG
+		
+		<dynamic prepend="WHERE">
+			<include refid="Log.WHERE_FILTER_ALL" />
+		</dynamic>
+		
+	</select>
+
+	<!-- ====== CountList ====== -->
+
+	<select id="CountList"  resultClass="java.lang.Integer"  parameterClass="Log">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_LOG
+			
+		<dynamic prepend="WHERE">
+			<include refid="Log.WHERE_FILTER_ALL" />
+		</dynamic>
+		
+	</select>
+
+	<!-- ====== Insert ====== -->
+
+	<insert id="Insert"  parameterClass="Log">
+		INSERT INTO MD_LOG
+			(
+				USERNAME,
+				IP,
+				FECHA_CLICK,
+				TIEMPO_CARGA,
+				EJE_ANALISIS_ID,
+				INDICADOR_ID,
+				ANIO,
+				AGRUPACION,
+				FILTRADO,
+				METADATA
+			)
+		VALUES
+			(
+				#username:STRING#,
+				#ip:STRING#,
+				#fechaClick:TIMESTAMP#,
+				#tiempoCarga:FLOAT#,
+				#ejeAnalisisId:INTEGER#,
+				#indicadorId:INTEGER#,
+				#anio:STRING#,
+				#agrupacion:STRING#,
+				#filtrado:STRING#,
+				#metadata:STRING#
+			)
+	</insert>
+
+	<!-- ====== Delete ====== -->
+
+	<delete id="Delete" parameterClass="Log">
+		DELETE
+			FROM MD_Log
+		
+		<dynamic prepend="WHERE">
+			<include refid="Log.WHERE_FILTER_ALL" />
+		</dynamic>
+			
+	</delete>
+
+
+	<delete id="DeleteOlder"  parameterClass="Log">
+		<![CDATA[ 
+     	DELETE FROM MD_Log WHERE
+			FECHA_CLICK <= #fechaClick# 
+  		]]>
+	</delete>
+	
+	<delete id="DeleteNewer"  parameterClass="Log">
+		<![CDATA[ 
+     	DELETE FROM MD_Log WHERE
+			FECHA_CLICK > #fechaClick# 
+  		]]>
+	</delete>
+
+	<!-- ====== DeleteAll ====== -->
+
+	<delete id="DeleteAll">
+		DELETE FROM MD_LOG
+	</delete>
+	
+	<!-- ====== Agrupaciones ====== -->
+	
+		<select id="SelectGroupList" resultMap="LogGroupMapping"  parameterClass="Log">
+		SELECT
+			COUNT(*) as TOTAL,
+			$agrupacion$ as AGRUPACION_EL
+		FROM
+			MD_LOG
+			
+		<dynamic prepend="WHERE">
+			<include refid="Log.WHERE_FILTER_FECHA" />
+		</dynamic>
+		
+		GROUP BY
+			$agrupacion$
+		
+		ORDER BY TOTAL DESC
+		
+	</select>
+	
+	<select id="SelectGroupHitList" resultMap="LogGroupMapping"  parameterClass="Log">
+		SELECT COUNT(*) as TOTAL, AGRUPACION_EL FROM(
+    		SELECT TO_CHAR(FECHA_CLICK, 'DD-MM-YYYY HH24:MI') as AGRUPACION_EL from MD_LOG
+    		<dynamic prepend="WHERE">
+	    		<include refid="Log.WHERE_FILTER_ALL" />
+	    	</dynamic>
+		)
+		GROUP BY AGRUPACION_EL ORDER BY AGRUPACION_EL
+		
+	</select>
+
+</sqlMap>
+

@@ -1,0 +1,353 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace="Indicadores">
+
+	
+		
+
+	
+
+	<resultMap id="IndicadoresMapping" type="Indicadores">
+		<result property="indicadorId" column="INDICADOR_ID"/>
+		<result property="nombre" column="NOMBRE"/>
+		<result property="grupoIndicadorId" column="GRUPO_INDICADOR_ID"/>
+		<result property="nombreCompleto" column="NOMBRE_COMPLETO"/>
+		<result property="descripcion" column="DESCRIPCION"/>
+		<result property="activo" column="ACTIVO"/>
+		<result property="etiqueta" column="ETIQUETA"/>
+		<result property="tipoIndicador" column="CODIGO_TIPO_INDICADOR"/>
+		<result property="metadata" column="METADATA"/>
+	</resultMap>
+
+	<resultMap id="FichaTecnicaMapping" type="FichaTecnica">
+		<result property="numHospitales" column="NUM_HOSPITALES"/>
+		<result property="numAltas" column="NUM_ALTAS"/>
+		<result property="pesoMedio" column="PESO_MEDIO"/>
+		<result property="pesoMediano" column="PESO_MEDIANO"/>
+		<result property="grdsInespecificos" column="GRDS_INESPECIFICOS"/>
+		<result property="clusterHospital" column="CLUSTER_HOSPITAL"/>
+		<result property="grupoHospital" column="TIPO_HOSPITAL"/>
+		<result property="clusterHospitalDesc" column="CLUSTER_HOSPITAL_DESC"/>
+		<result property="grupoHospitalDesc" column="TIPO_HOSPITAL_DESC"/>
+		<result property="numeroDiagnosticos" column="NUMERO_DIAGNOSTICOS"/>
+		<result property="numeroProcedimientos" column="NUMERO_PROCEDIMIENTOS"/>		
+	</resultMap>
+
+	
+
+	<select id="SelectAll" resultType="IndicadoresMapping">
+		SELECT
+			INDICADOR_ID,
+			NOMBRE,
+			GRUPO_INDICADOR_ID,
+			NOMBRE_COMPLETO,
+			DESCRIPCION,
+			ACTIVO,
+			ETIQUETA,
+			CODIGO_TIPO_INDICADOR,
+			METADATA
+		FROM
+			MD_INDICADORES
+	</select>
+
+	
+
+	<select id="CountAll">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_INDICADORES
+	</select>
+
+	
+
+	<select id="SelectById" parameterType="Indicadores" resultType="IndicadoresMapping">
+		SELECT
+			INDICADOR_ID,
+			NOMBRE,
+			GRUPO_INDICADOR_ID,
+			NOMBRE_COMPLETO,
+			DESCRIPCION,
+			ACTIVO,
+			ETIQUETA,
+			CODIGO_TIPO_INDICADOR,
+			METADATA
+		FROM
+			MD_INDICADORES
+		WHERE
+			INDICADOR_ID = #{indicadorId}
+	</select>
+
+	
+
+	<select id="SelectList" parameterType="Indicadores" resultType="IndicadoresMapping">
+		SELECT
+			INDICADOR_ID,
+			NOMBRE,
+			GRUPO_INDICADOR_ID,
+			NOMBRE_COMPLETO,
+			DESCRIPCION,
+			ACTIVO,
+			ETIQUETA,
+			CODIGO_TIPO_INDICADOR,
+			METADATA
+		FROM
+			MD_INDICADORES
+		<where>
+
+			<if test="indicadorId != null">AND 
+				INDICADOR_ID = #{indicadorId}
+			</if>
+
+			<if test="nombre != null">AND 
+				NOMBRE LIKE #{nombre}
+			</if>
+
+			<if test="grupoIndicadorId != null">AND 
+				GRUPO_INDICADOR_ID = #{grupoIndicadorId}
+			</if>
+
+			<if test="nombreCompleto != null">AND 
+				NOMBRE_COMPLETO LIKE #{nombreCompleto}
+			</if>
+
+			<if test="descripcion != null">AND 
+				DESCRIPCION LIKE #{descripcion}
+			</if>
+
+			<if test="activo != null">AND 
+				ACTIVO = #{activo}
+			</if>
+
+			<if test="etiqueta != null">AND 
+				ETIQUETA = #{etiqueta}
+			</if>
+			
+			<if test="tipoIndicador != null">AND 
+				CODIGO_TIPO_INDICADOR = #{tipoIndicador}
+			</if>
+
+			<if test="metadata != null">AND 
+				METADATA = #{metadata}
+			</if>
+		</where>
+		ORDER BY PESO ASC
+	</select>
+
+	
+
+	<select id="CountList" parameterType="Indicadores">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_INDICADORES
+		<where>
+
+			<if test="indicadorId != null">AND 
+				INDICADOR_ID = #{indicadorId}
+			</if>
+
+			<if test="nombre != null">AND 
+				NOMBRE LIKE #{nombre}
+			</if>
+
+			<if test="grupoIndicadorId != null">AND 
+				GRUPO_INDICADOR_ID = #{grupoIndicadorId}
+			</if>
+
+			<if test="nombreCompleto != null">AND 
+				NOMBRE_COMPLETO LIKE #{nombreCompleto}
+			</if>
+
+			<if test="descripcion != null">AND 
+				DESCRIPCION LIKE #{descripcion}
+			</if>
+
+			<if test="activo != null">AND 
+				ACTIVO = #{activo}
+			</if>
+
+			<if test="etiqueta != null">AND 
+				ETIQUETA = #{etiqueta}
+			</if>
+
+			<if test="tipoIndicador != null">AND 
+				CODIGO_TIPO_INDICADOR = #{tipoIndicador}
+			</if>
+			
+			<if test="metadata != null">AND 
+				METADATA = #{metadata}
+			</if>			
+		</where>
+	</select>
+
+	
+
+	<insert id="Insert" parameterType="Indicadores">
+		INSERT INTO MD_INDICADORES
+			(
+				INDICADOR_ID,
+				NOMBRE,
+				GRUPO_INDICADOR_ID,
+				NOMBRE_COMPLETO,
+				DESCRIPCION,
+				ACTIVO,
+				ETIQUETA,
+				CODIGO_TIPO_INDICADOR,
+				METADATA
+			)
+		VALUES
+			(
+				#{indicadorId},
+				#{nombre},
+				#{grupoIndicadorId},
+				#{nombreCompleto},
+				#{descripcion},
+				#{activo},
+				#{etiqueta},
+				#{tipoIndicador},
+				#{metadata}
+			)
+	</insert>
+
+	
+
+	<update id="Update" parameterType="Indicadores">
+		UPDATE MD_INDICADORES
+		SET
+			INDICADOR_ID = #{indicadorId},
+			NOMBRE = #{nombre},
+			GRUPO_INDICADOR_ID = #{grupoIndicadorId},
+			NOMBRE_COMPLETO = #{nombreCompleto},
+			DESCRIPCION = #{descripcion},
+			ACTIVO = #{activo},
+			ETIQUETA = #{etiqueta},
+			CODIGO_TIPO_INDICADOR = #{tipoIndicador},
+			METADATA = #{metadata}
+		WHERE
+			INDICADOR_ID = #{indicadorId}
+	</update>
+
+	
+
+	<delete id="Delete" parameterType="Indicadores">
+		DELETE FROM MD_INDICADORES
+		WHERE
+			INDICADOR_ID = #{indicadorId}
+	</delete>
+
+	
+
+	<delete id="DeleteAll">
+		DELETE FROM MD_INDICADORES
+	</delete>
+
+	
+	
+	<select id="FichaTecnicaResumen" parameterType="es.msc.aemsc.business.dao.ibatis.FiltroHospitalParameter" resultType="FichaTecnicaMapping">
+		select 
+    		count(distinct CODIGO_HOSPITAL) as NUM_HOSPITALES,count(*) as NUM_ALTAS, 
+    		avg(PESO) as PESO_MEDIO, median(PESO) as PESO_MEDIANO,
+    		
+    		    100*sum(CASE WHEN (CODIGO_GRD_APR in (955, 956)) THEN 1 ELSE 0 END)/count(*) as GRDS_INESPECIFICOS,
+    		
+    		
+    			100*sum(CASE WHEN (CODIGO_GRD in (468,469,470,476,477)) THEN 1 ELSE 0 END)/count(*) as GRDS_INESPECIFICOS,
+    		
+    		null as CLUSTER_HOSPITAL, null as TIPO_HOSPITAL,
+    		null as CLUSTER_HOSPITAL_DESC, null as TIPO_HOSPITAL_DESC,
+    		avg(NUMERO_DIAGNOSTICOS) as NUMERO_DIAGNOSTICOS,
+    		avg(NUMERO_PROCEDIMIENTOS) as NUMERO_PROCEDIMIENTOS
+ 		from complicaciones where ANIO=#{anio}
+ 		
+ 			AND CODIGO_TIPO_HOSPITAL=$filtro.value$
+ 		
+ 		
+ 			AND CODIGO_TIPO_HOSPITAL=$filtro.value$
+ 		
+ 	</select>
+	 	
+ 	<select id="FichaTecnicaClusterHospitalCommon">
+ 			
+ 	</select> 	
+ 	<select id="FichaTecnicaClusterHospital" parameterType="es.msc.aemsc.business.dao.ibatis.FiltroHospitalParameter" resultType="FichaTecnicaMapping">
+		select
+			count(distinct CODIGO_HOSPITAL) as NUM_HOSPITALES,
+			count(*) as NUM_ALTAS,
+			avg(PESO) as PESO_MEDIO,
+			median(PESO) as PESO_MEDIANO,
+			
+				100*sum(CASE WHEN (CODIGO_GRD_APR in (955, 956)) THEN 1 ELSE 0 END)/count(*) as GRDS_INESPECIFICOS,    		    
+    		
+    		
+    			100*sum(CASE WHEN (CODIGO_GRD in (468,469,470,476,477)) THEN 1 ELSE 0 END)/count(*) as GRDS_INESPECIFICOS,
+    		
+			null as TIPO_HOSPITAL,
+			null as TIPO_HOSPITAL_DESC,
+			C.CODIGO_CLUSTER_HOSPITAL as CLUSTER_HOSPITAL,
+			'variable12'||'.codigo'||C.CODIGO_CLUSTER_HOSPITAL as CLUSTER_HOSPITAL_DESC,
+			avg(NUMERO_DIAGNOSTICOS) as NUMERO_DIAGNOSTICOS,
+    		avg(NUMERO_PROCEDIMIENTOS) as NUMERO_PROCEDIMIENTOS
+		from complicaciones T, MD_CLUSTER_HOSPITAL C
+		where 
+			ANIO=#{anio}
+			AND C.CODIGO_CLUSTER_HOSPITAL = T.CODIGO_CLUSTER_HOSPITAL
+		
+ 			AND CODIGO_TIPO_HOSPITAL=$filtro.value$
+ 		
+ 		
+ 			AND CODIGO_TIPO_HOSPITAL=$filtro.value$
+ 		
+		group by C.CODIGO_CLUSTER_HOSPITAL
+	</select>
+ 	
+ 	 <select id="FichaTecnicaGrupoHospital" parameterType="es.msc.aemsc.business.dao.ibatis.FiltroHospitalParameter" resultType="FichaTecnicaMapping">
+		select
+			count(distinct CODIGO_HOSPITAL) as NUM_HOSPITALES,
+			count(*) as NUM_ALTAS,
+			avg(PESO) as PESO_MEDIO,
+			median(PESO) as PESO_MEDIANO,
+			
+    			100*sum(CASE WHEN (CODIGO_GRD_APR in (955, 956)) THEN 1 ELSE 0 END)/count(*) as GRDS_INESPECIFICOS,
+    		
+    		
+			    100*sum(CASE WHEN (CODIGO_GRD in (468,469,470,476,477)) THEN 1 ELSE 0 END)/count(*) as GRDS_INESPECIFICOS,    		    
+    		
+			null as CLUSTER_HOSPITAL,
+			CODIGO as TIPO_HOSPITAL,
+			null as CLUSTER_HOSPITAL_DESC,
+			'variable1'||'.codigo'||C.CODIGO as TIPO_HOSPITAL_DESC,
+			avg(NUMERO_DIAGNOSTICOS) as NUMERO_DIAGNOSTICOS,
+    		avg(NUMERO_PROCEDIMIENTOS) as NUMERO_PROCEDIMIENTOS
+		from complicaciones, MD_GRUPO_HOSPITAL C
+		where 
+			ANIO=#{anio}
+			AND C.CODIGO = CODIGO_GRUPO_HOSPITAL
+		
+ 			AND CODIGO_TIPO_HOSPITAL=$filtro.value$
+ 		
+ 		
+ 			AND CODIGO_TIPO_HOSPITAL=$filtro.value$
+ 		
+		group by C.CODIGO
+	</select>
+ 	
+	<select id="SelectPoblacionStdHospital">
+		SELECT
+			CODIGO_SEXO,
+			CODIGO_GRUPO_EDAD_Q,
+			sum(POBLACION) as POBLACION
+		FROM
+			POBLACION_ESTANDAR_HOSPITAL
+		group by cube(CODIGO_SEXO, CODIGO_GRUPO_EDAD_Q)
+	</select>
+
+ 	<select id="Procedimientos" parameterType="es.msc.aemsc.business.vo.IndicadorParamsVO">
+		SELECT
+			PROCEDIMIENTO AS "procedimiento",
+			PROCEDIMIENTO AS "procedimiento_desc",
+			100*frecuencia AS "procedimientoPorcentaje_p"
+		FROM casemix altas
+		WHERE Anio=$anio$ <include refid="includes.WHERE_DESCRIPTIVO"/>
+		ORDER BY frecuencia DESC
+	</select>
+</mapper>

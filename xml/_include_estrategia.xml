@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="includeEstrategia">
+<sql id="SELECT_LIST">
+		<isEqual property="indicadorEtiqueta" compareValue="estrategiaCronicidad">
+			<isEqual property="ejeAnalisisEtiqueta" compareValue="descriptivo_basico">
+				<include refid="includeEstrategiaCronicidadTotal.SELECT_LIST_DESCRIPTIVO"/>
+			</isEqual>
+		</isEqual>
+	</sql>
+	<sql id="POBLACION_JOIN">
+	   LEFT JOIN (
+			SELECT 
+				SUM(poblacion) as poblacion,
+				<iterate property="groupByList" conjunction=",">
+					<isEqual property="groupByList[].etiqueta" compareValue="codigo_grupo_edad_grande">
+					    <include refid="includeEstrategia.CODIGO_GRUPO_EDAD_MAPPING"/> as codigo_grupo_edad_grande
+					</isEqual>
+					<isEqual property="groupByList[].etiqueta" compareValue="sexo">sexo as sexo</isEqual>
+					<isEqual property="groupByList[].etiqueta" compareValue="codigo_ccaa_hospital">ccaa as codigo_ccaa_hospital</isEqual> 
+				</iterate>
+			FROM POBLACION_CCAA_DETALLE
+			WHERE ANIO=$anio$
+				<include refid="includeEstrategia.POPULATION_FILTER"/>
+			GROUP BY
+				<iterate property="groupByList" conjunction=","> 
+					<isEqual property="groupByList[].etiqueta" compareValue="codigo_grupo_edad_grande">
+					    <include refid="includeEstrategia.CODIGO_GRUPO_EDAD_MAPPING"/>
+					</isEqual>
+					<isEqual property="groupByList[].etiqueta" compareValue="sexo">sexo</isEqual>
+					<isEqual property="groupByList[].etiqueta" compareValue="codigo_ccaa_hospital">ccaa</isEqual>
+				</iterate>
+		) poblacion on 
+		<iterate property="groupByList" conjunction=" AND ">
+			altas.$groupByList[].etiqueta$ = poblacion.$groupByList[].etiqueta$
+		</iterate> 
+	</sql>
+	
+	<sql id="POBLACION_JOIN_TEMPORAL">
+	   LEFT JOIN (
+			SELECT 
+				anio, SUM(poblacion) as poblacion,
+				<iterate property="groupByList" conjunction=",">
+					<isEqual property="groupByList[].etiqueta" compareValue="codigo_grupo_edad_grande">
+					    <include refid="includeEstrategia.CODIGO_GRUPO_EDAD_MAPPING"/> as codigo_grupo_edad_grande
+					</isEqual>
+					<isEqual property="groupByList[].etiqueta" compareValue="sexo">sexo as sexo</isEqual>
+					<isEqual property="groupByList[].etiqueta" compareValue="codigo_ccaa_hospital">ccaa as codigo_ccaa_hospital</isEqual> 
+				</iterate>
+			FROM POBLACION_CCAA_DETALLE
+			WHERE (1=1) <include refid="includes.FILTRO_ANIOS_SERIE_TEMPORAL"/>
+				<include refid="includeEstrategia.POPULATION_FILTER"/>
+			GROUP BY anio
+				<iterate property="groupByList" conjunction="," open=","> 
+					<isEqual property="groupByList[].etiqueta" compareValue="codigo_grupo_edad_grande">
+					    <include refid="includeEstrategia.CODIGO_GRUPO_EDAD_MAPPING"/>
+					</isEqual>
+					<isEqual property="groupByList[].etiqueta" compareValue="sexo">sexo</isEqual>
+					<isEqual property="groupByList[].etiqueta" compareValue="codigo_ccaa_hospital">ccaa</isEqual>
+				</iterate>
+		) poblacion on altas.ANIO = poblacion.ANIO 
+		<iterate property="groupByList" conjunction=" AND "  open=" AND ">
+			altas.$groupByList[].etiqueta$ = poblacion.$groupByList[].etiqueta$
+		</iterate> 
+	</sql>
+	
+	<sql id="POBLACION_DIABETES_JOIN">
+	   LEFT JOIN (
+			SELECT 
+				SUM(poblacion) as poblacion,
+				<iterate property="groupByList" conjunction=",">
+			    	<isEqual property="groupByList[].etiqueta" compareValue="codigo_grupo_edad_grande">edad as codigo_grupo_edad_grande</isEqual>
+			    	<isEqual property="groupByList[].etiqueta" compareValue="sexo">sexo as sexo</isEqual>
+			    	<isEqual property="groupByList[].etiqueta" compareValue="codigo_ccaa_hospital">ccaa as codigo_ccaa_hospital</isEqual>
+				</iterate>
+			FROM POBLACION_CCAA_DIABETES
+			WHERE ANIO=$anio$
+				<include refid="includeEstrategia.POPULATION_DIABETES_FILTER"/>
+			GROUP BY
+				<iterate property="groupByList" conjunction=",">
+			    	<isEqual property="groupByList[].etiqueta" compareValue="codigo_grupo_edad_grande">edad</isEqual>
+			    	<isEqual property="groupByList[].etiqueta" compareValue="sexo">sexo</isEqual>
+			    	<isEqual property="groupByList[].etiqueta" compareValue="codigo_ccaa_hospital">ccaa</isEqual>
+				</iterate>
+		) poblacion on   
+		<iterate property="groupByList" conjunction=" AND ">
+	    	altas.$groupByList[].etiqueta$ = poblacion.$groupByList[].etiqueta$
+		</iterate>
+	</sql>	
+	
+	<sql id="POBLACION_DIABETES_JOIN_TEMPORAL">
+	   LEFT JOIN (
+			SELECT 
+				anio, SUM(poblacion) as poblacion,
+				<iterate property="groupByList" conjunction=",">
+			    	<isEqual property="groupByList[].etiqueta" compareValue="codigo_grupo_edad_grande">edad as codigo_grupo_edad_grande</isEqual>
+			    	<isEqual property="groupByList[].etiqueta" compareValue="sexo">sexo as sexo</isEqual>
+			    	<isEqual property="groupByList[].etiqueta" compareValue="codigo_ccaa_hospital">ccaa as codigo_ccaa_hospital</isEqual>
+				</iterate>
+			FROM POBLACION_CCAA_DIABETES
+			WHERE (1=1) <include refid="includes.FILTRO_ANIOS_SERIE_TEMPORAL"/>
+				<include refid="includeEstrategia.POPULATION_DIABETES_FILTER"/>
+			GROUP BY anio
+				<iterate property="groupByList" conjunction="," open=",">
+			    	<isEqual property="groupByList[].etiqueta" compareValue="codigo_grupo_edad_grande">edad</isEqual>
+			    	<isEqual property="groupByList[].etiqueta" compareValue="sexo">sexo</isEqual>
+			    	<isEqual property="groupByList[].etiqueta" compareValue="codigo_ccaa_hospital">ccaa</isEqual>
+				</iterate>
+		) poblacion on altas.ANIO = poblacion.ANIO 
+		<iterate property="groupByList" conjunction=" AND " open=" AND ">
+	    	altas.$groupByList[].etiqueta$ = poblacion.$groupByList[].etiqueta$
+		</iterate>
+	</sql>
+
+	<sql id="POPULATION_FILTER">
+		<isEqual property="indicadorEtiqueta" compareValue="AASHORTTERMDIABETESCHILDCOMP">
+		    AND edad &gt; 6 AND edad &lt; 15
+		</isEqual>
+		<isEqual property="indicadorEtiqueta" compareValue="AAASTHMACHILD">
+		    AND edad &gt; 2 AND edad &lt; 15
+		</isEqual>
+		<isEqual property="indicadorEtiqueta" compareValue="AACHRONICPATHOLOGIES">
+			AND edad &gt;= 15
+		</isEqual>
+		<iterate property="filtersList" conjunction="AND" open="AND">
+			<isEqual property="filtersList[].excluye" compareValue="true">
+				<iterate property="filtersList[].valoresList" conjunction="AND" open="(" close=")">
+					<isEqual property="filtersList[].nombre" compareValue="codigo_ccaa_hospital">
+						CCAA != $filtersList[].valoresList[].value$
+					</isEqual>
+					<isEqual property="filtersList[].nombre" compareValue="codigo_grupo_edad_grande">
+						<include refid="includeEstrategia.CODIGO_GRUPO_EDAD_MAPPING"/> != $filtersList[].valoresList[].value$
+					</isEqual>
+					<isEqual property="filtersList[].nombre" compareValue="sexo">
+						SEXO != $filtersList[].valoresList[].value$
+					</isEqual>
+				</iterate>
+			</isEqual>
+			<isEqual property="filtersList[].excluye" compareValue="false">
+				<iterate property="filtersList[].valoresList" conjunction="OR" open="(" close=")">
+					<isEqual property="filtersList[].nombre" compareValue="codigo_ccaa_hospital">
+						CCAA = $filtersList[].valoresList[].value$
+					</isEqual>
+					<isEqual property="filtersList[].nombre" compareValue="codigo_grupo_edad_grande">
+						<include refid="includeEstrategia.CODIGO_GRUPO_EDAD_MAPPING"/> = $filtersList[].valoresList[].value$
+					</isEqual>
+					<isEqual property="filtersList[].nombre" compareValue="sexo">
+						SEXO = $filtersList[].valoresList[].value$
+					</isEqual>
+				</iterate>
+			</isEqual>
+		</iterate>
+	</sql>
+	
+	<sql id="CODIGO_GRUPO_EDAD_MAPPING">
+		CASE WHEN (edad &gt;= 0 AND edad &lt;= 14) THEN 1 WHEN (edad &gt;= 15 AND edad &lt;= 39) THEN 2 WHEN (edad &gt;= 40 AND edad &lt;= 64) THEN 3 WHEN (edad &gt;= 65) THEN 4 END
+	</sql>
+
+	<sql id="POPULATION_DIABETES_FILTER">
+		<isEqual property="indicadorEtiqueta" compareValue="DIABETESVITRECTOMY">
+			AND edad &gt;= 1
+		</isEqual>
+		<isEqual property="indicadorEtiqueta" compareValue="AMPUTATIONDIABETES">
+			AND edad &gt;= 1
+		</isEqual>
+		<isEqual property="indicadorEtiqueta" compareValue="DIABETESCOMPLICATIONS">
+			AND edad &gt;= 1
+		</isEqual>
+		<isEqual property="indicadorEtiqueta" compareValue="AMIDIABETES">
+			AND edad &gt;= 1
+		</isEqual>
+		<isEqual property="indicadorEtiqueta" compareValue="ICTUSDIABETES">
+			AND edad &gt;= 1
+		</isEqual><iterate property="filtersList" conjunction="AND" open="AND">
+			<isEqual property="filtersList[].excluye" compareValue="true">
+				<iterate property="filtersList[].valoresList" conjunction="AND" open="(" close=")">
+					<isEqual property="filtersList[].nombre" compareValue="codigo_ccaa_hospital">
+						CCAA != $filtersList[].valoresList[].value$
+					</isEqual>
+					<isEqual property="filtersList[].nombre" compareValue="codigo_grupo_edad_grande">
+						EDAD != $filtersList[].valoresList[].value$
+					</isEqual>
+					<isEqual property="filtersList[].nombre" compareValue="sexo">
+						SEXO != $filtersList[].valoresList[].value$
+					</isEqual>
+				</iterate>
+			</isEqual>
+			<isEqual property="filtersList[].excluye" compareValue="false">
+				<iterate property="filtersList[].valoresList" conjunction="OR" open="(" close=")">
+					<isEqual property="filtersList[].nombre" compareValue="codigo_ccaa_hospital">
+						CCAA = $filtersList[].valoresList[].value$
+					</isEqual>
+					<isEqual property="filtersList[].nombre" compareValue="codigo_grupo_edad_grande">
+						EDAD = $filtersList[].valoresList[].value$
+					</isEqual>
+					<isEqual property="filtersList[].nombre" compareValue="sexo">
+						SEXO = $filtersList[].valoresList[].value$
+					</isEqual>
+				</iterate>
+			</isEqual>
+		</iterate>
+	</sql>
+		
+</sqlMap>

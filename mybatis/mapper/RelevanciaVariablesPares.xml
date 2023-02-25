@@ -1,0 +1,205 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace="RelevanciaVariablesPares">
+
+	
+
+	
+
+	<resultMap id="RelevanciaVariablesParesMapping" type="RelevanciaVariablesPares">
+		<result property="variacionMediaRelativa" column="VARIACION_MEDIA_RELATIVA"/>
+		<result property="variacionMaxRelativa" column="VARIACION_MAX_RELATIVA"/>
+		<result property="indicadorId" column="INDICADOR_ID"/>
+		<result property="variableId1" column="VARIABLE_ID_1"/>
+		<result property="variableId2" column="VARIABLE_ID_2"/>
+		<result property="variable1Desc" column="VARIABLE_1_DESC"/>
+		<result property="variable2Desc" column="VARIABLE_2_DESC"/>
+	</resultMap>
+
+	
+	<select id="SelectAllByIndicadorId" parameterType="java.lang.String" resultType="RelevanciaVariablesParesMapping">
+		SELECT 
+			VP.VARIACION_MEDIA_RELATIVA AS VARIACION_MEDIA_RELATIVA,
+			VP.VARIACION_MAX_RELATIVA AS VARIACION_MAX_RELATIVA,
+			VP.INDICADOR_ID AS INDICADOR_ID,	
+			VP.VARIABLE_ID_1 AS VARIABLE_ID_1, 
+			VP.VARIABLE_ID_2 AS VARIABLE_ID_2,
+			'variable'||VI1.VARIABLE_INFLUENCIA_ID AS VARIABLE_1_DESC,
+			'variable'||VI2.VARIABLE_INFLUENCIA_ID AS VARIABLE_2_DESC
+		FROM 
+			MD_RELEVANCIA_VARIABLES_PARES VP
+		INNER JOIN MD_VARS_INF VI1
+		ON VI1.VARIABLE_INFLUENCIA_ID = VP.VARIABLE_ID_1
+		INNER JOIN MD_VARS_INF VI2
+		ON VI2.VARIABLE_INFLUENCIA_ID = VP.VARIABLE_ID_2
+		AND VP.INDICADOR_ID = #{indicadorId}
+	</select>
+
+
+	
+
+	<select id="SelectAll" resultType="RelevanciaVariablesParesMapping">
+		SELECT
+			VARIACION_MEDIA_RELATIVA,
+			VARIACION_MAX_RELATIVA,
+			INDICADOR_ID,
+			VARIABLE_ID_1,
+			VARIABLE_ID_2
+		FROM
+			MD_RELEVANCIA_VARIABLES_PARES
+	</select>
+
+	
+
+	<select id="CountAll">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_RELEVANCIA_VARIABLES_PARES
+	</select>
+
+	
+
+	<select id="SelectById" parameterType="RelevanciaVariablesPares" resultType="RelevanciaVariablesParesMapping">
+		SELECT
+			VARIACION_MEDIA_RELATIVA,
+			VARIACION_MAX_RELATIVA,
+			INDICADOR_ID,
+			VARIABLE_ID_1,
+			VARIABLE_ID_2
+		FROM
+			MD_RELEVANCIA_VARIABLES_PARES
+		WHERE
+			INDICADOR_ID = #{indicadorId}
+		AND
+			VARIABLE_ID_1 = #{variableId1}
+		AND
+			VARIABLE_ID_2 = #{variableId2}
+	</select>
+
+	
+
+	<select id="SelectList" parameterType="RelevanciaVariablesPares" resultType="RelevanciaVariablesParesMapping">
+		SELECT
+			VARIACION_MEDIA_RELATIVA,
+			VARIACION_MAX_RELATIVA,
+			INDICADOR_ID,
+			VARIABLE_ID_1,
+			VARIABLE_ID_2
+		FROM
+			MD_RELEVANCIA_VARIABLES_PARES
+		<where>
+
+			<if test="variacionMediaRelativa != null">AND 
+				VARIACION_MEDIA_RELATIVA = #{variacionMediaRelativa}
+			</if>
+
+			<if test="variacionMaxRelativa != null">AND 
+				VARIACION_MAX_RELATIVA = #{variacionMaxRelativa}
+			</if>
+
+			<if test="indicadorId != null">AND 
+				INDICADOR_ID = #{indicadorId}
+			</if>
+
+			<if test="variableId1 != null">AND 
+				VARIABLE_ID_1 = #{variableId1}
+			</if>
+
+			<if test="variableId2 != null">AND 
+				VARIABLE_ID_2 = #{variableId2}
+			</if>
+
+		</where>
+		<include refid="includes.ORDER_BY"/>
+	</select>
+
+	
+
+	<select id="CountList" parameterType="RelevanciaVariablesPares">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_RELEVANCIA_VARIABLES_PARES
+		<where>
+
+			<if test="variacionMediaRelativa != null">AND 
+				VARIACION_MEDIA_RELATIVA = #{variacionMediaRelativa}
+			</if>
+
+			<if test="variacionMaxRelativa != null">AND 
+				VARIACION_MAX_RELATIVA = #{variacionMaxRelativa}
+			</if>
+
+			<if test="indicadorId != null">AND 
+				INDICADOR_ID = #{indicadorId}
+			</if>
+
+			<if test="variableId1 != null">AND 
+				VARIABLE_ID_1 = #{variableId1}
+			</if>
+
+			<if test="variableId2 != null">AND 
+				VARIABLE_ID_2 = #{variableId2}
+			</if>
+
+		</where>
+	</select>
+
+	
+
+	<insert id="Insert" parameterType="RelevanciaVariablesPares">
+		INSERT INTO MD_RELEVANCIA_VARIABLES_PARES
+			(
+				VARIACION_MEDIA_RELATIVA,
+				VARIACION_MAX_RELATIVA,
+				INDICADOR_ID,
+				VARIABLE_ID_1,
+				VARIABLE_ID_2
+			)
+		VALUES
+			(
+				#{variacionMediaRelativa},
+				#{variacionMaxRelativa},
+				#{indicadorId},
+				#{variableId1},
+				#{variableId2}
+			)
+	</insert>
+
+	
+
+	<update id="Update" parameterType="RelevanciaVariablesPares">
+		UPDATE MD_RELEVANCIA_VARIABLES_PARES
+		SET
+			VARIACION_MEDIA_RELATIVA = #{variacionMediaRelativa},
+			VARIACION_MAX_RELATIVA = #{variacionMaxRelativa},
+			INDICADOR_ID = #{indicadorId},
+			VARIABLE_ID_1 = #{variableId1},
+			VARIABLE_ID_2 = #{variableId2}
+		WHERE
+			INDICADOR_ID = #{indicadorId}
+		AND
+			VARIABLE_ID_1 = #{variableId1}
+		AND
+			VARIABLE_ID_2 = #{variableId2}
+	</update>
+
+	
+
+	<delete id="Delete" parameterType="RelevanciaVariablesPares">
+		DELETE FROM MD_RELEVANCIA_VARIABLES_PARES
+		WHERE
+			INDICADOR_ID = #{indicadorId}
+		AND
+			VARIABLE_ID_1 = #{variableId1}
+		AND
+			VARIABLE_ID_2 = #{variableId2}
+	</delete>
+
+	
+
+	<delete id="DeleteAll">
+		DELETE FROM MD_RELEVANCIA_VARIABLES_PARES
+	</delete>
+
+</mapper>

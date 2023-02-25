@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="RelevanciaVariables">
+
+	<typeAlias alias="RelevanciaVariables" type="es.msc.aemsc.business.vo.RelevanciaVariablesVO"/>
+
+	<!--
+	<cacheModel id="RelevanciaVariablesCache" type="LRU">
+		<flushInterval hours="24"/>
+		<flushOnExecute statement="RelevanciaVariables.Insert"/>
+		<flushOnExecute statement="RelevanciaVariables.Update"/>
+		<flushOnExecute statement="RelevanciaVariables.Delete"/>
+		<flushOnExecute statement="RelevanciaVariables.DeleteAll"/>
+		<property name="size" value="1000" />
+	</cacheModel>
+	-->
+
+	<resultMap id="RelevanciaVariablesMapping" class="RelevanciaVariables">
+		<result property="variacionAbsoluta"    column="VARIACION_ABSOLUTA"   jdbcType="DOUBLE"    javaType="java.lang.Double"  />
+		<result property="variacionRelativa"    column="VARIACION_RELATIVA"   jdbcType="DOUBLE"    javaType="java.lang.Double"  />
+		<result property="indicadorId"          column="INDICADOR_ID"         jdbcType="INTEGER"   javaType="java.lang.Integer" />
+		<result property="variableId"           column="VARIABLE_ID"          jdbcType="TINYINT"   javaType="java.lang.Short"   />
+		<result property="variableDesc"			column="VARIABLE_DESC"	  	  jdbcType="VARCHAR"   javaType="java.lang.String"  />
+	</resultMap>
+
+<!-- ====== RELEVANCIA DE VARIABLES DE INFLUENCIA para un indicador ====== -->
+	<select id="SelectAllByIndicadorId"  resultMap="RelevanciaVariablesMapping" parameterClass="java.lang.String">
+		SELECT 
+			RV.VARIACION_ABSOLUTA AS VARIACION_ABSOLUTA,
+			RV.VARIACION_RELATIVA AS VARIACION_RELATIVA,
+			RV.INDICADOR_ID AS INDICADOR_ID,
+			RV.VARIABLE_ID AS VARIABLE_ID,
+			'variable'||VI.VARIABLE_INFLUENCIA_ID AS VARIABLE_DESC
+		FROM 
+			MD_RELEVANCIA_VARIABLES RV, MD_VARS_INF VI                    
+		WHERE 
+			VI.VARIABLE_INFLUENCIA_ID = RV.VARIABLE_ID AND
+			RV.INDICADOR_ID = #indicadorId#
+	</select>
+
+	<!-- ====== SelectAll ====== -->
+
+	<select id="SelectAll"  resultMap="RelevanciaVariablesMapping">
+		SELECT
+			VARIACION_ABSOLUTA,
+			VARIACION_RELATIVA,
+			INDICADOR_ID,
+			VARIABLE_ID
+		FROM
+			MD_RELEVANCIA_VARIABLES
+	</select>
+
+	<!-- ====== CountAll ====== -->
+
+	<select id="CountAll"  resultClass="java.lang.Integer">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_RELEVANCIA_VARIABLES
+	</select>
+
+	<!-- ====== SelectById ====== -->
+
+	<select id="SelectById"  resultMap="RelevanciaVariablesMapping"  parameterClass="RelevanciaVariables">
+		SELECT
+			VARIACION_ABSOLUTA,
+			VARIACION_RELATIVA,
+			INDICADOR_ID,
+			VARIABLE_ID
+		FROM
+			MD_RELEVANCIA_VARIABLES
+		WHERE
+			INDICADOR_ID = #indicadorId#
+		AND
+			VARIABLE_ID = #variableId#
+	</select>
+
+	<!-- ====== SelectList ====== -->
+
+	<select id="SelectList"  resultMap="RelevanciaVariablesMapping"  parameterClass="RelevanciaVariables">
+		SELECT
+			VARIACION_ABSOLUTA,
+			VARIACION_RELATIVA,
+			INDICADOR_ID,
+			VARIABLE_ID
+		FROM
+			MD_RELEVANCIA_VARIABLES
+		<dynamic prepend="WHERE">
+
+			<isNotNull prepend="AND" property="variacionAbsoluta">
+				VARIACION_ABSOLUTA = #variacionAbsoluta#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="variacionRelativa">
+				VARIACION_RELATIVA = #variacionRelativa#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="indicadorId">
+				INDICADOR_ID = #indicadorId#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="variableId">
+				VARIABLE_ID = #variableId#
+			</isNotNull>
+
+		</dynamic>
+		<include refid="includes.ORDER_BY" />
+	</select>
+
+	<!-- ====== CountList ====== -->
+
+	<select id="CountList"  resultClass="java.lang.Integer"  parameterClass="RelevanciaVariables">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_RELEVANCIA_VARIABLES
+		<dynamic prepend="WHERE">
+
+			<isNotNull prepend="AND" property="variacionAbsoluta">
+				VARIACION_ABSOLUTA = #variacionAbsoluta#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="variacionRelativa">
+				VARIACION_RELATIVA = #variacionRelativa#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="indicadorId">
+				INDICADOR_ID = #indicadorId#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="variableId">
+				VARIABLE_ID = #variableId#
+			</isNotNull>
+
+		</dynamic>
+	</select>
+
+	<!-- ====== Insert ====== -->
+
+	<insert id="Insert"  parameterClass="RelevanciaVariables">
+		INSERT INTO MD_RELEVANCIA_VARIABLES
+			(
+				VARIACION_ABSOLUTA,
+				VARIACION_RELATIVA,
+				INDICADOR_ID,
+				VARIABLE_ID
+			)
+		VALUES
+			(
+				#variacionAbsoluta:DOUBLE#,
+				#variacionRelativa:DOUBLE#,
+				#indicadorId:INTEGER#,
+				#variableId:TINYINT#
+			)
+	</insert>
+
+	<!-- ====== Update ====== -->
+
+	<update id="Update"  parameterClass="RelevanciaVariables">
+		UPDATE MD_RELEVANCIA_VARIABLES
+		SET
+			VARIACION_ABSOLUTA = #variacionAbsoluta:DOUBLE#,
+			VARIACION_RELATIVA = #variacionRelativa:DOUBLE#,
+			INDICADOR_ID = #indicadorId:INTEGER#,
+			VARIABLE_ID = #variableId:TINYINT#
+		WHERE
+			INDICADOR_ID = #indicadorId#
+		AND
+			VARIABLE_ID = #variableId#
+	</update>
+
+	<!-- ====== Delete ====== -->
+
+	<delete id="Delete"  parameterClass="RelevanciaVariables">
+		DELETE FROM MD_RELEVANCIA_VARIABLES
+		WHERE
+			INDICADOR_ID = #indicadorId#
+		AND
+			VARIABLE_ID = #variableId#
+	</delete>
+
+	<!-- ====== DeleteAll ====== -->
+
+	<delete id="DeleteAll">
+		DELETE FROM MD_RELEVANCIA_VARIABLES
+	</delete>
+
+</sqlMap>
+

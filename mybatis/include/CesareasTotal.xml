@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><mapper namespace="includeCesareasTotal">
+	<sql id="SELECT_LIST_DESCRIPTIVO">
+		SELECT 
+		<include refid="includes.SELECT_DES_DESCRIPTIVO"/>	    
+		numeropartos_i as "numeropartos_i", estancia_mediapartos_f as "estancia_mediapartos_f", edad_mediapartos_f as "edad_mediapartos_f", numero_cesareas_i as "numero_cesareas_i", cesareas_edad_media_f as "cesareas_edad_media_f", cesareas_estancia_media_f as "cesareas_estancia_media_f", tasa_cesareas_p as "tasa_cesareas_p"
+		FROM(
+			SELECT      
+	            <include refid="includes.SELECT_COD_DESCRIPTIVO"/>
+	            numero_altas AS numeropartos_i,
+	            estancias/NULLIF(1.0*numero_altas,0) AS estancia_mediapartos_f,
+	            edad/NULLIF(1.0*numero_altas,0) AS edad_mediapartos_f,
+	            numero_altas_ind AS numero_cesareas_i,
+	            (estancias_ind)/NULLIF(1.0*(numero_altas_ind),0) AS cesareas_estancia_media_f,
+	            (edad_ind)/NULLIF(1.0*(numero_altas_ind),0) AS cesareas_edad_media_f,
+	            100.0*(numero_altas_ind)/NULLIF(1.0*numero_altas,0) AS tasa_cesareas_p
+	        FROM (
+	                SELECT
+	                    <include refid="includes.SELECT_COD_DESCRIPTIVO_G"/>
+	                    SUM(numero_altas) as numero_altas,
+	                    SUM(estancias) as estancias,
+	                    SUM(edad) as edad,
+	                    SUM(CASE WHEN Cesarea=1 THEN numero_altas ELSE 0.0 END) as numero_altas_ind,
+	                    SUM(CASE WHEN Cesarea=1 THEN estancias ELSE 0.0 END) as estancias_ind,
+	                    SUM(CASE WHEN Cesarea=1 THEN edad ELSE 0.0 END) as edad_ind
+	                FROM (
+	                        SELECT 
+	                            <include refid="includes.SELECT_COD_DESCRIPTIVO_CCAA"/>
+	                            Cesarea,
+	                            COUNT(*) as numero_altas,
+	                            SUM(Estancia) as estancias,
+	                            SUM(Edad) as edad
+	                        FROM
+	                                <include refid="includes.FROM_TABLE_CLAUSE"/>
+	                        WHERE Cesarea IS NOT NULL AND Anio=$anio$ 
+	                        <include refid="includes.GROPY_BY_COMMA_DESCRIPTIVO"/>
+	                        	Cesarea 
+					) altas <include refid="includes.GROUP_BY_LIST"/>
+				) altas <include refid="includes.WHERE_ALLCOD_NULL"/>
+		) altas 
+		<include refid="includes.INNER_JOIN_DESCRIPTIVO"/>	   
+	</sql>
+	
+	<sql id="SELECT_LIST_SERIE_TEMPORAL">
+				<include refid="includes.INICIAL_SERIE_TEMPORAL"/>
+						SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_G"/> 
+						    Anio,
+						    <if test="temporalSerieColumn.column == 'DEFAULT'">
+						    	SUM(numero_altas) as numero_altas,
+						    	SUM(CASE WHEN Cesarea=1 THEN numero_altas ELSE 0.0 END) as numero_altas_ind
+						    </if>
+						    <if test="temporalSerieColumn.column == 'RECORDS_DELIVERY'">
+						    	SUM(numero_altas) as numero_altas,
+						    	SUM(numero_altas) as numero_altas_ind
+						    </if>
+						FROM(
+							SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_CCAA"/> 
+							    Anio,Cesarea,
+							    COUNT(*) as numero_altas
+							FROM
+								<include refid="includes.FROM_TABLE_CLAUSE"/>
+							WHERE Cesarea IS NOT NULL 
+								<include refid="includes.FILTRO_ANIOS_SERIE_TEMPORAL"/>
+								<include refid="includes.GROPY_BY_COMMA_DESCRIPTIVO"/>
+								Anio,Cesarea
+						) altas <include refid="includes.GROPY_BY_LIST2"/>
+								Anio
+					<include refid="includes.FINAL_SERIE_TEMPORAL"/>	    
+	</sql>
+	
+</mapper>

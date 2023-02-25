@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="includeReingreso">
+
+	<sql id="SELECT_LIST">
+		<isEqual property="indicadorEtiqueta" compareValue="reingreso">
+			<isEqual property="ejeAnalisisEtiqueta" compareValue="descriptivo_basico">
+				<include refid="includeReingresoTotal.SELECT_LIST_DESCRIPTIVO"/>
+			</isEqual>
+			<isEqual property="ejeAnalisisEtiqueta" compareValue="serie_temporal">
+				<include refid="includeReingresoTotal.SELECT_LIST_SERIE_TEMPORAL"/>
+			</isEqual>
+			<isEqual property="ejeAnalisisEtiqueta" compareValue="valor_base">
+				<include refid="includeReingresoTotal.SELECT_LIST_SERIE_TEMPORAL"/>
+			</isEqual>
+			<isEqual property="ejeAnalisisEtiqueta" compareValue="estandar_intraserie">
+				<include refid="includeReingresoTotal.SELECT_LIST_DESCRIPTIVO"/>
+			</isEqual>
+		</isEqual>
+		<isEqual property="indicadorEtiqueta" compareValue="reingresomental">
+			<isEqual property="ejeAnalisisEtiqueta" compareValue="descriptivo_basico">
+				<include refid="includeReingresoMental.SELECT_LIST_DESCRIPTIVO"/>
+			</isEqual>
+			<isEqual property="ejeAnalisisEtiqueta" compareValue="serie_temporal">
+				<include refid="includeReingresoMental.SELECT_LIST_SERIE_TEMPORAL"/>
+			</isEqual>
+			<isEqual property="ejeAnalisisEtiqueta" compareValue="valor_base">
+				<include refid="includeReingresoMental.SELECT_LIST_SERIE_TEMPORAL"/>
+			</isEqual>
+			<isEqual property="ejeAnalisisEtiqueta" compareValue="estandar_intraserie">
+				<include refid="includeReingresoMental.SELECT_LIST_DESCRIPTIVO"/>
+			</isEqual>
+		</isEqual>
+	</sql>
+	
+</sqlMap>

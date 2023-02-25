@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="includeAmbulatorizacion">
+	<sql id="SELECT_LIST_DESCRIPTIVO">
+		SELECT 
+		<include refid="includes.SELECT_DES_DESCRIPTIVO"/>	    
+		numero_altas_hospitalizacion_i as "numero_altas_hospitalizacion_i", estancia_media_f as "estancia_media_f", numero_altas_amb_i as "numero_altas_amb_i", tasa_ambulatorizacion_p as "tasa_ambulatorizacion_p"
+		<isEqual property="avoidableStaysOrAdmissions" compareValue="true" prepend=",">
+			ROUND(avoidable_admission) as "avoidable_admission_i"
+		</isEqual>
+		FROM(
+			SELECT
+					<include refid="includes.SELECT_COD_DESCRIPTIVO"/>	    
+		            numero_altas_hosp_ind AS numero_altas_hospitalizacion_i,
+		            estancias/NULLIF(1.0*numero_altas_hosp_ind,0) AS estancia_media_f,
+		            numero_altas_ind AS numero_altas_amb_i,
+		            100.0*(numero_altas_ind)/NULLIF(1.0*numero_altas,0) AS tasa_ambulatorizacion_p
+		            <isEqual property="avoidableStaysOrAdmissions" compareValue="true" prepend=",">
+				    	avoidable_admission as avoidable_admission
+				    </isEqual>
+				FROM (
+					SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_G"/> 
+	                    SUM(numero_altas) as numero_altas,
+	                    SUM(estancias) as estancias,
+	                    SUM(numero_altas_hosp_ind) as numero_altas_hosp_ind,
+	                    SUM(numero_altas_ind) as numero_altas_ind
+	                    <isEqual property="avoidableStaysOrAdmissions" compareValue="true" prepend=",">
+					    	SUM(avoidable_admission) as avoidable_admission
+					    </isEqual>                  
+					FROM (
+						<isEqual property="avoidableStaysOrAdmissions" compareValue="false">
+							SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_CCAA"/> 
+	                            SUM(CASE WHEN Ambulatorizacion=0 THEN 1 ELSE 0.0 END) as numero_altas_hosp_ind,
+		                    	SUM(CASE WHEN Ambulatorizacion=1 THEN 1 ELSE 0.0 END) as numero_altas_ind,
+	                            COUNT(*) as numero_altas,
+	                            SUM(Estancia) as estancias
+							FROM
+								<include refid="includes.FROM_TABLE_CLAUSE"/>
+							WHERE Ambulatorizacion IS NOT NULL AND Anio=$anio$
+							     AND NOT (Anio=2004 AND (codigo_ccaa_hospital=5 OR codigo_ccaa_hospital=11 OR codigo_ccaa_hospital=12)) 
+							     AND NOT (Anio=2005 AND (codigo_ccaa_hospital=12)) 
+								<include refid="includes.GROPY_BY_COMMA_DESCRIPTIVO"/> Anio
+						</isEqual>
+						<isEqual property="avoidableStaysOrAdmissions" compareValue="true">
+							SELECT
+								ROUND(AVG(HOSPITALES_COUNT)) as HOSPITALES_COUNT,
+								<include refid="includes.SELECT_COD_DESCRIPTIVO_CCAA_NO_HOSP"/>
+								SUM(numero_altas_hosp_ind) as numero_altas_hosp_ind,
+			                    SUM(numero_altas_ind) as numero_altas_ind,
+			                    SUM(numero_altas) as numero_altas,
+			                    SUM(estancias) as estancias,
+			                    SUM(numero_altas*(ambolatorizacion_norma-ambolatorizacion_media)) as avoidable_admission
+							FROM(
+								SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_CCAA"/> 
+									<isNotEqual property="hospitalAsGrouping" compareValue="true">
+										null as codigo_hospital,
+									</isNotEqual>
+		                            SUM(CASE WHEN altas.Ambulatorizacion=0 THEN 1 ELSE 0.0 END) as numero_altas_hosp_ind,
+			                    	SUM(CASE WHEN altas.Ambulatorizacion=1 THEN 1 ELSE 0.0 END) as numero_altas_ind,
+		                            COUNT(*) as numero_altas,
+		                            SUM(Estancia) as estancias,
+		                            AVG(altas.Ambulatorizacion) as ambolatorizacion_media,
+									AVG(norma.Ambulatorizacion) as ambolatorizacion_norma
+									<isNotEqual property="drgAsGrouping" compareValue="true" prepend=",">
+										altas.$drgColumn$
+									</isNotEqual>
+								FROM
+									<include refid="includes.FROM_TABLE_CLAUSE"/> 
+									INNER JOIN AMBULATORIZACION_NORMA norma ON altas.$drgColumn$ = norma.codigo_grd
+								WHERE 
+									altas.Ambulatorizacion IS NOT NULL AND altas.Anio=$anio$ AND norma.anio=$anio$
+									AND NOT (altas.Anio=2004 AND (codigo_ccaa_hospital=5 OR codigo_ccaa_hospital=11 OR codigo_ccaa_hospital=12)) 
+								    AND NOT (altas.Anio=2005 AND (codigo_ccaa_hospital=12))
+									<include refid="includes.GROPY_BY_COMMA_DESCRIPTIVO"/> altas.Anio
+									<isNotEqual property="drgAsGrouping" compareValue="true" prepend=",">
+										altas.$drgColumn$
+									</isNotEqual>
+							) altas
+							<include refid="includes.GROUP_BY_LIST_NOROLLUP"/>
+						</isEqual>
+					) altas <include refid="includes.GROUP_BY_LIST"/>
+				) altas
+				<include refid="includes.WHERE_ALLCOD_NULL"/>
+		) altas 
+		<include refid="includes.INNER_JOIN_DESCRIPTIVO"/>	    
+	</sql>
+	<sql id="SELECT_LIST_SERIE_TEMPORAL">
+				<include refid="includes.INICIAL_SERIE_TEMPORAL"/>
+						SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_G"/> 
+						    Anio,
+						    <isEqual property="temporalSerieColumn.column" compareValue="DEFAULT">
+						    	SUM(numero_altas) as numero_altas,
+						    	SUM(CASE WHEN Ambulatorizacion=1 THEN numero_altas ELSE 0.0 END) as numero_altas_ind
+						    </isEqual>
+						    <isNotEqual property="temporalSerieColumn.column" compareValue="DEFAULT">
+						    	SUM(CASE WHEN Ambulatorizacion=1 THEN numero_altas ELSE 0.0 END) as numero_altas,
+						    	SUM(CASE WHEN Ambulatorizacion=1 THEN numero_altas ELSE 0.0 END) as numero_altas_ind
+						    </isNotEqual>
+						FROM(
+							SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_CCAA"/> 
+							    Anio,Ambulatorizacion,
+							    COUNT(*) as numero_altas
+							FROM
+								<include refid="includes.FROM_TABLE_CLAUSE"/>
+							WHERE Anio>=2004 AND Ambulatorizacion IS NOT NULL
+							     AND NOT (Anio=2004 AND (codigo_ccaa_hospital=5 OR codigo_ccaa_hospital=11 OR codigo_ccaa_hospital=12)) 
+							     AND NOT (Anio=2005 AND (codigo_ccaa_hospital=12)) 
+							    <include refid="includes.FILTRO_ANIOS_SERIE_TEMPORAL"/>
+								<include refid="includes.GROPY_BY_COMMA_DESCRIPTIVO"/>
+								Anio,Ambulatorizacion
+						) altas <include refid="includes.GROPY_BY_LIST2"/>
+								Anio
+					<include refid="includes.FINAL_SERIE_TEMPORAL"/>	    
+	</sql>
+</sqlMap>

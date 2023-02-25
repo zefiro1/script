@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="includeEstanciaMediaTotal">
+	<sql id="SELECT_LIST_DESCRIPTIVO">
+		SELECT 
+		<include refid="includes.SELECT_DES_DESCRIPTIVO"/>
+		numero_altas_i AS "numero_altas_i", numero_estancias_i AS "numero_estancias_i", estancia_media_f AS "estancia_media_f", edad_media_f as "edad_media_f", peso_medio_f as "peso_medio_f"
+		<isEqual property="avoidableStaysOrAdmissions" compareValue="true" prepend=",">
+			ROUND(avoidable_stay) as "avoidable_stay_i"
+		</isEqual>
+		FROM(
+			SELECT
+				<include refid="includes.SELECT_COD_DESCRIPTIVO"/>	    
+	            numero_altas AS numero_altas_i,
+	            estancias AS numero_estancias_i,
+	            estancias/NULLIF(1.0*numero_altas,0) AS estancia_media_f,
+				edad/NULLIF(1.0*numero_altas,0) AS edad_media_f,
+				peso/NULLIF(1.0*numero_altas,0) AS peso_medio_f
+				<isEqual property="avoidableStaysOrAdmissions" compareValue="true" prepend=",">
+					avoidable_stay as avoidable_stay
+				</isEqual>
+				FROM (
+					SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_G"/> 
+	                    SUM(numero_altas) as numero_altas,
+	                    SUM(estancias) as estancias,
+					    SUM(edad) as edad,
+					    SUM(peso) as peso
+					    <isEqual property="avoidableStaysOrAdmissions" compareValue="true" prepend=",">
+					    	SUM(avoidable_stay) as avoidable_stay
+					    </isEqual>
+					FROM (
+						<isEqual property="avoidableStaysOrAdmissions" compareValue="false">
+							SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_CCAA"/> 
+	                            COUNT(*) as numero_altas,
+	                            SUM(Estancia) as estancias,
+	                            SUM(Edad) as edad,
+							    SUM(peso) as peso
+							FROM
+								<include refid="includes.FROM_TABLE_CLAUSE"/>
+							WHERE Anio=$anio$ 
+								<include refid="includes.GROPY_BY_COMMA_DESCRIPTIVO"/>
+								Anio
+						</isEqual>
+						<isEqual property="avoidableStaysOrAdmissions" compareValue="true">
+							SELECT
+								ROUND(AVG(HOSPITALES_COUNT)) as HOSPITALES_COUNT,
+								<include refid="includes.SELECT_COD_DESCRIPTIVO_CCAA_NO_HOSP"/>
+								SUM(numero_altas) as numero_altas,
+								SUM(estancias) as estancias,
+								SUM(edad) as edad,
+								SUM(peso) as peso,
+								SUM(numero_altas*(estancia_media-estancia_norma)) as avoidable_stay
+							FROM(         
+								SELECT
+									<include refid="includes.SELECT_COD_DESCRIPTIVO_CCAA"/>
+									<isNotEqual property="hospitalAsGrouping" compareValue="true">
+										null as codigo_hospital,
+									</isNotEqual>
+									COUNT(*) as numero_altas,
+									SUM(altas.Estancia) as estancias,
+									SUM(Edad) as edad,
+									SUM(peso) as peso,
+									AVG(altas.Estancia) as estancia_media,
+									AVG(norma.estancia) as estancia_norma
+									<isNotEqual property="drgAsGrouping" compareValue="true" prepend=",">
+										altas.$drgColumn$
+									</isNotEqual>									
+								FROM
+									<include refid="includes.FROM_TABLE_CLAUSE"/> 
+									LEFT JOIN ESTANCIA_NORMA norma ON altas.$drgColumn$ = norma.codigo_grd
+								WHERE 
+									altas.Anio=$anio$ AND norma.anio=$anio$
+									<include refid="includes.GROPY_BY_COMMA_DESCRIPTIVO"/> altas.Anio 
+									<isNotEqual property="drgAsGrouping" compareValue="true" prepend=",">
+										altas.$drgColumn$
+									</isNotEqual>
+							) altas
+							<include refid="includes.GROUP_BY_LIST_NOROLLUP"/>
+						</isEqual>
+					) altas <include refid="includes.GROUP_BY_LIST"/>
+				) altas
+				<include refid="includes.WHERE_ALLCOD_NULL"/>
+		) altas 
+		<include refid="includes.INNER_JOIN_DESCRIPTIVO"/>
+	</sql>
+	<sql id="SELECT_LIST_SERIE_TEMPORAL">
+				<include refid="includes.INICIAL_SERIE_TEMPORAL"/>
+						SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_G"/> 
+						    Anio,
+						    <isEqual property="temporalSerieColumn.column" compareValue="DEFAULT">
+							    SUM(numero_altas) as numero_altas,
+							    SUM(estancias)/100.0 as numero_altas_ind
+						    </isEqual>
+						    <isEqual property="temporalSerieColumn.column" compareValue="RECORDS">
+							    SUM(numero_altas) as numero_altas,
+							    SUM(numero_altas) as numero_altas_ind
+						    </isEqual>
+						FROM(
+							SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_CCAA"/> 
+							    Anio,
+							    COUNT(*) as numero_altas,
+							    SUM(Estancia) as estancias 
+							FROM
+								<include refid="includes.FROM_TABLE_CLAUSE"/>
+							WHERE (1=1) 
+								<include refid="includes.FILTRO_ANIOS_SERIE_TEMPORAL"/>
+								<include refid="includes.GROPY_BY_COMMA_DESCRIPTIVO"/>
+								Anio
+						) altas <include refid="includes.GROPY_BY_LIST2"/>
+								Anio
+					<include refid="includes.FINAL_SERIE_TEMPORAL"/>	    
+	</sql>
+
+
+</sqlMap>

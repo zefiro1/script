@@ -1,0 +1,225 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace="UsuariosRoles">
+
+	
+	
+
+	<resultMap id="UsuariosRolesMapping" type="UsuariosRoles">
+		<result property="uid" column="U_ID"/>
+		<result property="rid" column="RID"/>
+		<result property="userName" column="UNAME"/>
+		<result property="roleName" column="RNAME"/>
+		<result property="inherit" column="INHERIT"/>
+	</resultMap>
+	
+	<resultMap id="RolesMapping" type="UsuariosRoles">
+		<result property="rid" column="RID"/>
+		<result property="roleName" column="RNAME"/>
+	</resultMap>
+
+
+	
+
+	<select id="SelectAll" resultType="UsuariosRolesMapping">
+		SELECT
+			UR.U_ID,
+			UR.RID,
+			UR.INHERIT,
+			R.RNAME,
+			U.UNAME
+		FROM
+			MD_USUARIOSROLES UR, MD_USUARIOS U, MD_ROLES R
+		WHERE
+			UR.RID = R.RID AND
+			UR.U_ID = U.U_ID
+	</select>
+
+	
+
+	<select id="CountAll">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_USUARIOSROLES
+	</select>
+
+	
+
+	<select id="SelectById" parameterType="UsuariosRoles" resultType="UsuariosRolesMapping">
+		SELECT
+			UR.U_ID,
+			UR.RID,
+			UR.INHERIT,
+			R.RNAME,
+			U.UNAME
+		FROM
+			MD_USUARIOSROLES UR, MD_USUARIOS U, MD_ROLES R
+		WHERE
+			U.U_ID = #{uid} AND
+			R.RID = #{rid} AND
+			UR.RID = R.RID AND
+			UR.U_ID = U.U_ID
+	</select>
+
+	<select id="SelectRoleList" parameterType="UsuariosRoles" resultType="RolesMapping">
+		SELECT
+			R.RID,
+			R.RNAME
+		FROM
+			MD_ROLES R
+		WHERE
+			1=1
+			<if test="rid != null">AND 
+				R.RID = #{rid}
+			</if>
+			<if test="roleName != null">AND 
+				R.RNAME LIKE #{roleName}
+			</if>						
+
+	</select>
+
+	
+
+	<select id="SelectList" parameterType="UsuariosRoles" resultType="UsuariosRolesMapping">
+		SELECT
+			UR.U_ID,
+			UR.RID,
+			UR.INHERIT,
+			R.RNAME,
+			U.UNAME
+		FROM
+			MD_USUARIOSROLES UR, MD_USUARIOS U, MD_ROLES R
+		WHERE
+			UR.RID = R.RID AND
+			UR.U_ID = U.U_ID
+
+			<if test="uid != null">AND 
+				U.U_ID = #{uid}
+			</if>
+
+			<if test="rid != null">AND 
+				R.RID = #{rid}
+			</if>
+			
+			<if test="inherit != null">AND 
+				UR.INHERIT = #{inherit}
+			</if>
+			
+			<if test="userName != null">AND 
+				U.UNAME LIKE #{userName}
+			</if>
+			
+			<if test="roleName != null">AND 
+				R.RNAME LIKE #{roleName}
+			</if>						
+
+	</select>
+
+	
+
+	<select id="CountList" parameterType="UsuariosRoles">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_USUARIOSROLES
+		<where>
+
+			<if test="uid != null">AND 
+				U_ID = #{uid}
+			</if>
+			
+			<if test="inherit != null">AND 
+				INHERIT = #{inherit}
+			</if>
+
+			<if test="rid != null">AND 
+				RID LIKE #{rid}
+			</if>
+			
+		</where>
+	</select>
+
+	
+
+	<insert id="Insert" parameterType="UsuariosRoles">
+		INSERT INTO MD_USUARIOSROLES
+			(
+				U_ID,
+				RID,
+				INHERIT
+			)
+		VALUES
+			(
+				#{uid},
+				#{rid},
+				#{inherit}
+			)
+	</insert>
+
+	
+
+	<update id="Update" parameterType="UsuariosRoles">
+		UPDATE MD_USUARIOSROLES
+		SET
+			U_ID     = #{uid},
+			RID      = #{rid},
+			INHERIT  = #{inherit}
+		WHERE
+			U_ID = #{uid} AND
+			RID = #{rid}
+	</update>
+
+	
+
+	<delete id="Delete" parameterType="UsuariosRoles">
+		DELETE FROM MD_USUARIOSROLES
+		WHERE
+			U_ID = #{uid} AND
+			RID = #{rid}
+	</delete>
+	
+	<delete id="DeleteByUsuariosList" parameterType="Usuarios">
+		DELETE FROM MD_USUARIOSROLES
+		WHERE
+			U_ID IN(
+				SELECT
+					U_ID
+					FROM MD_USUARIOS
+					
+					<where>
+			
+						<if test="id != null">AND 
+							U_ID = #{id}
+						</if>
+			
+						<if test="name != null">AND 
+							UNAME LIKE #{name}
+						</if>
+						
+						<if test="mail != null">AND 
+							MAIL LIKE #{mail}
+						</if>
+						
+						<if test="password != null">AND 
+							PASSWORD LIKE #{password}
+						</if>						
+			
+						<if test="padreId != null">AND 
+							PADRE_ID = #{padreId}
+						</if>
+			
+						<if test="active != null">AND 
+							ACTIVE = #{active}
+						</if>
+			
+					</where>
+			)
+	</delete>
+
+	
+
+	<delete id="DeleteAll">
+		DELETE FROM MD_USUARIOSROLES
+	</delete>
+
+</mapper>

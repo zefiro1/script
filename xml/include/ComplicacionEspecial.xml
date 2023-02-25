@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="includeComplicacionEspecial">
+	<sql id="SELECT_LIST_DESCRIPTIVO">
+		SELECT 
+		<include refid="includes.SELECT_DES_DESCRIPTIVO"/>	    
+	    numero_altas_i as "numero_altas_i", estancia_media_f as "estancia_media_f", edad_media_f as "edad_media_f", peso_medio_f as "peso_medio_f", tasa_mortalidad_q as "tasa_mortalidad_q", complicacion_numero_altas_i as "compespecial_numero_altas_i", complicacion_estancia_media_f as "compespecial_estancia_media_f", complicacion_edad_media_f as "compespecial_edad_media_f", complicacionpeso_medio_f as "compespecialpeso_medio_f", complicacion_mortalidad_q as "compespecial_mortalidad_q", tasa_complicacion_p as "tasa_compespecial_4p" 	    
+		FROM(
+			SELECT
+					<include refid="includes.SELECT_COD_DESCRIPTIVO"/>	    
+					numero_altas AS numero_altas_i,
+		            estancias/NULLIF(1.0*numero_altas,0) AS estancia_media_f,
+		            edad/NULLIF(1.0*numero_altas,0) AS edad_media_f,
+		            peso/NULLIF(1.0*numero_altas,0) AS peso_medio_f,
+		            numero_altas_complicacion AS complicacion_numero_altas_i,
+		            numero_altas_mortalidad/NULLIF(1.0*numero_altas,0) AS tasa_mortalidad_q,
+		            (estancias_complicacion)/NULLIF(1.0*(numero_altas_complicacion),0) AS complicacion_estancia_media_f,
+		            (edad_complicacion)/NULLIF(1.0*(numero_altas_complicacion),0) AS complicacion_edad_media_f,
+		            (peso_complicacion)/NULLIF(1.0*(numero_altas_complicacion),0) AS complicacionpeso_medio_f,
+		            (mortalidad_complicacion)/NULLIF(1.0*(numero_altas_complicacion),0) AS complicacion_mortalidad_q,
+		            100.0*(numero_altas_complicacion)/NULLIF(1.0*denominador_complicacion,0) AS tasa_complicacion_p
+				FROM (
+					SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_G"/> 
+					    SUM(numero_altas) as numero_altas,
+	                    SUM(estancias) as estancias,
+	                    SUM(edad) as edad,
+	                    SUM(peso) as peso,
+	                    SUM(CASE WHEN Mortal=1 THEN numero_altas ELSE 0.0 END) as numero_altas_mortalidad,
+	                    SUM(CASE WHEN complicacion=1 THEN numero_altas ELSE 0.0 END) as numero_altas_complicacion,
+	                    SUM(CASE WHEN complicacion>=0 THEN numero_altas ELSE 0.0 END) as denominador_complicacion,
+	                    SUM(CASE WHEN complicacion=1 THEN estancias ELSE 0.0 END) as estancias_complicacion,
+	                    SUM(CASE WHEN complicacion=1 THEN edad ELSE 0.0 END) as edad_complicacion,
+	                    SUM(CASE WHEN complicacion=1 THEN peso ELSE 0.0 END) as peso_complicacion,
+	                    SUM(CASE WHEN complicacion=1 AND Mortal=1 THEN numero_altas ELSE 0.0 END) as mortalidad_complicacion
+					    
+					FROM (
+						SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_CCAA"/> 
+                            $indicadorEtiqueta$ AS complicacion,Mortal,
+                            COUNT(*) as numero_altas,
+                            SUM(Estancia) as estancias,
+                            SUM(Edad) as edad,
+                            SUM(peso) as peso
+						FROM
+							<include refid="includes.FROM_TABLE_CLAUSE"/>
+						WHERE Anio=$anio$ AND $indicadorEtiqueta$ IS NOT NULL
+							<include refid="includes.GROPY_BY_COMMA_DESCRIPTIVO"/>
+								$indicadorEtiqueta$,Mortal 
+					) altas <include refid="includes.GROUP_BY_LIST"/>
+				) altas <include refid="includes.WHERE_ALLCOD_NULL"/>
+		) altas 
+		<include refid="includes.INNER_JOIN_DESCRIPTIVO"/>	    
+	</sql>
+	<sql id="SELECT_LIST_SERIE_TEMPORAL">
+				<include refid="includes.INICIAL_SERIE_TEMPORAL"/>
+						SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_G"/> 
+						    Anio,
+							<isEqual property="temporalSerieColumn.column" compareValue="DEFAULT">
+						    	SUM(numero_altas) as numero_altas,
+						    	SUM(CASE WHEN complicacion=1 THEN numero_altas ELSE 0.0 END) as numero_altas_ind
+						    </isEqual>
+							<isEqual property="temporalSerieColumn.column" compareValue="RECORDS">
+								SUM(numero_altas) as numero_altas,
+								SUM(numero_altas) as numero_altas_ind
+						    </isEqual>
+						    <isEqual property="temporalSerieColumn.column" compareValue="RECORDS_COMPLICATIONS">
+								SUM(CASE WHEN complicacion=1 THEN numero_altas ELSE 0.0 END) as numero_altas,
+						    	SUM(CASE WHEN complicacion=1 THEN numero_altas ELSE 0.0 END) as numero_altas_ind
+						    </isEqual>
+						FROM(
+							SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_CCAA"/> 
+							    Anio,$indicadorEtiqueta$ AS complicacion,
+							    COUNT(*) as numero_altas
+							FROM
+							<include refid="includes.FROM_TABLE_CLAUSE"/> 
+							WHERE (1=1) AND
+							    $indicadorEtiqueta$ IS NOT NULL 
+							    <include refid="includes.FILTRO_ANIOS_SERIE_TEMPORAL"/>
+								<include refid="includes.GROPY_BY_COMMA_DESCRIPTIVO"/>
+								Anio,$indicadorEtiqueta$
+						) altas <include refid="includes.GROPY_BY_LIST2"/>
+								Anio
+					<include refid="includes.FINAL_SERIE_TEMPORAL"/>	    
+	</sql>
+</sqlMap>

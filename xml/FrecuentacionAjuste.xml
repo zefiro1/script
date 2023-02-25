@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="includeFrecuentacionAjuste">
+	<sql id="SELECT_LIST_DESCRIPTIVO">
+		SELECT
+			<include refid="includes.SELECT_DES_DESCRIPTIVO"/>
+			<isEqual property="flexibleTypeOfPopulationAdjustment" compareValue="codigo_provincia_hospital">
+				sum(poblacion) as "poblacion_i", sum(pob_ccaa) as "frq_prv_hospital_f", sum(pob_ccaa_pac_aj) as "frq_prv_ajustada_f",
+				sum(pob_ccaa_pac) as "frq_prv_total_f", sum(pob_pac) as "frq_prv_paciente_f", sum(pob_pac_aj) as "frq_prv_paciente_ajustada_f"
+			</isEqual>
+			<isNotEqual property="flexibleTypeOfPopulationAdjustment" compareValue="codigo_provincia_hospital">
+				sum(poblacion) as "poblacion_i", sum(pob_ccaa) as "frq_hospital_f", sum(pob_ccaa_pac_aj) as "frq_ajustada_f",
+				sum(pob_ccaa_pac) as "frq_total_f",sum(pob_pac) as "frq_paciente_f", sum(pob_pac_aj) as "frq_paciente_ajustada_f"
+			</isNotEqual>		
+			FROM (
+				SELECT
+					sum(poblacion) as poblacion,
+					10000*sum(ccaa_hosp)/sum(poblacion) as pob_ccaa,
+					10000*sum(ccaa_hosp_eq)/sum(poblacion) as pob_ccaa_pac,
+					10000*sum(ccaa_hosp*(estandar_rat/poblacion_rat))/sum(poblacion) AS pob_ccaa_pac_aj
+					<dynamic prepend=","><include refid="includes.SELECT_COUNT_COD_DESCRIPTIVO"/></dynamic>
+				FROM(
+					SELECT 
+						SUM(CASE WHEN (
+							(1=1) <include refid="includeRealizacion.FILTER_NOPOPULATION_PREFIXED"/>
+						) THEN 1 ELSE 0 END) as ccaa_hosp,
+						<isNotEqual property="flexibleTypeOfPopulationAdjustment" compareValue="codigo_provincia_hospital">
+							SUM(CASE WHEN 
+								(altas.CODIGO_CCAA_HOSPITAL=altas.CODIGO_CCAA_PACIENTE OR CODIGO_CCAA_PACIENTE=99) 
+								<include refid="includeRealizacion.FILTER_NOPOPULATION_PREFIXED"/>
+							THEN 1 ELSE 0 END) as ccaa_hosp_eq,
+						</isNotEqual>
+						<isEqual property="flexibleTypeOfPopulationAdjustment" compareValue="codigo_provincia_hospital">
+							SUM(CASE WHEN 
+								(altas.CODIGO_PROVINCIA_HOSPITAL=altas.PROVINCIA_RESIDENCIA OR PROVINCIA_RESIDENCIA=99)
+								<include refid="includeRealizacion.FILTER_NOPOPULATION_PREFIXED"/> 
+							THEN 1 ELSE 0 END) as ccaa_hosp_eq,
+						</isEqual>
+			   			<isNotEqual property="typeOfPopulationAdjustment" compareValue="codigo_provincia_hospital">
+			   				(SUM(POBLACION_CCAA_HOSP)/count(*)) AS poblacion,
+							RATIO_TO_REPORT(POBLACION_CCAA_HOSP) OVER(PARTITION BY <include refid="includes.SELECT_COUNT_COD_DESCRIPTIVO"/>) AS poblacion_rat,
+						</isNotEqual>
+						<isEqual property="typeOfPopulationAdjustment" compareValue="codigo_provincia_hospital">
+							(SUM(POBLACION_PROV_HOSP)/count(*)) AS poblacion,
+							RATIO_TO_REPORT(POBLACION_PROV_HOSP) OVER(PARTITION BY <include refid="includes.SELECT_COUNT_COD_DESCRIPTIVO"/>) AS poblacion_rat,									
+						</isEqual>
+						RATIO_TO_REPORT(POBLACION_STD) OVER(PARTITION BY <include refid="includes.SELECT_COUNT_COD_DESCRIPTIVO"/>) AS estandar_rat
+						<dynamic prepend=","><include refid="includes.SELECT_COUNT_COD_DESCRIPTIVO"/></dynamic>
+					FROM 
+						REALIZACION altas
+					WHERE altas.Anio=$anio$
+						<isNotEqual property="typeOfPopulationAdjustment" compareValue="codigo_provincia_hospital">
+							AND POBLACION_CCAA_HOSP is not null AND POBLACION_STD is not null
+						</isNotEqual>
+						<isEqual property="typeOfPopulationAdjustment" compareValue="codigo_provincia_hospital">
+							AND POBLACION_PROV_HOSP is not null AND POBLACION_STD is not null
+						</isEqual>
+						<include refid="includeRealizacion.FILTER_POPULATION_PREFIXED"/> 
+					GROUP BY
+						ROLLUP(<include refid="includes.SELECT_COUNT_COD_DESCRIPTIVO"/>)
+						<dynamic prepend=",">
+						 	<isNotEqual property="typeOfPopulationAdjustment" compareValue="codigo_provincia_hospital"> 
+								POBLACION_CCAA_HOSP,1000*CODIGO_CCAA_HOSPITAL+(SEXO*CODIGO_GRUPO_EDAD),
+							</isNotEqual>
+							<isEqual property="typeOfPopulationAdjustment" compareValue="codigo_provincia_hospital"> 
+								POBLACION_PROV_HOSP,1000*CODIGO_PROVINCIA_HOSPITAL+(SEXO*CODIGO_GRUPO_EDAD),
+							</isEqual>
+							POBLACION_STD
+						</dynamic>
+				) altas GROUP BY <include refid="includes.SELECT_COUNT_COD_DESCRIPTIVO"/>
+			) altas INNER JOIN (
+				SELECT
+					10000*sum(ccaa_pac)/sum(poblacion) as pob_pac,
+					10000*sum(ccaa_pac*(estandar_rat/poblacion_rat))/sum(poblacion) AS pob_pac_aj
+					<dynamic prepend=","><include refid="includeFrecuentacionAjuste.hospital_to_paciente"/></dynamic>
+				FROM(
+					SELECT 
+						SUM(CASE WHEN (
+							(1=1) <include refid="includeRealizacion.FILTER_NOPOPULATION_PREFIXED"/>
+						) THEN 1 ELSE 0 END) as ccaa_pac,
+						<isNotEqual property="typeOfPopulationAdjustment" compareValue="codigo_provincia_hospital">
+							(SUM(POBLACION_CCAA_PAC)/count(*)) AS poblacion,
+							RATIO_TO_REPORT(POBLACION_CCAA_PAC) OVER(PARTITION BY <include refid="includeFrecuentacionAjuste.hospital_to_paciente"/>) AS poblacion_rat,
+						</isNotEqual>
+						<isEqual property="typeOfPopulationAdjustment" compareValue="codigo_provincia_hospital">
+							(SUM(POBLACION_PROV_PAC)/count(*)) AS poblacion,
+							RATIO_TO_REPORT(POBLACION_PROV_PAC) OVER(PARTITION BY <include refid="includeFrecuentacionAjuste.hospital_to_paciente"/>) AS poblacion_rat,									
+						</isEqual>
+						RATIO_TO_REPORT(POBLACION_STD) OVER(PARTITION BY <include refid="includeFrecuentacionAjuste.hospital_to_paciente"/>) AS estandar_rat
+						<dynamic prepend=","><include refid="includeFrecuentacionAjuste.hospital_to_paciente"/></dynamic>
+					FROM
+						REALIZACION altas
+					WHERE altas.Anio=$anio$ 
+						<isNotEqual property="typeOfPopulationAdjustment" compareValue="codigo_provincia_hospital">
+							AND POBLACION_CCAA_PAC is not null AND POBLACION_STD is not null
+						</isNotEqual>
+						<isEqual property="typeOfPopulationAdjustment" compareValue="codigo_provincia_hospital">
+							AND POBLACION_PROV_PAC is not null AND POBLACION_STD is not null
+						</isEqual>
+						<dynamic prepend="AND" open="(" close=")">
+							<iterate property="populationFiltersList" conjunction="AND">
+								<isEqual property="populationFiltersList[].excluye" compareValue="true">
+									<iterate property="populationFiltersList[].valoresList" conjunction="AND" open="(" close=")">
+										<isEqual property="populationFiltersList[].nombre" compareValue="codigo_ccaa_hospital">
+											altas.codigo_ccaa_paciente != $populationFiltersList[].valoresList[].value$
+										</isEqual>
+										<isEqual property="populationFiltersList[].nombre" compareValue="codigo_provincia_hospital">
+											altas.provincia_residencia != $populationFiltersList[].valoresList[].value$
+										</isEqual>
+										<isNotEqual property="populationFiltersList[].nombre" compareValue="codigo_provincia_hospital">
+										<isNotEqual property="populationFiltersList[].nombre" compareValue="codigo_ccaa_hospital">
+											altas.$populationFiltersList[].nombre$ != $populationFiltersList[].valoresList[].value$
+										</isNotEqual>
+										</isNotEqual>
+									 </iterate>
+								</isEqual>
+								<isEqual property="populationFiltersList[].excluye" compareValue="false">
+									<iterate property="populationFiltersList[].valoresList" conjunction="OR" open="(" close=")">
+										<isEqual property="populationFiltersList[].nombre" compareValue="codigo_ccaa_hospital">
+											altas.codigo_ccaa_paciente = $populationFiltersList[].valoresList[].value$
+										</isEqual>
+										<isEqual property="populationFiltersList[].nombre" compareValue="codigo_provincia_hospital">
+											altas.provincia_residencia = $populationFiltersList[].valoresList[].value$
+										</isEqual>
+										<isNotEqual property="populationFiltersList[].nombre" compareValue="codigo_provincia_hospital">
+										<isNotEqual property="populationFiltersList[].nombre" compareValue="codigo_ccaa_hospital">
+											altas.$populationFiltersList[].nombre$ = $populationFiltersList[].valoresList[].value$
+										</isNotEqual>
+										</isNotEqual>
+									 </iterate>				
+								</isEqual>
+							</iterate>
+					</dynamic>
+					GROUP BY
+						ROLLUP(<include refid="includeFrecuentacionAjuste.hospital_to_paciente"/>)
+						<dynamic prepend=",">
+						 	<isNotEqual property="typeOfPopulationAdjustment" compareValue="codigo_provincia_hospital"> 
+								POBLACION_CCAA_PAC,1000*CODIGO_CCAA_PACIENTE+(SEXO*CODIGO_GRUPO_EDAD),
+							</isNotEqual>
+							<isEqual property="typeOfPopulationAdjustment" compareValue="codigo_provincia_hospital"> 
+								POBLACION_PROV_PAC,1000*PROVINCIA_RESIDENCIA+(SEXO*CODIGO_GRUPO_EDAD),
+							</isEqual>
+							POBLACION_STD
+						</dynamic>
+				) altas GROUP BY 
+					<dynamic>			
+						<include refid="includeFrecuentacionAjuste.hospital_to_paciente"/>
+					</dynamic>				
+			) altas2
+			<dynamic prepend=" ON " open="(" close=")">
+				<iterate property="unprefixGroupByListNames" conjunction=" AND " open="(" close=")">
+					altas.$unprefixGroupByListNames[]$ = 
+					<isEqual property="unprefixGroupByListNames[]" compareValue="codigo_provincia_hospital">
+						altas2.provincia_residencia
+					</isEqual>
+					<isEqual property="unprefixGroupByListNames[]" compareValue="codigo_ccaa_hospital">
+						altas2.codigo_ccaa_paciente
+					</isEqual>
+					<isNotEqual property="unprefixGroupByListNames[]" compareValue="codigo_ccaa_hospital">
+						<isNotEqual property="unprefixGroupByListNames[]" compareValue="codigo_provincia_hospital">
+							altas2.$unprefixGroupByListNames[]$
+						</isNotEqual>
+					</isNotEqual>
+				</iterate>
+				<iterate property="unprefixGroupByListNames" conjunction=" AND " open="OR (" close=")">
+					altas.$unprefixGroupByListNames[]$ is null AND
+					<isEqual property="unprefixGroupByListNames[]" compareValue="codigo_provincia_hospital">
+						altas2.provincia_residencia is null
+					</isEqual>
+					<isEqual property="unprefixGroupByListNames[]" compareValue="codigo_ccaa_hospital">
+						altas2.codigo_ccaa_paciente is null
+					</isEqual>
+					<isNotEqual property="unprefixGroupByListNames[]" compareValue="codigo_ccaa_hospital">
+						<isNotEqual property="unprefixGroupByListNames[]" compareValue="codigo_provincia_hospital">
+							altas2.$unprefixGroupByListNames[]$ is null
+						</isNotEqual>
+					</isNotEqual>
+				</iterate>
+			</dynamic>
+		GROUP BY 
+			<include refid="includes.SELECT_COUNT_COD_DESCRIPTIVO"/>
+		<include refid="includes.INNER_JOIN_DESCRIPTIVO"/>
+	</sql>
+	
+	<sql id="hospital_to_paciente">
+		<iterate property="groupByList" conjunction=",">
+			<isEqual property="groupByList[].nombre" compareValue="altas.codigo_provincia_hospital">
+				altas.provincia_residencia
+			</isEqual>
+			<isEqual property="groupByList[].nombre" compareValue="altas.codigo_ccaa_hospital">
+				altas.codigo_ccaa_paciente
+			</isEqual>
+			<isNotEqual property="groupByList[].nombre" compareValue="altas.codigo_ccaa_hospital">
+				<isNotEqual property="groupByList[].nombre" compareValue="altas.codigo_provincia_hospital">
+					NVL($groupByList[].nombre$,999999) as $groupByList[].nombreDeprefixed$
+				</isNotEqual>
+			</isNotEqual>						
+		</iterate>
+	</sql>
+	
+	<sql id="SELECT_LIST_SERIE_TEMPORAL">
+		<include refid="includes.INICIAL_SERIE_TEMPORAL"/>
+			SELECT
+				altas.Anio,
+				100*SUM(CASE WHEN (
+					(1=1) <include refid="includeRealizacion.FILTER_NOPOPULATION_PREFIXED"/>
+				) THEN 1 ELSE 0 END) as numero_altas_ind,
+				<isNotEqual property="typeOfPopulationAdjustment" compareValue="codigo_provincia_hospital">
+	   				SUM(DISTINCT POBLACION_CCAA_HOSP) AS numero_altas
+				</isNotEqual>
+				<isEqual property="typeOfPopulationAdjustment" compareValue="codigo_provincia_hospital">
+					SUM(DISTINCT POBLACION_PROV_HOSP) AS numero_altas
+				</isEqual>
+				<dynamic prepend=","><include refid="includes.SELECT_COUNT_COD_DESCRIPTIVO"/></dynamic>
+			FROM REALIZACION altas
+			WHERE 
+				<iterate property="anios" conjunction="," prepend="altas.anio" open=" in(" close=")">
+					$anios[]$
+				</iterate>
+				<isNotEqual property="typeOfPopulationAdjustment" compareValue="codigo_provincia_hospital">
+					AND POBLACION_CCAA_HOSP is not null
+				</isNotEqual>
+				<isEqual property="typeOfPopulationAdjustment" compareValue="codigo_provincia_hospital">
+					AND POBLACION_PROV_HOSP is not null
+				</isEqual>
+				<include refid="includeRealizacion.FILTER_POPULATION_PREFIXED"/>
+			GROUP BY
+				altas.anio<dynamic prepend=","><include refid="includes.SELECT_COUNT_COD_DESCRIPTIVO"/></dynamic>
+		<include refid="includes.FINAL_SERIE_TEMPORAL"/>
+	</sql>
+</sqlMap>

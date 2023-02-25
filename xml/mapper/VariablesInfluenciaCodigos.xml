@@ -1,0 +1,221 @@
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="VariablesInfluenciaCodigos">
+
+	<typeAlias alias="VariablesInfluenciaCodigos" type="es.msc.aemsc.business.vo.VariablesInfluenciaCodigosVO"/>
+	<typeAlias alias="HospitalVO" type="es.msc.aemsc.business.vo.HospitalVO"/>
+
+	<resultMap id="VariablesInfluenciaCodigosMapping" class="VariablesInfluenciaCodigos">
+		<result property="variableInfluenciaId"     column="VARIABLE_INFLUENCIA_ID"   jdbcType="TINYINT"   javaType="java.lang.Short"   />
+		<result property="codigo"                   column="CODIGO"                   jdbcType="INTEGER"    javaType="java.lang.Integer" />
+		<result property="valor"                    column="VALOR"                    jdbcType="STRING"    javaType="java.lang.String" />
+		<result property="orden"                    column="ORDEN"                    jdbcType="INTEGER"   javaType="java.lang.Integer" />
+		<result property="descripcion"              column="DESCRIPCION"              jdbcType="STRING"    javaType="java.lang.String" />
+		<result property="variableInfluenciaDesc"   column="VARIABLE_INFLUENCIA_DESC" jdbcType="STRING"    javaType="java.lang.String" />
+	</resultMap>
+	
+	<resultMap id="HospitalMapping" class="HospitalVO">
+		<result property="codigo"       column="CODIGO_HOSPITAL"      jdbcType="TINYINT"   	javaType="java.lang.Integer" />
+		<result property="descripcion"  column="DESCRIPCION"          jdbcType="VARCHAR"   	javaType="java.lang.String"  />
+		<result property="grupo"        column="GRUPO_HOSPITAL"       jdbcType="TINYINT"   	javaType="java.lang.Integer" />
+		<result property="provincia"    column="PROVINCIA_HOSPITAL"   jdbcType="TINYINT"    javaType="java.lang.Integer" />
+		<result property="cluster"      column="CLUSTER_HOSPITAL"     jdbcType="TINYINT"    javaType="java.lang.Integer" />
+		<result property="tipo"         column="TIPO_HOSPITAL"        jdbcType="TINYINT"    javaType="java.lang.Integer" />
+	</resultMap>
+
+	<!-- ====== SelectAll ====== -->
+
+	<select id="SelectAll"  resultMap="VariablesInfluenciaCodigosMapping">
+		SELECT
+			VI.VARIABLE_INFLUENCIA_ID,
+			VI.CODIGO,
+			VI.VALOR,
+			VI.ORDEN,
+			VI.DESCRIPCION,
+			V.NOMBRE AS VARIABLE_INFLUENCIA_DESC
+		FROM
+			MD_VARS_INF_CODIGOS VI,
+			MD_VARS_INF V
+		WHERE
+			V.VARIABLE_INFLUENCIA_ID = VI.VARIABLE_INFLUENCIA_ID
+	</select>
+
+	<!-- ====== CountAll ====== -->
+
+	<select id="CountAll"  resultClass="java.lang.Integer">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_VARS_INF_CODIGOS
+	</select>
+
+	<!-- ====== SelectById ====== -->
+
+	<select id="SelectById"  resultMap="VariablesInfluenciaCodigosMapping"  parameterClass="VariablesInfluenciaCodigos">
+		SELECT
+			VI.VARIABLE_INFLUENCIA_ID,
+			VI.CODIGO,
+			VI.VALOR,
+			VI.ORDEN,
+			VI.DESCRIPCION,
+			V.NOMBRE AS VARIABLE_INFLUENCIA_DESC
+		FROM
+			MD_VARS_INF_CODIGOS VI,
+			MD_VARS_INF V
+		WHERE
+			V.VARIABLE_INFLUENCIA_ID = VI.VARIABLE_INFLUENCIA_ID AND
+			VI.VARIABLE_INFLUENCIA_ID = #variableInfluenciaId# AND
+			VI.CODIGO LIKE #codigo#
+	</select>
+
+	<!-- ====== SelectList ====== -->
+
+	<select id="SelectList"  resultMap="VariablesInfluenciaCodigosMapping"  parameterClass="VariablesInfluenciaCodigos">
+		SELECT
+			VI.VARIABLE_INFLUENCIA_ID,
+			VI.CODIGO,
+			VI.VALOR,
+			VI.ORDEN,
+			VI.DESCRIPCION,
+			V.NOMBRE AS VARIABLE_INFLUENCIA_DESC
+		FROM
+			MD_VARS_INF_CODIGOS VI,
+			MD_VARS_INF V
+			
+		WHERE
+			V.VARIABLE_INFLUENCIA_ID = VI.VARIABLE_INFLUENCIA_ID
+
+			<isNotNull prepend="AND" property="variableInfluenciaId">
+				VI.VARIABLE_INFLUENCIA_ID = #variableInfluenciaId#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="codigo">
+				VI.CODIGO LIKE #codigo#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="valor">
+				VI.VALOR LIKE #valor#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="orden">
+				VI.ORDEN = #orden#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="descripcion">
+				VI.DESCRIPCION LIKE #descripcion#
+			</isNotNull>			
+			
+	</select>
+
+	<!-- ====== CountList ====== -->
+
+	<select id="CountList"  resultClass="java.lang.Integer"  parameterClass="VariablesInfluenciaCodigos">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_VARS_INF_CODIGOS
+		<dynamic prepend="WHERE">
+
+			<isNotNull prepend="AND" property="variableInfluenciaId">
+				VI.VARIABLE_INFLUENCIA_ID = #variableInfluenciaId#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="codigo">
+				VI.CODIGO LIKE #codigo#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="valor">
+				VI.VALOR LIKE #valor#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="orden">
+				VI.ORDEN = #orden#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="descripcion">
+				VI.DESCRIPCION LIKE #descripcion#
+			</isNotNull>				
+		</dynamic>
+	</select>
+
+	<!-- ====== Insert ====== -->
+
+	<insert id="Insert"  parameterClass="VariablesInfluenciaCodigos">
+		INSERT INTO MD_VARS_INF_CODIGOS
+			(
+				VARIABLE_INFLUENCIA_ID,
+				CODIGO,
+				VALOR,
+				ORDEN,
+				DESCRIPCION
+			)
+		VALUES
+			(
+				#variableInfluenciaId:TINYINT#,
+				#codigo:STRING#,
+				#valor:STRING#,
+				#orden:TINYINT#,
+				#descripcion:STRING#
+			)
+	</insert>
+
+	<!-- ====== Update ====== -->
+
+	<update id="Update"  parameterClass="VariablesInfluenciaCodigos">
+		UPDATE MD_VARS_INF_CODIGOS
+		SET
+			VARIABLE_INFLUENCIA_ID = #variableInfluenciaId:TINYINT#,
+			CODIGO = #codigo:STRING#,
+			VALOR = #valor:STRING#,
+			ORDEN = #orden:TINYINT#,
+			DESCRIPCION = #descripcion:STRING#
+		WHERE
+			VARIABLE_INFLUENCIA_ID = #variableInfluenciaId#
+		AND
+			CODIGO LIKE #codigo#
+	</update>
+
+	<!-- ====== Delete ====== -->
+
+	<delete id="Delete"  parameterClass="VariablesInfluenciaCodigos">
+		DELETE FROM MD_VARS_INF_CODIGOS
+		WHERE
+			VARIABLE_INFLUENCIA_ID = #variableInfluenciaId#
+		<isNotNull property="codigo">
+			<isNotEmpty property="codigo">
+				AND CODIGO LIKE #codigo#
+			</isNotEmpty>
+		</isNotNull>		
+	</delete>
+	
+	<!-- ====== DeleteAll ====== -->
+
+	<delete id="DeleteAll">
+		CODIGO LIKE #codigo#
+	</delete>
+
+	<delete id="DeleteHospitales">
+		DELETE FROM MD_HOSPITALES
+	</delete>
+
+	<select id="SelectHospitales" resultMap="HospitalMapping">
+		SELECT * FROM MD_HOSPITALES
+	</select>
+	
+	<insert id="InsertHospital"  parameterClass="HospitalVO">
+		INSERT INTO MD_HOSPITALES
+			(
+				CODIGO_HOSPITAL,DESCRIPCION,GRUPO_HOSPITAL,PROVINCIA_HOSPITAL,CLUSTER_HOSPITAL,TIPO_HOSPITAL
+
+			)
+		VALUES
+			(
+				#codigo:INT#,
+				#descripcion:VARCHAR#,
+				#grupo:INT#,
+				#provincia:INT#,
+				#cluster:INT#,
+				#tipo:INT#
+			)
+	</insert>
+</sqlMap>

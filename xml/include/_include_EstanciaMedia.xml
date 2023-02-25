@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="includeEstanciaMedia">
+
+	<sql id="SELECT_LIST">
+		<isEqual property="indicadorEtiqueta" compareValue="estancia">
+			<isEqual property="ejeAnalisisEtiqueta" compareValue="descriptivo_basico">
+				<include refid="includeEstanciaMediaTotal.SELECT_LIST_DESCRIPTIVO"/>
+			</isEqual>
+		</isEqual>
+		<isEqual property="ejeAnalisisEtiqueta" compareValue="serie_temporal">
+				<include refid="includeEstanciaMediaTotal.SELECT_LIST_SERIE_TEMPORAL"/>
+			</isEqual>
+			<isEqual property="ejeAnalisisEtiqueta" compareValue="valor_base">
+				<include refid="includeEstanciaMediaTotal.SELECT_LIST_SERIE_TEMPORAL"/>
+			</isEqual>
+			<isEqual property="ejeAnalisisEtiqueta" compareValue="estandar_intraserie">
+				<include refid="includeEstanciaMediaTotal.SELECT_LIST_DESCRIPTIVO"/>
+			</isEqual>
+		
+	</sql>
+	
+</sqlMap>

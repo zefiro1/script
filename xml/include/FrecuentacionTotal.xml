@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="includeFrecuentacionTotal">
+	<sql id="SELECT_LIST_DESCRIPTIVO">
+		SELECT 
+			<include refid="includes.SELECT_DES_DESCRIPTIVO"/>
+			altas_total_i as "altas_total_i", altas_paciente_i as "altas_paciente_i"	    
+		FROM(
+	        SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_CCAA"/> 
+	             COUNT(*) AS altas_total_i,
+	             SUM(CASE WHEN (codigo_ccaa_paciente = codigo_ccaa_hospital OR codigo_ccaa_paciente=99) THEN 1 ELSE 0 END) AS altas_paciente_i
+	         FROM <include refid="includes.FROM_TABLE_CLAUSE"/> 
+	         WHERE Anio=$anio$
+	         <include refid="includes.WHERE_AND_GROUPBY_ROLLUP_DESCRIPTIVO"/>
+		) altas
+		<include refid="includes.INNER_JOIN_DESCRIPTIVO"/>
+	</sql>
+
+	<sql id="SELECT_LIST_SERIE_TEMPORAL">
+		<include refid="includes.INICIAL_SERIE_TEMPORAL"/>
+		SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_G"/> 
+			Anio,
+			SUM(numero_altas) as numero_altas,
+			SUM(numero_altas) as numero_altas_ind
+			FROM(
+				SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_CCAA"/> 
+				    Anio,COUNT(*) as numero_altas
+				FROM
+					<include refid="includes.FROM_TABLE_CLAUSE"/>
+				WHERE (1=1) 
+					<include refid="includes.FILTRO_ANIOS_SERIE_TEMPORAL"/>
+					<include refid="includes.GROPY_BY_COMMA_DESCRIPTIVO"/>
+					Anio
+			) altas <include refid="includes.GROPY_BY_LIST2"/> anio
+		<include refid="includes.FINAL_SERIE_TEMPORAL"/>	    
+	</sql>
+	
+</sqlMap>

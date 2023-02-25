@@ -1,0 +1,294 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace="Usuarios">
+
+	
+
+	<resultMap id="UsuariosMapping" type="Usuarios">
+		<result property="id" column="U_ID"/>
+		<result property="name" column="UNAME"/>
+		<result property="mail" column="MAIL"/>
+		<result property="password" column="PASSWORD"/>
+		<result property="active" column="ACTIVE"/>
+		<result property="padreId" column="PADRE_ID"/>
+		<result property="passwordChanged" column="PASSWORD_CHANGED"/>
+		<result property="lastPasswords" column="LAST_PASSWORDS"/>
+		<result property="nombreApellidos" column="NAMES"/>
+		<result property="token" column="TOKEN"/>
+		<result property="customFilter" column="CUSTOM_FILTER"/>
+	</resultMap>
+
+
+	
+
+	<select id="SelectAll" resultType="UsuariosMapping">
+		SELECT
+			U_ID,
+			UNAME,
+			MAIL,
+			PASSWORD,
+			PADRE_ID,
+			ACTIVE,
+			PASSWORD_CHANGED,
+			LAST_PASSWORDS,
+			NAMES,
+			TOKEN,
+			CUSTOM_FILTER
+		FROM
+			MD_USUARIOS
+	</select>
+
+	
+
+	<select id="CountAll">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_USUARIOS
+	</select>
+
+	
+
+	<select id="SelectById" parameterType="Usuarios" resultType="UsuariosMapping">
+		SELECT
+			U_ID,
+			UNAME,
+			MAIL,
+			PASSWORD,
+			PADRE_ID,
+			ACTIVE,
+			PASSWORD_CHANGED,
+			LAST_PASSWORDS,
+			NAMES,
+			TOKEN,
+			CUSTOM_FILTER
+		FROM
+			MD_USUARIOS
+		WHERE
+			U_ID = #{id}
+	</select>
+
+	
+
+	<select id="SelectList" parameterType="Usuarios" resultType="UsuariosMapping">
+		SELECT
+			U_ID,
+			UNAME,
+			MAIL,
+			PASSWORD,
+			PADRE_ID,
+			ACTIVE,
+			PASSWORD_CHANGED,
+			LAST_PASSWORDS,
+			NAMES,
+			TOKEN,
+			CUSTOM_FILTER
+		FROM
+			MD_USUARIOS
+		<where>
+			<if test="id != null">AND 
+				U_ID = #{id}
+			</if>
+			
+			<if test="idList != null">AND 
+				U_ID in ( $idList[]$ )
+			</if>
+
+			<if test="name != null">AND 
+				UNAME LIKE #{name}
+			</if>
+			
+			<if test="mail != null">AND 
+				MAIL LIKE #{mail}
+			</if>
+			
+			<if test="password != null">AND 
+				PASSWORD LIKE #{password}
+			</if>						
+
+			<if test="padreId != null">AND 
+				PADRE_ID = #{padreId}
+			</if>
+
+			<if test="active != null">AND 
+				ACTIVE = #{active}
+			</if>
+			
+			<if test="nombreApellidos != null">AND 
+				NAMES = #{nombreApellidos}
+			</if>
+			
+			<if test="token != null">AND 
+				TOKEN = #{token}
+			</if>
+			
+			<if test="customFilter != null">AND 
+				CUSTOM_FILTER = #{customFilter}
+			</if>
+
+		</where>
+		
+	</select>
+
+	
+
+	<select id="CountList" parameterType="Usuarios">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_USUARIOS
+		<where>
+
+			<if test="id != null">AND 
+				U_ID = #{id}
+			</if>
+
+			<if test="name != null">AND 
+				UNAME LIKE #{name}
+			</if>
+			
+			<if test="mail != null">AND 
+				MAIL LIKE #{mail}
+			</if>
+			
+			<if test="password != null">AND 
+				PASSWORD LIKE #{password}
+			</if>						
+
+			<if test="padreId != null">AND 
+				PADRE_ID = #{padreId}
+			</if>
+
+			<if test="active != null">AND 
+				ACTIVE = #{active}
+			</if>
+			
+			<if test="nombreApellidos != null">AND 
+				NAMES = #{nombreApellidos}
+			</if>
+			
+			<if test="token != null">AND 
+				TOKEN = #{token}
+			</if>
+			
+			<if test="customFilter != null">AND 
+				CUSTOM_FILTER = #{customFilter}
+			</if>
+
+		</where>
+	</select>
+
+	
+
+	<insert id="Insert" parameterType="Usuarios">
+		INSERT INTO MD_USUARIOS
+			(
+				U_ID
+				UNAME
+				MAIL
+				PASSWORD
+				PADRE_ID
+				ACTIVE
+				PASSWORD_CHANGED
+				LAST_PASSWORDS
+				NAMES
+				TOKEN
+				CUSTOM_FILTER
+			)
+		VALUES
+			(
+				(SELECT max(U_ID) + 1 FROM MD_USUARIOS)
+				#{name}
+				#{mail}
+				#{password}
+				#{padreId}
+				#{active}
+				#{passwordChanged}
+				#{lastPasswords}
+				#{nombreApellidos}
+				#{token}
+				#{customFilter}
+			)
+	</insert>
+
+	
+
+	<update id="Update" parameterType="Usuarios">
+		UPDATE MD_USUARIOS
+		SET
+			U_ID = #{id}
+			UNAME = #{name}
+			MAIL = #{mail}
+			PASSWORD = #{password}
+			PADRE_ID = #{padreId}
+			ACTIVE   = #{active}
+			PASSWORD_CHANGED = #{passwordChanged}
+			LAST_PASSWORDS = #{lastPasswords}
+			NAMES = #{nombreApellidos}
+			TOKEN = #{token}
+			CUSTOM_FILTER = #{customFilter}
+		WHERE
+			U_ID = #{id}
+	</update>
+
+	
+
+	<delete id="Delete" parameterType="Usuarios">
+		DELETE FROM MD_USUARIOS
+		<where>
+
+			<if test="id != null">AND 
+				U_ID = #{id}
+			</if>
+
+			<if test="name != null">AND 
+				UNAME LIKE #{name}
+			</if>
+			
+			<if test="mail != null">AND 
+				MAIL LIKE #{mail}
+			</if>
+			
+			<if test="password != null">AND 
+				PASSWORD LIKE #{password}
+			</if>						
+
+			<if test="padreId != null">AND 
+				PADRE_ID = #{padreId}
+			</if>
+
+			<if test="active != null">AND 
+				ACTIVE = #{active}
+			</if>
+			
+			<if test="nombreApellidos != null">AND 
+				NAMES LIKE #{nombreApellidos}
+			</if>
+			
+			<if test="token != null">AND 
+				TOKEN LIKE #{token}
+			</if>
+			
+			<if test="customFilter != null">AND 
+				CUSTOM_FILTER LIKE #{customFilter}
+			</if>
+
+		</where>
+	</delete>
+
+	
+
+	<delete id="DeleteAll">
+		DELETE FROM MD_USUARIOS
+	</delete>
+
+	<delete id="DeleteOrphanRoles">
+		DELETE FROM MD_USUARIOSROLES WHERE U_ID NOT IN (SELECT U_ID FROM MD_USUARIOS)
+	</delete>
+	
+	<delete id="DeleteOrphans">
+		DELETE FROM MD_USUARIOS WHERE PADRE_ID NOT IN (SELECT U_ID FROM MD_USUARIOS)
+	</delete>
+	
+	
+
+</mapper>

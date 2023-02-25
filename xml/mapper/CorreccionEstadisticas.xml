@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="CorreccionEstadisticas">
+
+	<typeAlias alias="CorreccionEstadisticas" type="es.msc.aemsc.business.vo.CorreccionEstadisticasVO"/>
+
+	<!--
+	<cacheModel id="CorreccionEstadisticasCache" type="LRU">
+		<flushInterval hours="24"/>
+		<flushOnExecute statement="CorreccionEstadisticas.Insert"/>
+		<flushOnExecute statement="CorreccionEstadisticas.Update"/>
+		<flushOnExecute statement="CorreccionEstadisticas.Delete"/>
+		<flushOnExecute statement="CorreccionEstadisticas.DeleteAll"/>
+		<property name="size" value="1000" />
+	</cacheModel>
+	-->
+
+	<resultMap id="CorreccionEstadisticasMapping" class="CorreccionEstadisticas">
+		<result property="variable1"        column="VARIABLE_1"       jdbcType="INTEGER"   javaType="java.lang.Integer" />
+		<result property="variable2"        column="VARIABLE_2"       jdbcType="INTEGER"   javaType="java.lang.Integer" />
+		<result property="variable3"        column="VARIABLE_3"       jdbcType="INTEGER"   javaType="java.lang.Integer" />
+		<result property="desvOriginal"     column="DESV_ORIGINAL"    jdbcType="DOUBLE"    javaType="java.lang.Double"  />
+		<result property="cvOriginal"       column="CV_ORIGINAL"      jdbcType="DOUBLE"    javaType="java.lang.Double"  />
+		<result property="riOriginal"       column="RI_ORIGINAL"      jdbcType="DOUBLE"    javaType="java.lang.Double"  />
+		<result property="desvCorregido"    column="DESV_CORREGIDO"   jdbcType="DOUBLE"    javaType="java.lang.Double"  />
+		<result property="cvCorregido"      column="CV_CORREGIDO"     jdbcType="DOUBLE"    javaType="java.lang.Double"  />
+		<result property="riCorregido"      column="RI_CORREGIDO"     jdbcType="DOUBLE"    javaType="java.lang.Double"  />
+		<result property="indicadorId"      column="INDICADOR_ID"     jdbcType="INTEGER"   javaType="java.lang.Integer" />
+		<result property="varExplicada"     column="VAR_EXPLICADA"    jdbcType="DOUBLE"    javaType="java.lang.Double"  />
+		<result property="anio"      		column="ANIO"     		  jdbcType="INTEGER"   javaType="java.lang.Integer" />		
+	</resultMap>
+
+
+	<!-- ====== SelectAll ====== -->
+
+	<select id="SelectAll"  resultMap="CorreccionEstadisticasMapping">
+		SELECT
+			VARIABLE_1,
+			VARIABLE_2,
+			VARIABLE_3,
+			DESV_ORIGINAL,
+			CV_ORIGINAL,
+			RI_ORIGINAL,
+			DESV_CORREGIDO,
+			CV_CORREGIDO,
+			RI_CORREGIDO,
+			INDICADOR_ID,
+			VAR_EXPLICADA,
+			ANIO
+		FROM
+			MD_CORRECCION_ESTADISTICAS
+	</select>
+
+	<!-- ====== CountAll ====== -->
+
+	<select id="CountAll"  resultClass="java.lang.Integer">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_CORRECCION_ESTADISTICAS
+	</select>
+
+	<!-- ====== SelectById ====== -->
+
+	<select id="SelectById"  resultMap="CorreccionEstadisticasMapping"  parameterClass="CorreccionEstadisticas">
+		SELECT
+			VARIABLE_1,
+			VARIABLE_2,
+			VARIABLE_3,
+			DESV_ORIGINAL,
+			CV_ORIGINAL,
+			RI_ORIGINAL,
+			DESV_CORREGIDO,
+			CV_CORREGIDO,
+			RI_CORREGIDO,
+			INDICADOR_ID,
+			VAR_EXPLICADA,
+			ANIO
+		FROM
+			MD_CORRECCION_ESTADISTICAS
+		WHERE
+			INDICADOR_ID = #indicadorId#
+	</select>
+
+	<!-- ====== SelectList ====== -->
+
+	<select id="SelectList"  resultMap="CorreccionEstadisticasMapping"  parameterClass="CorreccionEstadisticas">
+		SELECT
+			VARIABLE_1,
+			VARIABLE_2,
+			VARIABLE_3,
+			DESV_ORIGINAL,
+			CV_ORIGINAL,
+			RI_ORIGINAL,
+			DESV_CORREGIDO,
+			CV_CORREGIDO,
+			RI_CORREGIDO,
+			INDICADOR_ID,
+			VAR_EXPLICADA,
+			ANIO
+		FROM
+			MD_CORRECCION_ESTADISTICAS
+		<dynamic prepend="WHERE">
+
+			<isNotNull prepend="AND" property="variable1">
+				VARIABLE_1 = #variable1#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="variable2">
+				VARIABLE_2 = #variable2#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="variable3">
+				VARIABLE_3 = #variable3#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="desvOriginal">
+				DESV_ORIGINAL = #desvOriginal#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="cvOriginal">
+				CV_ORIGINAL = #cvOriginal#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="riOriginal">
+				RI_ORIGINAL = #riOriginal#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="desvCorregido">
+				DESV_CORREGIDO = #desvCorregido#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="cvCorregido">
+				CV_CORREGIDO = #cvCorregido#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="riCorregido">
+				RI_CORREGIDO = #riCorregido#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="indicadorId">
+				INDICADOR_ID = #indicadorId#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="anio">
+				ANIO = #anio#
+			</isNotNull>
+		</dynamic>
+	</select>
+
+	<!-- ====== CountList ====== -->
+
+	<select id="CountList"  resultClass="java.lang.Integer"  parameterClass="CorreccionEstadisticas">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_CORRECCION_ESTADISTICAS
+		<dynamic prepend="WHERE">
+
+			<isNotNull prepend="AND" property="variable1">
+				VARIABLE_1 = #variable1#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="variable2">
+				VARIABLE_2 = #variable2#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="variable3">
+				VARIABLE_3 = #variable3#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="desvOriginal">
+				DESV_ORIGINAL = #desvOriginal#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="cvOriginal">
+				CV_ORIGINAL = #cvOriginal#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="riOriginal">
+				RI_ORIGINAL = #riOriginal#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="desvCorregido">
+				DESV_CORREGIDO = #desvCorregido#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="cvCorregido">
+				CV_CORREGIDO = #cvCorregido#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="riCorregido">
+				RI_CORREGIDO = #riCorregido#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="indicadorId">
+				INDICADOR_ID = #indicadorId#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="anio">
+				ANIO = #anio#
+			</isNotNull>
+		</dynamic>
+	</select>
+
+	<!-- ====== Insert ====== -->
+
+	<insert id="Insert"  parameterClass="CorreccionEstadisticas">
+		INSERT INTO MD_CORRECCION_ESTADISTICAS
+			(
+				VARIABLE_1,
+				VARIABLE_2,
+				VARIABLE_3,
+				DESV_ORIGINAL,
+				CV_ORIGINAL,
+				RI_ORIGINAL,
+				DESV_CORREGIDO,
+				CV_CORREGIDO,
+				RI_CORREGIDO,
+				INDICADOR_ID,
+				VAR_EXPLICADA,
+				ANIO
+			)
+		VALUES
+			(
+				#variable1:INTEGER#,
+				#variable2:INTEGER#,
+				#variable3:INTEGER#,
+				#desvOriginal:DOUBLE#,
+				#cvOriginal:DOUBLE#,
+				#riOriginal:DOUBLE#,
+				#desvCorregido:DOUBLE#,
+				#cvCorregido:DOUBLE#,
+				#riCorregido:DOUBLE#,
+				#indicadorId:INTEGER#,
+				#varExplicada:DOUBLE#,
+				#anio:INTEGER#
+			)
+	</insert>
+
+	<!-- ====== Update ====== -->
+
+	<update id="Update"  parameterClass="CorreccionEstadisticas">
+		UPDATE MD_CORRECCION_ESTADISTICAS
+		SET
+			VARIABLE_1 = #variable1:INTEGER#,
+			VARIABLE_2 = #variable2:INTEGER#,
+			VARIABLE_3 = #variable3:INTEGER#,
+			DESV_ORIGINAL = #desvOriginal:DOUBLE#,
+			CV_ORIGINAL = #cvOriginal:DOUBLE#,
+			RI_ORIGINAL = #riOriginal:DOUBLE#,
+			DESV_CORREGIDO = #desvCorregido:DOUBLE#,
+			CV_CORREGIDO = #cvCorregido:DOUBLE#,
+			RI_CORREGIDO = #riCorregido:DOUBLE#,
+			INDICADOR_ID = #indicadorId:INTEGER#,
+			VAR_EXPLICADA = #varExplicada:DOUBLE#,
+			ANIO = #anio:INTEGER#
+		WHERE
+			INDICADOR_ID = #indicadorId#
+	</update>
+
+	<!-- ====== Delete ====== -->
+
+	<delete id="Delete"  parameterClass="CorreccionEstadisticas">
+		DELETE FROM MD_CORRECCION_ESTADISTICAS
+		WHERE 1=1
+			<isNotEmpty property="indicadorId" prepend="AND">
+				INDICADOR_ID = #indicadorId#
+			</isNotEmpty>
+			<isNotEmpty property="anio" prepend="AND">
+				ANIO = #anio#
+			</isNotEmpty>
+	</delete>
+
+	<!-- ====== DeleteAll ====== -->
+
+	<delete id="DeleteAll">
+		DELETE FROM MD_CORRECCION_ESTADISTICAS
+	</delete>
+
+</sqlMap>
+

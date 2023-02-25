@@ -1,0 +1,224 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+	
+
+	
+
+	<resultMap xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" id="VariablesInfluenciaIndicadoresRolesMapping">
+		<result property="indicadorId" column="INDICADOR_ID"/>
+		<result property="variableInfluenciaId" column="VARIABLE_INFLUENCIA_ID"/>
+		<result property="aplicaFiltro" column="APLICA_FILTRO"/>
+		<result property="aplicaAgrupacion" column="APLICA_AGRUPACION"/>
+		<result property="peso" column="PESO"/>
+		<result property="indicadorDesc" column="INDICADOR_DESC"/>
+		<result property="variableInfluenciaDesc" column="VARIABLE_INFLUENCIA_DESC"/>
+		<result property="roleName" column="RNAME"/>
+		<result property="rid" column="RID"/>
+	</resultMap>
+
+
+	
+
+	<select xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" id="SelectAll">
+		SELECT
+			VI.INDICADOR_ID,
+			VI.VARIABLE_INFLUENCIA_ID,
+			VI.APLICA_FILTRO,
+			VI.APLICA_AGRUPACION,
+			VI.PESO,
+			I.NOMBRE_COMPLETO AS INDICADOR_DESC,
+			V.NOMBRE AS VARIABLE_INFLUENCIA_DESC,
+			R.RNAME AS RNAME,
+			R.RID AS RID
+		FROM
+			MD_VARS_INF_INDICADORES_ROLES VI,
+			MD_INDICADORES I,
+			MD_VARS_INF V,
+			MD_ROLES R
+		WHERE
+			V.VARIABLE_INFLUENCIA_ID = VI.VARIABLE_INFLUENCIA_ID AND
+			I.INDICADOR_ID = VI.INDICADOR_ID AND
+			R.RID = VI.RID  
+	</select>
+
+	
+
+	<select xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" id="CountAll">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_VARS_INF_INDICADORES_ROLES
+	</select>
+
+	
+
+	<select xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" id="SelectById">
+		SELECT
+			VI.INDICADOR_ID,
+			VI.VARIABLE_INFLUENCIA_ID,
+			VI.APLICA_FILTRO,
+			VI.APLICA_AGRUPACION,
+			VI.PESO,
+			I.NOMBRE_COMPLETO AS INDICADOR_DESC,
+			V.NOMBRE AS VARIABLE_INFLUENCIA_DESC,
+			R.RNAME AS RNAME,
+			R.RID AS RID
+		FROM
+			MD_VARS_INF_INDICADORES_ROLES VI,
+			MD_INDICADORES I,
+			MD_VARS_INF V,
+			MD_ROLES R
+		WHERE
+			VI.INDICADOR_ID = #{indicadorId}
+		AND
+			VI.VARIABLE_INFLUENCIA_ID = #{variableInfluenciaId} AND
+			V.VARIABLE_INFLUENCIA_ID = VI.VARIABLE_INFLUENCIA_ID AND
+			I.INDICADOR_ID = VI.INDICADOR_ID AND
+			R.RID = VI.RID
+	</select>
+
+	
+
+	<select xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" id="SelectList">
+		SELECT
+			VI.INDICADOR_ID,
+			VI.VARIABLE_INFLUENCIA_ID,
+			VI.APLICA_FILTRO,
+			VI.APLICA_AGRUPACION,
+			VI.PESO,
+			I.NOMBRE_COMPLETO AS INDICADOR_DESC,
+			V.NOMBRE AS VARIABLE_INFLUENCIA_DESC,
+			R.RNAME AS RNAME,
+			R.RID AS RID
+		FROM
+			MD_VARS_INF_INDICADORES_ROLES VI,
+			MD_INDICADORES I,
+			MD_VARS_INF V,
+			MD_ROLES R			
+		WHERE
+			V.VARIABLE_INFLUENCIA_ID = VI.VARIABLE_INFLUENCIA_ID AND
+			I.INDICADOR_ID = VI.INDICADOR_ID AND
+			R.RID = VI.RID
+			
+			AND 
+				VI.INDICADOR_ID = #{indicadorId}
+			
+
+			AND 
+				VI.VARIABLE_INFLUENCIA_ID = #{variableInfluenciaId}
+			
+
+			AND 
+				VI.APLICA_FILTRO = #{aplicaFiltro}
+			
+
+			AND 
+				VI.APLICA_AGRUPACION = #{aplicaAgrupacion}
+			
+
+			AND 
+				VI.PESO = #{peso}
+			
+			
+			AND 
+				R.RID = #{rid}
+			
+			
+			AND 
+				R.RID = #{roleName}
+			
+	</select>
+
+	
+
+	<select xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" id="CountList">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_VARS_INF_INDICADORES_ROLES
+		
+
+			AND 
+				INDICADOR_ID = #{indicadorId}
+			
+
+			AND 
+				VARIABLE_INFLUENCIA_ID = #{variableInfluenciaId}
+			
+
+			AND 
+				APLICA_FILTRO = #{aplicaFiltro}
+			
+
+			AND 
+				PESO = #{peso}
+			
+			
+			AND 
+				RID = #{rid}
+						
+		
+	</select>
+
+	
+
+	<insert xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" id="Insert">
+		INSERT INTO MD_VARS_INF_INDICADORES_ROLES
+			(
+				INDICADOR_ID,
+				VARIABLE_INFLUENCIA_ID,
+				APLICA_FILTRO,
+				APLICA_AGRUPACION,
+				PESO,
+				RID
+			)
+		VALUES
+			(
+				#{indicadorId},
+				#{variableInfluenciaId},
+				#{aplicaFiltro},
+				#{aplicaAgrupacion},
+				#{peso},
+				#{rid}
+			)
+	</insert>
+
+	
+
+	<update xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" id="Update">
+		UPDATE MD_VARS_INF_INDICADORES_ROLES
+		SET
+			INDICADOR_ID = #{indicadorId},
+			VARIABLE_INFLUENCIA_ID = #{variableInfluenciaId},
+			APLICA_FILTRO = #{aplicaFiltro},
+			APLICA_AGRUPACION = #{aplicaAgrupacion},
+			PESO = #{peso},
+			RID = #{rid}
+		WHERE
+			INDICADOR_ID = #{indicadorId}
+		AND
+			VARIABLE_INFLUENCIA_ID = #{variableInfluenciaId}
+		AND
+			RID = #{rid}			
+	</update>
+
+	
+
+	<delete xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" id="Delete">
+		DELETE FROM MD_VARS_INF_INDICADORES_ROLES
+		WHERE
+			INDICADOR_ID = #{indicadorId}
+		AND
+			VARIABLE_INFLUENCIA_ID = #{variableInfluenciaId}
+		AND
+			RID = #{rid}			
+	</delete>
+
+	
+
+	<delete xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" id="DeleteAll">
+		DELETE FROM MD_VARS_INF_INDICADORES_ROLES
+	</delete>
+
+

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="altasCCS">
+	<sql id="SELECT_LIST_DESCRIPTIVO">
+		SELECT 
+			<dynamic>			
+				<isNotEmpty property="selectList">
+		 			<iterate property="selectList" conjunction="," close=",">$selectList[]$ </iterate>
+				</isNotEmpty>
+		 		<isEmpty property="selectList">
+		  			NULL AS total_desc,
+		 		</isEmpty>
+			</dynamic>
+			null AS HOSPITALES_COUNT,	
+			100*SUM(frecuencia) AS "aa_tasa_p",
+			SUM(altas) AS "numero_altas_i",
+			null as HOSPITALES_COUNT
+		FROM CASEMIX_CCS altas
+		WHERE Anio=$anio$ <include refid="includes.WHERE_DESCRIPTIVO"/>
+		GROUP BY ROLLUP(<include refid="includes.SELECT_COUNT_COD_DESCRIPTIVO"/>)
+		<include refid="includes.ORDER_BY"/>
+	</sql>
+
+	<sql id="SELECT_LIST_SERIE_TEMPORAL">
+   
+	</sql>
+	
+</sqlMap>

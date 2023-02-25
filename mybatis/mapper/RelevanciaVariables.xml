@@ -1,0 +1,178 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace="RelevanciaVariables">
+
+	
+
+	
+
+	<resultMap id="RelevanciaVariablesMapping" type="RelevanciaVariables">
+		<result property="variacionAbsoluta" column="VARIACION_ABSOLUTA"/>
+		<result property="variacionRelativa" column="VARIACION_RELATIVA"/>
+		<result property="indicadorId" column="INDICADOR_ID"/>
+		<result property="variableId" column="VARIABLE_ID"/>
+		<result property="variableDesc" column="VARIABLE_DESC"/>
+	</resultMap>
+
+
+	<select id="SelectAllByIndicadorId" parameterType="java.lang.String" resultType="RelevanciaVariablesMapping">
+		SELECT 
+			RV.VARIACION_ABSOLUTA AS VARIACION_ABSOLUTA,
+			RV.VARIACION_RELATIVA AS VARIACION_RELATIVA,
+			RV.INDICADOR_ID AS INDICADOR_ID,
+			RV.VARIABLE_ID AS VARIABLE_ID,
+			'variable'||VI.VARIABLE_INFLUENCIA_ID AS VARIABLE_DESC
+		FROM 
+			MD_RELEVANCIA_VARIABLES RV, MD_VARS_INF VI                    
+		WHERE 
+			VI.VARIABLE_INFLUENCIA_ID = RV.VARIABLE_ID AND
+			RV.INDICADOR_ID = #{indicadorId}
+	</select>
+
+	
+
+	<select id="SelectAll" resultType="RelevanciaVariablesMapping">
+		SELECT
+			VARIACION_ABSOLUTA,
+			VARIACION_RELATIVA,
+			INDICADOR_ID,
+			VARIABLE_ID
+		FROM
+			MD_RELEVANCIA_VARIABLES
+	</select>
+
+	
+
+	<select id="CountAll">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_RELEVANCIA_VARIABLES
+	</select>
+
+	
+
+	<select id="SelectById" parameterType="RelevanciaVariables" resultType="RelevanciaVariablesMapping">
+		SELECT
+			VARIACION_ABSOLUTA,
+			VARIACION_RELATIVA,
+			INDICADOR_ID,
+			VARIABLE_ID
+		FROM
+			MD_RELEVANCIA_VARIABLES
+		WHERE
+			INDICADOR_ID = #{indicadorId}
+		AND
+			VARIABLE_ID = #{variableId}
+	</select>
+
+	
+
+	<select id="SelectList" parameterType="RelevanciaVariables" resultType="RelevanciaVariablesMapping">
+		SELECT
+			VARIACION_ABSOLUTA,
+			VARIACION_RELATIVA,
+			INDICADOR_ID,
+			VARIABLE_ID
+		FROM
+			MD_RELEVANCIA_VARIABLES
+		<where>
+
+			<if test="variacionAbsoluta != null">AND 
+				VARIACION_ABSOLUTA = #{variacionAbsoluta}
+			</if>
+
+			<if test="variacionRelativa != null">AND 
+				VARIACION_RELATIVA = #{variacionRelativa}
+			</if>
+
+			<if test="indicadorId != null">AND 
+				INDICADOR_ID = #{indicadorId}
+			</if>
+
+			<if test="variableId != null">AND 
+				VARIABLE_ID = #{variableId}
+			</if>
+
+		</where>
+		<include refid="includes.ORDER_BY"/>
+	</select>
+
+	
+
+	<select id="CountList" parameterType="RelevanciaVariables">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_RELEVANCIA_VARIABLES
+		<where>
+
+			<if test="variacionAbsoluta != null">AND 
+				VARIACION_ABSOLUTA = #{variacionAbsoluta}
+			</if>
+
+			<if test="variacionRelativa != null">AND 
+				VARIACION_RELATIVA = #{variacionRelativa}
+			</if>
+
+			<if test="indicadorId != null">AND 
+				INDICADOR_ID = #{indicadorId}
+			</if>
+
+			<if test="variableId != null">AND 
+				VARIABLE_ID = #{variableId}
+			</if>
+
+		</where>
+	</select>
+
+	
+
+	<insert id="Insert" parameterType="RelevanciaVariables">
+		INSERT INTO MD_RELEVANCIA_VARIABLES
+			(
+				VARIACION_ABSOLUTA,
+				VARIACION_RELATIVA,
+				INDICADOR_ID,
+				VARIABLE_ID
+			)
+		VALUES
+			(
+				#{variacionAbsoluta},
+				#{variacionRelativa},
+				#{indicadorId},
+				#{variableId}
+			)
+	</insert>
+
+	
+
+	<update id="Update" parameterType="RelevanciaVariables">
+		UPDATE MD_RELEVANCIA_VARIABLES
+		SET
+			VARIACION_ABSOLUTA = #{variacionAbsoluta},
+			VARIACION_RELATIVA = #{variacionRelativa},
+			INDICADOR_ID = #{indicadorId},
+			VARIABLE_ID = #{variableId}
+		WHERE
+			INDICADOR_ID = #{indicadorId}
+		AND
+			VARIABLE_ID = #{variableId}
+	</update>
+
+	
+
+	<delete id="Delete" parameterType="RelevanciaVariables">
+		DELETE FROM MD_RELEVANCIA_VARIABLES
+		WHERE
+			INDICADOR_ID = #{indicadorId}
+		AND
+			VARIABLE_ID = #{variableId}
+	</delete>
+
+	
+
+	<delete id="DeleteAll">
+		DELETE FROM MD_RELEVANCIA_VARIABLES
+	</delete>
+
+</mapper>

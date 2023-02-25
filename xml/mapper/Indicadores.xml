@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Indicadores">
+
+	<typeAlias alias="Indicadores" type="es.msc.aemsc.business.vo.IndicadoresVO"/>
+	<typeAlias alias="FichaTecnica" type="es.msc.aemsc.business.vo.FichaTecnicaVO"/>	
+
+	<!--
+	<cacheModel id="IndicadoresCache" type="LRU">
+		<flushInterval hours="24"/>
+		<flushOnExecute statement="Indicadores.Insert"/>
+		<flushOnExecute statement="Indicadores.Update"/>
+		<flushOnExecute statement="Indicadores.Delete"/>
+		<flushOnExecute statement="Indicadores.DeleteAll"/>
+		<property name="size" value="1000" />
+	</cacheModel>
+	-->
+
+	<resultMap id="IndicadoresMapping" class="Indicadores">
+		<result property="indicadorId"          column="INDICADOR_ID"          jdbcType="INTEGER"   javaType="java.lang.Integer" />
+		<result property="nombre"               column="NOMBRE"                jdbcType="VARCHAR"   javaType="java.lang.String"  />
+		<result property="grupoIndicadorId"     column="GRUPO_INDICADOR_ID"    jdbcType="TINYINT"   javaType="java.lang.Short"   />
+		<result property="nombreCompleto"       column="NOMBRE_COMPLETO"       jdbcType="VARCHAR"   javaType="java.lang.String"  />
+		<result property="descripcion"          column="DESCRIPCION"           jdbcType="VARCHAR"   javaType="java.lang.String"  />
+		<result property="activo"               column="ACTIVO"                jdbcType="BIT"       javaType="java.lang.Boolean" />
+		<result property="etiqueta"          	column="ETIQUETA"			   jdbcType="VARCHAR"   javaType="java.lang.String"  />
+		<result property="tipoIndicador"        column="CODIGO_TIPO_INDICADOR" jdbcType="TINYINT"   javaType="java.lang.Short"   />
+		<result property="metadata"             column="METADATA"              jdbcType="VARCHAR"   javaType="java.lang.String"   />
+	</resultMap>
+
+	<resultMap id="FichaTecnicaMapping" class="FichaTecnica">
+		<result property="numHospitales"     	column="NUM_HOSPITALES"  	   	 jdbcType="INTEGER"    	javaType="java.lang.Integer" />
+		<result property="numAltas"		    	column="NUM_ALTAS"   			 jdbcType="INTEGER"    	javaType="java.lang.Integer" />
+		<result property="pesoMedio"        	column="PESO_MEDIO"         	 jdbcType="FLOAT"    	javaType="java.lang.Float"   />
+		<result property="pesoMediano"        	column="PESO_MEDIANO"       	 jdbcType="FLOAT"    	javaType="java.lang.Float"   />
+		<result property="grdsInespecificos"   	column="GRDS_INESPECIFICOS"      jdbcType="FLOAT"       javaType="java.lang.Float"   />
+		<result property="clusterHospital"     	column="CLUSTER_HOSPITAL"   	 jdbcType="INTEGER"     javaType="java.lang.Integer" />
+		<result property="grupoHospital"       	column="TIPO_HOSPITAL"     		 jdbcType="INTEGER"     javaType="java.lang.Integer" />
+		<result property="clusterHospitalDesc" 	column="CLUSTER_HOSPITAL_DESC"   jdbcType="VARCHAR"     javaType="java.lang.String" />
+		<result property="grupoHospitalDesc"   	column="TIPO_HOSPITAL_DESC"      jdbcType="VARCHAR"     javaType="java.lang.String" />
+		<result property="numeroDiagnosticos"  	column="NUMERO_DIAGNOSTICOS"   	 jdbcType="FLOAT"       javaType="java.lang.Float" />
+		<result property="numeroProcedimientos"	column="NUMERO_PROCEDIMIENTOS"   jdbcType="FLOAT"       javaType="java.lang.Float" />		
+	</resultMap>
+
+	<!-- ====== SelectAll ====== -->
+
+	<select id="SelectAll"  resultMap="IndicadoresMapping">
+		SELECT
+			INDICADOR_ID,
+			NOMBRE,
+			GRUPO_INDICADOR_ID,
+			NOMBRE_COMPLETO,
+			DESCRIPCION,
+			ACTIVO,
+			ETIQUETA,
+			CODIGO_TIPO_INDICADOR,
+			METADATA
+		FROM
+			MD_INDICADORES
+	</select>
+
+	<!-- ====== CountAll ====== -->
+
+	<select id="CountAll"  resultClass="java.lang.Integer">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_INDICADORES
+	</select>
+
+	<!-- ====== SelectById ====== -->
+
+	<select id="SelectById"  resultMap="IndicadoresMapping"  parameterClass="Indicadores">
+		SELECT
+			INDICADOR_ID,
+			NOMBRE,
+			GRUPO_INDICADOR_ID,
+			NOMBRE_COMPLETO,
+			DESCRIPCION,
+			ACTIVO,
+			ETIQUETA,
+			CODIGO_TIPO_INDICADOR,
+			METADATA
+		FROM
+			MD_INDICADORES
+		WHERE
+			INDICADOR_ID = #indicadorId#
+	</select>
+
+	<!-- ====== SelectList ====== -->
+
+	<select id="SelectList"  resultMap="IndicadoresMapping"  parameterClass="Indicadores">
+		SELECT
+			INDICADOR_ID,
+			NOMBRE,
+			GRUPO_INDICADOR_ID,
+			NOMBRE_COMPLETO,
+			DESCRIPCION,
+			ACTIVO,
+			ETIQUETA,
+			CODIGO_TIPO_INDICADOR,
+			METADATA
+		FROM
+			MD_INDICADORES
+		<dynamic prepend="WHERE">
+
+			<isNotNull prepend="AND" property="indicadorId">
+				INDICADOR_ID = #indicadorId#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="nombre">
+				NOMBRE LIKE #nombre#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="grupoIndicadorId">
+				GRUPO_INDICADOR_ID = #grupoIndicadorId#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="nombreCompleto">
+				NOMBRE_COMPLETO LIKE #nombreCompleto#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="descripcion">
+				DESCRIPCION LIKE #descripcion#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="activo">
+				ACTIVO = #activo#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="etiqueta">
+				ETIQUETA = #etiqueta#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="tipoIndicador">
+				CODIGO_TIPO_INDICADOR = #tipoIndicador#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="metadata">
+				METADATA = #metadata#
+			</isNotNull>
+		</dynamic>
+		ORDER BY PESO ASC
+	</select>
+
+	<!-- ====== CountList ====== -->
+
+	<select id="CountList"  resultClass="java.lang.Integer"  parameterClass="Indicadores">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_INDICADORES
+		<dynamic prepend="WHERE">
+
+			<isNotNull prepend="AND" property="indicadorId">
+				INDICADOR_ID = #indicadorId#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="nombre">
+				NOMBRE LIKE #nombre#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="grupoIndicadorId">
+				GRUPO_INDICADOR_ID = #grupoIndicadorId#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="nombreCompleto">
+				NOMBRE_COMPLETO LIKE #nombreCompleto#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="descripcion">
+				DESCRIPCION LIKE #descripcion#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="activo">
+				ACTIVO = #activo#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="etiqueta">
+				ETIQUETA = #etiqueta#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="tipoIndicador">
+				CODIGO_TIPO_INDICADOR = #tipoIndicador#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="metadata">
+				METADATA = #metadata#
+			</isNotNull>			
+		</dynamic>
+	</select>
+
+	<!-- ====== Insert ====== -->
+
+	<insert id="Insert"  parameterClass="Indicadores">
+		INSERT INTO MD_INDICADORES
+			(
+				INDICADOR_ID,
+				NOMBRE,
+				GRUPO_INDICADOR_ID,
+				NOMBRE_COMPLETO,
+				DESCRIPCION,
+				ACTIVO,
+				ETIQUETA,
+				CODIGO_TIPO_INDICADOR,
+				METADATA
+			)
+		VALUES
+			(
+				#indicadorId:INTEGER#,
+				#nombre:VARCHAR#,
+				#grupoIndicadorId:TINYINT#,
+				#nombreCompleto:VARCHAR#,
+				#descripcion:VARCHAR#,
+				#activo:BIT#,
+				#etiqueta:VARCHAR#,
+				#tipoIndicador:TINYINT#,
+				#metadata:VARCHAR#
+			)
+	</insert>
+
+	<!-- ====== Update ====== -->
+
+	<update id="Update"  parameterClass="Indicadores">
+		UPDATE MD_INDICADORES
+		SET
+			INDICADOR_ID = #indicadorId:INTEGER#,
+			NOMBRE = #nombre:VARCHAR#,
+			GRUPO_INDICADOR_ID = #grupoIndicadorId:TINYINT#,
+			NOMBRE_COMPLETO = #nombreCompleto:VARCHAR#,
+			DESCRIPCION = #descripcion:VARCHAR#,
+			ACTIVO = #activo:BIT#,
+			ETIQUETA = #etiqueta:VARCHAR#,
+			CODIGO_TIPO_INDICADOR = #tipoIndicador:TINYINT#,
+			METADATA = #metadata:VARCHAR#
+		WHERE
+			INDICADOR_ID = #indicadorId#
+	</update>
+
+	<!-- ====== Delete ====== -->
+
+	<delete id="Delete"  parameterClass="Indicadores">
+		DELETE FROM MD_INDICADORES
+		WHERE
+			INDICADOR_ID = #indicadorId#
+	</delete>
+
+	<!-- ====== DeleteAll ====== -->
+
+	<delete id="DeleteAll">
+		DELETE FROM MD_INDICADORES
+	</delete>
+
+	
+	<!-- Ficha tecnica de un ano -->
+	<select id="FichaTecnicaResumen"  resultMap="FichaTecnicaMapping"  parameterClass="es.msc.aemsc.business.dao.ibatis.FiltroHospitalParameter">
+		select 
+    		count(distinct CODIGO_HOSPITAL) as NUM_HOSPITALES,count(*) as NUM_ALTAS, 
+    		avg(PESO) as PESO_MEDIO, median(PESO) as PESO_MEDIANO,
+    		<isGreaterThan property="anio" compareValue="2015">
+    		    100*sum(CASE WHEN (CODIGO_GRD_APR in (955, 956)) THEN 1 ELSE 0 END)/count(*) as GRDS_INESPECIFICOS,
+    		</isGreaterThan>
+    		<isLessThan property="anio" compareValue="2016">
+    			100*sum(CASE WHEN (CODIGO_GRD in (468,469,470,476,477)) THEN 1 ELSE 0 END)/count(*) as GRDS_INESPECIFICOS,
+    		</isLessThan>
+    		null as CLUSTER_HOSPITAL, null as TIPO_HOSPITAL,
+    		null as CLUSTER_HOSPITAL_DESC, null as TIPO_HOSPITAL_DESC,
+    		avg(NUMERO_DIAGNOSTICOS) as NUMERO_DIAGNOSTICOS,
+    		avg(NUMERO_PROCEDIMIENTOS) as NUMERO_PROCEDIMIENTOS
+ 		from complicaciones where ANIO=#anio#
+ 		<isEqual property="filtro.label" compareValue="SNS">
+ 			AND CODIGO_TIPO_HOSPITAL=$filtro.value$
+ 		</isEqual>
+ 		<isEqual property="filtro.label" compareValue="NO_SNS">
+ 			AND CODIGO_TIPO_HOSPITAL=$filtro.value$
+ 		</isEqual>
+ 	</select>
+	 	
+ 	<sql id="FichaTecnicaClusterHospitalCommon">
+ 			
+ 	</sql> 	
+ 	<select id="FichaTecnicaClusterHospital"  resultMap="FichaTecnicaMapping"  parameterClass="es.msc.aemsc.business.dao.ibatis.FiltroHospitalParameter">
+		select
+			count(distinct CODIGO_HOSPITAL) as NUM_HOSPITALES,
+			count(*) as NUM_ALTAS,
+			avg(PESO) as PESO_MEDIO,
+			median(PESO) as PESO_MEDIANO,
+			<isGreaterThan property="anio" compareValue="2015">
+				100*sum(CASE WHEN (CODIGO_GRD_APR in (955, 956)) THEN 1 ELSE 0 END)/count(*) as GRDS_INESPECIFICOS,    		    
+    		</isGreaterThan>
+    		<isLessThan property="anio" compareValue="2016">
+    			100*sum(CASE WHEN (CODIGO_GRD in (468,469,470,476,477)) THEN 1 ELSE 0 END)/count(*) as GRDS_INESPECIFICOS,
+    		</isLessThan>
+			null as TIPO_HOSPITAL,
+			null as TIPO_HOSPITAL_DESC,
+			C.CODIGO_CLUSTER_HOSPITAL as CLUSTER_HOSPITAL,
+			'variable12'||'.codigo'||C.CODIGO_CLUSTER_HOSPITAL as CLUSTER_HOSPITAL_DESC,
+			avg(NUMERO_DIAGNOSTICOS) as NUMERO_DIAGNOSTICOS,
+    		avg(NUMERO_PROCEDIMIENTOS) as NUMERO_PROCEDIMIENTOS
+		from complicaciones T, MD_CLUSTER_HOSPITAL C
+		where 
+			ANIO=#anio#
+			AND C.CODIGO_CLUSTER_HOSPITAL = T.CODIGO_CLUSTER_HOSPITAL
+		<isEqual property="filtro.label" compareValue="SNS">
+ 			AND CODIGO_TIPO_HOSPITAL=$filtro.value$
+ 		</isEqual>
+ 		<isEqual property="filtro.label" compareValue="NO_SNS">
+ 			AND CODIGO_TIPO_HOSPITAL=$filtro.value$
+ 		</isEqual>
+		group by C.CODIGO_CLUSTER_HOSPITAL
+	</select>
+ 	
+ 	 <select id="FichaTecnicaGrupoHospital"  resultMap="FichaTecnicaMapping"  parameterClass="es.msc.aemsc.business.dao.ibatis.FiltroHospitalParameter">
+		select
+			count(distinct CODIGO_HOSPITAL) as NUM_HOSPITALES,
+			count(*) as NUM_ALTAS,
+			avg(PESO) as PESO_MEDIO,
+			median(PESO) as PESO_MEDIANO,
+			<isGreaterThan property="anio" compareValue="2015">
+    			100*sum(CASE WHEN (CODIGO_GRD_APR in (955, 956)) THEN 1 ELSE 0 END)/count(*) as GRDS_INESPECIFICOS,
+    		</isGreaterThan>
+    		<isLessThan property="anio" compareValue="2016">
+			    100*sum(CASE WHEN (CODIGO_GRD in (468,469,470,476,477)) THEN 1 ELSE 0 END)/count(*) as GRDS_INESPECIFICOS,    		    
+    		</isLessThan>
+			null as CLUSTER_HOSPITAL,
+			CODIGO as TIPO_HOSPITAL,
+			null as CLUSTER_HOSPITAL_DESC,
+			'variable1'||'.codigo'||C.CODIGO as TIPO_HOSPITAL_DESC,
+			avg(NUMERO_DIAGNOSTICOS) as NUMERO_DIAGNOSTICOS,
+    		avg(NUMERO_PROCEDIMIENTOS) as NUMERO_PROCEDIMIENTOS
+		from complicaciones, MD_GRUPO_HOSPITAL C
+		where 
+			ANIO=#anio#
+			AND C.CODIGO = CODIGO_GRUPO_HOSPITAL
+		<isEqual property="filtro.label" compareValue="SNS">
+ 			AND CODIGO_TIPO_HOSPITAL=$filtro.value$
+ 		</isEqual>
+ 		<isEqual property="filtro.label" compareValue="NO_SNS">
+ 			AND CODIGO_TIPO_HOSPITAL=$filtro.value$
+ 		</isEqual>
+		group by C.CODIGO
+	</select>
+ 	
+	<select id="SelectPoblacionStdHospital" resultClass="java.util.LinkedHashMap">
+		SELECT
+			CODIGO_SEXO,
+			CODIGO_GRUPO_EDAD_Q,
+			sum(POBLACION) as POBLACION
+		FROM
+			POBLACION_ESTANDAR_HOSPITAL
+		group by cube(CODIGO_SEXO, CODIGO_GRUPO_EDAD_Q)
+	</select>
+
+ 	<select id="Procedimientos" resultClass="java.util.LinkedHashMap" remapResults="true" parameterClass="es.msc.aemsc.business.vo.IndicadorParamsVO">
+		SELECT
+			PROCEDIMIENTO AS "procedimiento",
+			PROCEDIMIENTO AS "procedimiento_desc",
+			100*frecuencia AS "procedimientoPorcentaje_p"
+		FROM casemix altas
+		WHERE Anio=$anio$ <include refid="includes.WHERE_DESCRIPTIVO"/>
+		ORDER BY frecuencia DESC
+	</select>
+</sqlMap>
+

@@ -1,0 +1,344 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace="VariablesInfluencia">
+
+	
+	
+	
+	<resultMap id="VariablesInfluenciaMapping" type="VariablesInfluencia">
+		<result property="variableInfluenciaId" column="VARIABLE_INFLUENCIA_ID"/>
+		<result property="nombre" column="NOMBRE"/>
+		<result property="descripcion" column="DESCRIPCION"/>
+		<result property="activo" column="ACTIVO"/>
+		<result property="etiqueta" column="ETIQUETA"/>
+		<result property="orderByField" column="ORDER_BY_FIELD"/>
+		<result property="groupByField" column="GROUP_BY_FIELD"/>
+		<result property="selectFields" column="SELECT_FIELDS"/>
+		<result property="isInPart" column="IS_IN_PART"/>
+		<result property="isInBayes" column="IS_IN_BAYES"/>
+		<result property="orden" column="ORDEN"/>
+		<result property="peso" column="PESO"/>
+		<result property="canFilter" column="APLICA_FILTRO"/>
+		<result property="canGroup" column="APLICA_AGRUPACION"/>
+		<result property="influyeBayes" column="INFLUYE_BAYES"/>
+		<result property="corrigeBayes" column="CORRIGE_BAYES"/>
+	</resultMap>
+
+	
+
+	<select id="SelectAll" resultType="VariablesInfluenciaMapping">
+		SELECT
+			VARIABLE_INFLUENCIA_ID,
+			NOMBRE,
+			DESCRIPCION,
+			ACTIVO,
+			ETIQUETA,
+			ORDER_BY_FIELD,
+			GROUP_BY_FIELD,
+			SELECT_FIELDS,
+			IS_IN_PART,
+			IS_IN_BAYES,
+			0 as ORDEN,
+			0 as PESO,
+			0 as APLICA_FILTRO,
+			0 as APLICA_AGRUPACION,
+			0 as INFLUYE_BAYES,
+			0 as CORRIGE_BAYES
+		FROM
+			MD_VARS_INF
+	</select>
+
+	
+
+	<select id="CountAll">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_VARS_INF
+	</select>
+
+	
+
+	<select id="SelectById" parameterType="VariablesInfluencia" resultType="VariablesInfluenciaMapping">
+		SELECT
+			VARIABLE_INFLUENCIA_ID,
+			NOMBRE,
+			DESCRIPCION,
+			ACTIVO,
+			ETIQUETA,
+			ORDER_BY_FIELD,
+			GROUP_BY_FIELD,
+			SELECT_FIELDS,
+			IS_IN_PART,
+			IS_IN_BAYES,
+			0 as ORDEN,
+			0 as PESO,
+			0 as APLICA_FILTRO,
+			0 as APLICA_AGRUPACION,
+			0 as INFLUYE_BAYES,
+			0 as CORRIGE_BAYES
+			
+		FROM
+			MD_VARS_INF
+		WHERE
+			VARIABLE_INFLUENCIA_ID = #{variableInfluenciaId}
+	</select>
+
+	
+
+	<select id="SelectList" parameterType="VariablesInfluencia" resultType="VariablesInfluenciaMapping">
+		SELECT
+			VARIABLE_INFLUENCIA_ID,
+			NOMBRE,
+			DESCRIPCION,
+			ACTIVO,
+			ETIQUETA,
+			ORDER_BY_FIELD,
+			GROUP_BY_FIELD,
+			SELECT_FIELDS,
+			IS_IN_PART,
+			IS_IN_BAYES,
+			0 as ORDEN,
+			0 as PESO,
+			0 as APLICA_FILTRO,
+			0 as APLICA_AGRUPACION,
+			0 as INFLUYE_BAYES,
+			0 as CORRIGE_BAYES
+			
+		FROM
+			MD_VARS_INF
+		<where>
+
+			<if test="variableInfluenciaId != null">AND 
+				VARIABLE_INFLUENCIA_ID = #{variableInfluenciaId}
+			</if>
+
+			<if test="nombre != null">AND 
+				NOMBRE LIKE #{nombre}
+			</if>
+
+			<if test="descripcion != null">AND 
+				DESCRIPCION LIKE #{descripcion}
+			</if>
+
+			<if test="activo != null">AND 
+				ACTIVO = #{activo}
+			</if>
+
+			<if test="etiqueta != null">AND 
+				ETIQUETA LIKE #{etiqueta}
+			</if>
+
+			<if test="orderByField != null">AND 
+				ORDER_BY_FIELD LIKE #{orderByField}
+			</if>
+			
+			<if test="groupByField != null">AND 
+				GROUP_BY_FIELD LIKE #{groupByField}
+			</if>
+			
+			<if test="selectFields != null">AND 
+				SELECT_FIELDS LIKE #{selectFields}
+			</if>
+			
+			<if test="isInPart != null">AND 
+				IS_IN_PART = #{isInPart}
+			</if>
+			
+			<if test="isInBayes != null">AND 
+				IS_IN_BAYES = #{isInBayes}
+			</if>
+					
+		</where>
+
+	</select>
+
+	
+
+	<select id="CountList" parameterType="VariablesInfluencia">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_VARS_INF
+		<where>
+
+			<if test="variableInfluenciaId != null">AND 
+				VARIABLE_INFLUENCIA_ID = #{variableInfluenciaId}
+			</if>
+
+			<if test="nombre != null">AND 
+				NOMBRE LIKE #{nombre}
+			</if>
+
+			<if test="descripcion != null">AND 
+				DESCRIPCION LIKE #{descripcion}
+			</if>
+
+			<if test="activo != null">AND 
+				ACTIVO = #{activo}
+			</if>
+
+			<if test="etiqueta != null">AND 
+				ETIQUETA LIKE #{etiqueta}
+			</if>
+
+			<if test="orderByField != null">AND 
+				ORDER_BY_FIELD LIKE #{orderByField}
+			</if>
+			
+			<if test="groupByField != null">AND 
+				GROUP_BY_FIELD LIKE #{groupByField}
+			</if>
+			
+			<if test="selectFields != null">AND 
+				SELECT_FIELDS LIKE #{selectFields}
+			</if>
+			
+			<if test="isInPart != null">AND 
+				IS_IN_PART = #{isInPart}
+			</if>
+			
+			<if test="isInBayes != null">AND 
+				IS_IN_BAYES = #{isInBayes}
+			</if>
+
+		</where>
+	</select>
+
+	
+
+	<insert id="Insert" parameterType="VariablesInfluencia">
+		INSERT INTO MD_VARS_INF
+			(
+				VARIABLE_INFLUENCIA_ID,
+				NOMBRE,
+				DESCRIPCION,
+				ACTIVO,
+				ETIQUETA,			
+				ORDER_BY_FIELD,
+				GROUP_BY_FIELD,
+				SELECT_FIELDS,
+				IS_IN_PART,
+				IS_IN_BAYES
+			)
+		VALUES
+			(
+				#{variableInfluenciaId},
+				#{nombre},
+				#{descripcion},
+				#{activo},
+				#{etiqueta},
+				#{orderByField},
+				#{groupByField},
+				#{selectFields},
+				#{isInPart},
+				#{isInBayes}
+			)
+	</insert>
+
+	
+
+	<update id="Update" parameterType="VariablesInfluencia">
+		UPDATE MD_VARS_INF
+		SET
+			VARIABLE_INFLUENCIA_ID = #{variableInfluenciaId},
+			NOMBRE = #{nombre},
+			DESCRIPCION = #{descripcion},
+			ACTIVO = #{activo},
+			ETIQUETA = #{etiqueta},
+			ORDER_BY_FIELD = #{orderByField},
+			GROUP_BY_FIELD = #{groupByField},
+			SELECT_FIELDS = #{selectFields},
+			IS_IN_PART = #{isInPart},
+			IS_IN_BAYES = #{isInBayes}
+		WHERE
+			VARIABLE_INFLUENCIA_ID = #{variableInfluenciaId}
+	</update>
+
+	
+
+	<delete id="Delete" parameterType="VariablesInfluencia">
+		DELETE FROM MD_VARS_INF
+		WHERE
+			VARIABLE_INFLUENCIA_ID = #{variableInfluenciaId}
+	</delete>
+
+	
+
+	<delete id="DeleteAll">
+		DELETE FROM MD_VARS_INF
+	</delete>
+
+	
+	
+	<select id="SelectFirstRoleVariable" parameterType="java.lang.String" resultType="VariablesInfluenciaMapping">
+		SELECT 
+			VI.VARIABLE_INFLUENCIA_ID, NOMBRE, DESCRIPCION, ACTIVO, ETIQUETA,
+			ORDER_BY_FIELD, GROUP_BY_FIELD,	SELECT_FIELDS, VI.IS_IN_PART, VI.IS_IN_BAYES, VIR.ORDEN, VIR.PESO,
+			APLICA_FILTRO, APLICA_AGRUPACION, 0 as INFLUYE_BAYES, 0 as CORRIGE_BAYES
+		FROM 
+			MD_VARS_INF VI
+			INNER JOIN MD_VARS_INF_INDICADORES_ROLES VIR ON  VIR.VARIABLE_INFLUENCIA_ID = VI.VARIABLE_INFLUENCIA_ID
+    		INNER JOIN MD_ROLES R ON R.RID = VIR.RID
+		WHERE 
+			VI.ACTIVO =1 AND ((VIR.APLICA_FILTRO = 1) OR (VIR.APLICA_AGRUPACION = 1))
+			AND R.RNAME = #{roleName} 
+			AND ROWNUM &lt;= 1
+	</select>
+	
+	<select id="SelectVariablesByIndicadorIdUserName" parameterType="IndicadoresUsuarioVO" resultType="VariablesInfluenciaMapping">
+			SELECT 
+			VI.VARIABLE_INFLUENCIA_ID, NOMBRE, DESCRIPCION, ACTIVO, ETIQUETA,
+			ORDER_BY_FIELD, GROUP_BY_FIELD,	SELECT_FIELDS, VI.IS_IN_PART, VI.IS_IN_BAYES, VIR.ORDEN, VIR.PESO,
+			APLICA_FILTRO, APLICA_AGRUPACION, 0 as INFLUYE_BAYES, 0 as CORRIGE_BAYES
+		FROM 
+			MD_VARS_INF VI, 
+			MD_VARS_INF_INDICADORES_ROLES VIR,
+			MD_USUARIOSROLES UR,
+    		MD_USUARIOS U
+		WHERE 
+			ACTIVO =1  AND 
+			((APLICA_FILTRO = 1) OR (APLICA_AGRUPACION = 1)) AND
+			U.U_ID = UR.U_ID AND
+    		U.UNAME = #{userName} AND
+    		UR.RID = VIR.RID AND
+    		VIR.VARIABLE_INFLUENCIA_ID = VI.VARIABLE_INFLUENCIA_ID AND
+    		INDICADOR_ID = #{indicadorId}
+		ORDER BY PESO
+	</select>
+
+	<select id="SelectVariablesByIndicadorId" parameterType="java.lang.String" resultType="VariablesInfluenciaMapping">
+		SELECT 
+			VI.VARIABLE_INFLUENCIA_ID, NOMBRE, DESCRIPCION, ACTIVO, ETIQUETA, 			
+			ORDER_BY_FIELD, GROUP_BY_FIELD,	SELECT_FIELDS, VI.IS_IN_PART, VI.IS_IN_BAYES, VII.ORDEN, VII.PESO,
+			APLICA_FILTRO, APLICA_AGRUPACION, INFLUYE_BAYES, CORRIGE_BAYES
+		FROM 
+			MD_VARS_INF VI, 
+			MD_VARS_INF_INDICADORES VII
+		WHERE 
+			ACTIVO = 1  AND 
+			((APLICA_FILTRO = 1) OR (APLICA_AGRUPACION = 1) OR (INFLUYE_BAYES = 1) OR (CORRIGE_BAYES = 1)) AND
+			INDICADOR_ID = #{indicadorId} AND 
+			VI.VARIABLE_INFLUENCIA_ID = VII.VARIABLE_INFLUENCIA_ID
+		ORDER BY NOMBRE ASC
+			
+	</select>
+
+	<select id="SelectDefaultGroupingVarByIndicadorId" parameterType="java.lang.String" resultType="VariablesInfluenciaMapping">
+		SELECT
+			VI.VARIABLE_INFLUENCIA_ID, NOMBRE, DESCRIPCION, ACTIVO, ETIQUETA,
+			ORDER_BY_FIELD, GROUP_BY_FIELD,	SELECT_FIELDS, VI.IS_IN_PART, VI.IS_IN_BAYES, VII.ORDEN, VII.PESO, VII.APLICA_FILTRO, VII.APLICA_AGRUPACION,
+			VII.INFLUYE_BAYES, VII.CORRIGE_BAYES
+		FROM 
+			MD_VARS_INF VI, 
+			MD_VARS_INF_INDICADORES VII
+		WHERE 
+			ACTIVO =1  AND 
+			APLICA_AGRUPACION = 1	AND 
+			INDICADOR_ID = #{indicadorId} AND 
+			VI.VARIABLE_INFLUENCIA_ID = VII.VARIABLE_INFLUENCIA_ID AND
+		    ORDEN = (SELECT MIN(ORDEN) FROM MD_VARS_INF_INDICADORES 
+		    		 WHERE INDICADOR_ID = #{indicadorId} AND 
+		    		 APLICA_AGRUPACION = 1)
+	</select>
+
+</mapper>

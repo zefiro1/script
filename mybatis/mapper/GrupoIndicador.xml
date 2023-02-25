@@ -1,0 +1,191 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace="GrupoIndicador">
+
+	
+	
+	
+	
+
+	<resultMap id="GrupoIndicadorMapping" type="GrupoIndicador">
+		<result property="grupoIndicadorId" column="GRUPO_INDICADOR_ID"/>
+		<result property="nombre" column="NOMBRE"/>
+		<result property="descripcion" column="DESCRIPCION"/>
+		<result property="activo" column="ACTIVO"/>
+		<result property="etiqueta" column="ETIQUETA"/>
+	</resultMap>
+
+
+	
+
+	<select id="SelectAll" resultType="GrupoIndicadorMapping">
+		SELECT
+			GRUPO_INDICADOR_ID,
+			NOMBRE,
+			DESCRIPCION,
+			ACTIVO,
+			ETIQUETA
+		FROM
+			MD_GRUPO_INDICADOR
+	</select>
+
+	
+
+	<select id="CountAll">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_GRUPO_INDICADOR
+	</select>
+
+	
+
+	<select id="SelectById" parameterType="GrupoIndicador" resultType="GrupoIndicadorMapping">
+		SELECT
+			GRUPO_INDICADOR_ID,
+			NOMBRE,
+			DESCRIPCION,
+			ACTIVO,
+			ETIQUETA
+		FROM
+			MD_GRUPO_INDICADOR
+		WHERE
+			GRUPO_INDICADOR_ID = #{grupoIndicadorId}
+	</select>
+
+	
+
+	<select id="SelectList" parameterType="GrupoIndicador" resultType="GrupoIndicadorMapping">
+		SELECT
+			GRUPO_INDICADOR_ID,
+			NOMBRE,
+			DESCRIPCION,
+			ACTIVO,
+			ETIQUETA
+		FROM
+			MD_GRUPO_INDICADOR
+		<where>
+
+			<if test="grupoIndicadorId != null">AND 
+				GRUPO_INDICADOR_ID = #{grupoIndicadorId}
+			</if>
+
+			<if test="nombre != null">AND 
+				NOMBRE LIKE #{nombre}
+			</if>
+
+			<if test="descripcion != null">AND 
+				DESCRIPCION LIKE #{descripcion}
+			</if>
+
+			<if test="activo != null">AND 
+				ACTIVO = #{activo}
+			</if>
+
+			<if test="etiqueta != null">AND 
+				ETIQUETA = #{etiqueta}
+			</if>
+
+		</where>
+		ORDER BY GRUPO_INDICADOR_ID
+	</select>
+
+	
+
+	<select id="CountList" parameterType="GrupoIndicador">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_GRUPO_INDICADOR
+		<where>
+
+			<if test="grupoIndicadorId != null">AND 
+				GRUPO_INDICADOR_ID = #{grupoIndicadorId}
+			</if>
+
+			<if test="nombre != null">AND 
+				NOMBRE LIKE #{nombre}
+			</if>
+
+			<if test="descripcion != null">AND 
+				DESCRIPCION LIKE #{descripcion}
+			</if>
+
+			<if test="activo != null">AND 
+				ACTIVO = #{activo}
+			</if>
+
+			<if test="etiqueta != null">AND 
+				ETIQUETA = #{etiqueta}
+			</if>
+
+		</where>
+	</select>
+
+	
+
+	<insert id="Insert" parameterType="GrupoIndicador">
+		INSERT INTO MD_GRUPO_INDICADOR
+			(
+				GRUPO_INDICADOR_ID,
+				NOMBRE,
+				DESCRIPCION,
+				ACTIVO,
+				ETIQUETA
+			)
+		VALUES
+			(
+				#{grupoIndicadorId},
+				#{nombre},
+				#{descripcion},
+				#{activo},
+				#{etiqueta}
+			)
+	</insert>
+
+	
+
+	<update id="Update" parameterType="GrupoIndicador">
+		UPDATE MD_GRUPO_INDICADOR
+		SET
+			GRUPO_INDICADOR_ID = #{grupoIndicadorId},
+			NOMBRE = #{nombre},
+			DESCRIPCION = #{descripcion},
+			ACTIVO = #{activo},
+			ETIQUETA = #{etiqueta}
+		WHERE
+			GRUPO_INDICADOR_ID = #{grupoIndicadorId}
+	</update>
+
+	
+
+	<delete id="Delete" parameterType="GrupoIndicador">
+		DELETE FROM MD_GRUPO_INDICADOR
+		WHERE
+			GRUPO_INDICADOR_ID = #{grupoIndicadorId}
+	</delete>
+
+	
+
+	<delete id="DeleteAll">
+		DELETE FROM MD_GRUPO_INDICADOR
+	</delete>
+
+	<insert id="InsertGrupoIndicadorRoles" parameterType="GrupoIndicadoresRolesVO">
+		INSERT INTO MD_GRUPO_INDICADOR_ROLES
+			(
+				GRUPO_INDICADOR_ID,
+				RID
+			)
+		VALUES
+			(
+				#{grupoIndicadorId},
+				#{rid}
+			)
+	</insert>
+	
+	<delete id="DeleteGrupoIndicadorRoles" parameterType="java.lang.String">
+		DELETE FROM MD_GRUPO_INDICADOR_ROLES
+		WHERE
+			MD_GRUPO_INDICADOR_ROLES.GRUPO_INDICADOR_ID = #{grupoIndicadorId}
+	</delete>
+</mapper>

@@ -1,0 +1,189 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace="EjesAnalisis">
+
+	
+
+	
+
+	<resultMap id="EjesAnalisisMapping" type="EjesAnalisis">
+		<result property="ejeAnalisisId" column="EJE_ANALISIS_ID"/>
+		<result property="nombre" column="NOMBRE"/>
+		<result property="descripcion" column="DESCRIPCION"/>
+		<result property="activo" column="ACTIVO"/>
+		<result property="etiqueta" column="ETIQUETA"/>
+	</resultMap>
+
+
+	
+
+	<select id="SelectAll" resultType="EjesAnalisisMapping">
+		SELECT
+			EJE_ANALISIS_ID,
+			NOMBRE,
+			DESCRIPCION,
+			ACTIVO,
+			ETIQUETA
+		FROM
+			MD_EJES_ANALISIS
+	</select>
+
+	
+
+	<select id="CountAll">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_EJES_ANALISIS
+	</select>
+
+	
+
+	<select id="SelectById" parameterType="EjesAnalisis" resultType="EjesAnalisisMapping">
+		SELECT
+			EJE_ANALISIS_ID,
+			NOMBRE,
+			DESCRIPCION,
+			ACTIVO,
+			ETIQUETA
+		FROM
+			MD_EJES_ANALISIS
+		WHERE
+			EJE_ANALISIS_ID = #{ejeAnalisisId}
+	</select>
+
+	
+
+	<select id="SelectList" parameterType="EjesAnalisis" resultType="EjesAnalisisMapping">
+		SELECT
+			EJE_ANALISIS_ID,
+			NOMBRE,
+			DESCRIPCION,
+			ACTIVO,
+			ETIQUETA
+		FROM
+			MD_EJES_ANALISIS
+		<where>
+
+			<if test="ejeAnalisisId != null">AND 
+				EJE_ANALISIS_ID = #{ejeAnalisisId}
+			</if>
+
+			<if test="nombre != null">AND 
+				NOMBRE LIKE #{nombre}
+			</if>
+
+			<if test="descripcion != null">AND 
+				DESCRIPCION LIKE #{descripcion}
+			</if>
+
+			<if test="activo != null">AND 
+				ACTIVO = #{activo}
+			</if>
+
+			<if test="etiqueta != null">AND 
+				ETIQUETA LIKE #{etiqueta}
+			</if>
+
+		</where>
+		<include refid="includes.ORDER_BY"/>
+	</select>
+
+	
+
+	<select id="CountList" parameterType="EjesAnalisis">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_EJES_ANALISIS
+		<where>
+
+			<if test="ejeAnalisisId != null">AND 
+				EJE_ANALISIS_ID = #{ejeAnalisisId}
+			</if>
+
+			<if test="nombre != null">AND 
+				NOMBRE LIKE #{nombre}
+			</if>
+
+			<if test="descripcion != null">AND 
+				DESCRIPCION LIKE #{descripcion}
+			</if>
+
+			<if test="activo != null">AND 
+				ACTIVO = #{activo}
+			</if>
+
+			<if test="etiqueta != null">AND 
+				ETIQUETA LIKE #{etiqueta}
+			</if>
+
+		</where>
+	</select>
+
+	
+
+	<insert id="Insert" parameterType="EjesAnalisis">
+		INSERT INTO MD_EJES_ANALISIS
+			(
+				EJE_ANALISIS_ID,
+				NOMBRE,
+				DESCRIPCION,
+				ACTIVO,
+				ETIQUETA
+			)
+		VALUES
+			(
+				#{ejeAnalisisId},
+				#{nombre},
+				#{descripcion},
+				#{activo},
+				#{etiqueta}
+			)
+	</insert>
+
+	
+
+	<update id="Update" parameterType="EjesAnalisis">
+		UPDATE MD_EJES_ANALISIS
+		SET
+			EJE_ANALISIS_ID = #{ejeAnalisisId},
+			NOMBRE = #{nombre},
+			DESCRIPCION = #{descripcion},
+			ACTIVO = #{activo},
+			ETIQUETA = #{etiqueta}
+		WHERE
+			EJE_ANALISIS_ID = #{ejeAnalisisId}
+	</update>
+
+	
+
+	<delete id="Delete" parameterType="EjesAnalisis">
+		DELETE FROM MD_EJES_ANALISIS
+		WHERE
+			EJE_ANALISIS_ID = #{ejeAnalisisId}
+	</delete>
+
+	
+
+	<delete id="DeleteAll">
+		DELETE FROM MD_EJES_ANALISIS
+	</delete>
+
+
+	<select id="SelectEjesByIndicadorId" parameterType="java.lang.String" resultType="EjesAnalisisMapping">
+		SELECT
+			E.EJE_ANALISIS_ID,
+			NOMBRE,
+			DESCRIPCION,
+			ACTIVO,
+			ETIQUETA
+		FROM 
+			MD_EJES_ANALISIS E,
+			MD_EJES_ANALISIS_INDICADORES EAI
+		WHERE
+			ACTIVO = 1 AND
+			INDICADOR_ID = #{indicadorId} AND
+			E.EJE_ANALISIS_ID = EAI.EJE_ANALISIS_ID
+	</select>
+
+</mapper>

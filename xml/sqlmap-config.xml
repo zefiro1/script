@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<!DOCTYPE sqlMapConfig PUBLIC  "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+
+<sqlMapConfig>
+
+	<settings
+	  lazyLoadingEnabled="true"
+	  cacheModelsEnabled="true"
+	  enhancementEnabled="true"
+	  useStatementNamespaces="true"
+	  maxSessions="64"
+	  maxTransactions="8"
+	  maxRequests="128"
+	  />
+
+	<!-- mapeos generales de la app -->
+	<sqlMap resource="ibatis/aemsc/_includes.xml"/>
+	
+	
+	<sqlMap resource="ibatis/aemsc/mortalidad/_include_Mortalidad.xml"/>
+	<sqlMap resource="ibatis/aemsc/mortalidad/MortalidadTotal.xml"/>
+	<sqlMap resource="ibatis/aemsc/mortalidad/MortalidadEspecial.xml"/>
+	
+	<sqlMap resource="ibatis/aemsc/estanciaMedia/_include_EstanciaMedia.xml"/>
+	<sqlMap resource="ibatis/aemsc/estanciaMedia/EstanciaMediaTotal.xml"/>	
+	
+	<sqlMap resource="ibatis/aemsc/reingreso/_include_Reingreso.xml"/>
+	<sqlMap resource="ibatis/aemsc/reingreso/ReingresoTotal.xml"/>
+	<sqlMap resource="ibatis/aemsc/reingreso/ReingresoMental.xml"/>
+	
+	<sqlMap resource="ibatis/aemsc/ComplicacionMedica/_include_ComplicacionMedica.xml"/>
+	<sqlMap resource="ibatis/aemsc/ComplicacionMedica/ComplicacionMedicaTotal.xml"/>
+	<sqlMap resource="ibatis/aemsc/ComplicacionMedica/ComplicacionEspecial.xml"/>
+
+	<sqlMap resource="ibatis/aemsc/Realizacion/_include_Realizacion.xml"/>
+	<sqlMap resource="ibatis/aemsc/Realizacion/TasaRealizacion.xml"/>
+	<sqlMap resource="ibatis/aemsc/Realizacion/Realizacion.xml"/>
+	<sqlMap resource="ibatis/aemsc/Realizacion/RealizacionAjuste.xml"/>
+
+	<sqlMap resource="ibatis/aemsc/Frecuentacion/_include_Frecuentacion.xml"/>
+	<sqlMap resource="ibatis/aemsc/Frecuentacion/FrecuentacionTotal.xml"/>
+	<sqlMap resource="ibatis/aemsc/Frecuentacion/DistribucionAltas.xml"/>
+	<sqlMap resource="ibatis/aemsc/Frecuentacion/DistribucionContactos.xml"/>
+	<sqlMap resource="ibatis/aemsc/Frecuentacion/FrecuentacionAjuste.xml"/>
+	<sqlMap resource="ibatis/aemsc/Frecuentacion/DistribucionGRD.xml"/>
+	<sqlMap resource="ibatis/aemsc/Frecuentacion/AltasCCS.xml"/>
+	
+	<sqlMap resource="ibatis/aemsc/InfeccionNosocomial/_include_InfeccionNosocomial.xml"/>
+	<sqlMap resource="ibatis/aemsc/InfeccionNosocomial/InfeccionNosocomialTotal.xml"/>
+	
+	<sqlMap resource="ibatis/aemsc/Cesareas/_include_Cesareas.xml"/>
+	<sqlMap resource="ibatis/aemsc/Cesareas/CesareasTotal.xml"/>
+	
+	<sqlMap resource="ibatis/aemsc/estrategia/_include_estrategia.xml"/>
+	<sqlMap resource="ibatis/aemsc/estrategia/_include_estrategiaCronicidad.xml"/>
+	<sqlMap resource="ibatis/aemsc/estrategia/_include_estrategiaInfarto.xml"/>
+	<sqlMap resource="ibatis/aemsc/estrategia/_include_estrategiaDiabetes.xml"/>
+	<sqlMap resource="ibatis/aemsc/estrategia/EstrategiaCronicidad.xml"/>
+	<sqlMap resource="ibatis/aemsc/estrategia/EstrategiaDiabetes.xml"/>
+	<sqlMap resource="ibatis/aemsc/estrategia/EstrategiaInfarto.xml"/>
+
+	<sqlMap resource="ibatis/aemsc/EM_preoperatoria/_include_EM_preoperatoria.xml"/>
+	<sqlMap resource="ibatis/aemsc/EM_preoperatoria/EM_preoperatoriaTotal.xml"/>
+
+	<sqlMap resource="ibatis/aemsc/ambulatorizacion/_include_ambulatorizacion.xml"/>
+	<sqlMap resource="ibatis/aemsc/ambulatorizacion/ambulatorizacion.xml"/>
+	<sqlMap resource="ibatis/aemsc/ambulatorizacion/ambulatorizacion_potencial.xml"/>
+
+	<sqlMap resource="ibatis/aemsc/AvoidableAdmission/_include_AvoidableAdmission.xml"/>
+	<sqlMap resource="ibatis/aemsc/AvoidableAdmission/AvoidableAdmissionTotal.xml"/>
+	<sqlMap resource="ibatis/aemsc/AvoidableAdmission/AvoidableAdmission.xml"/>
+	
+	<sqlMap resource="ibatis/aemsc/coste/_include_Coste.xml"/>
+	<sqlMap resource="ibatis/aemsc/coste/CosteTotal.xml"/>
+	
+	<sqlMap resource="ibatis/aemsc/AnalisisIndicador.xml"/>
+			
+</sqlMapConfig>
+

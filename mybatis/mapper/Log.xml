@@ -1,0 +1,291 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace="Log">
+
+	
+
+	<resultMap id="LogGroupMapping" type="Log">
+		<result property="total" column="TOTAL"/>
+		<result property="agrupacion" column="AGRUPACION_EL"/>
+	</resultMap>
+
+	<resultMap id="LogMapping" type="Log">
+		<result property="username" column="USERNAME"/>
+		<result property="ip" column="IP"/>
+		<result property="fechaClick" column="FECHA_CLICK"/>
+		<result property="tiempoCarga" column="TIEMPO_CARGA"/>
+		<result property="ejeAnalisisId" column="EJE_ANALISIS_ID"/>
+		<result property="indicadorId" column="INDICADOR_ID"/>
+		<result property="anio" column="ANIO"/>
+		<result property="agrupacion" column="AGRUPACION"/>
+		<result property="filtrado" column="FILTRADO"/>
+		<result property="metadata" column="METADATA"/>
+	</resultMap>
+
+
+	
+	
+	<select id="WHERE_FILTER_FECHA">
+		<if test="fechaClickMin != null">AND 
+			
+				FECHA_CLICK BETWEEN #{fechaClickMin} AND #{fechaClickMax}
+			
+			
+				
+				FECHA_CLICK &gt; #{fechaClickMin} 
+			   	
+			
+		</if>
+			
+		<if test="fechaClickMax != null">AND 
+			
+				
+				FECHA_CLICK &lt; #{fechaClickMax} 
+		     	
+			
+		</if>
+	</select>
+	
+	<select id="WHERE_FILTER_ALL">
+		
+			<if test="username != null">AND 
+				USERNAME = #{username}
+			</if>
+
+			<if test="ip != null">AND 
+				IP LIKE #{ip}
+			</if>
+			
+			<if test="fechaClick != null">AND 
+				FECHA_CLICK = #{fechaClick}
+			</if>
+			
+			<if test="tiempoCarga != null">AND 
+				TIEMPO_CARGA = #{tiempoCarga}
+			</if>
+			
+			<if test="ejeAnalisisId != null">AND 
+				EJE_ANALISIS_ID = #{ejeAnalisisId}
+			</if>
+			
+			<if test="indicadorId != null">AND 
+				INDICADOR_ID = #{indicadorId}
+			</if>
+			
+			<if test="anio != null">AND 
+				ANIO = #{anio}
+			</if>
+			
+			<if test="agrupacion != null">AND 
+				AGRUPACION LIKE #{agrupacion}
+			</if>
+			
+			<if test="filtrado != null">AND 
+				FILTRADO LIKE #{filtrado}
+			</if>
+			
+			<if test="metadata != null">AND 
+				METADATA LIKE #{metadata}
+			</if>
+			
+			<if test="tiempoCargaMin != null">AND 
+				
+					TIEMPO_CARGA BETWEEN #{tiempoCargaMin} AND #{tiempoCargaMax}
+				
+				
+					
+					TIEMPO_CARGA &gt; #{tiempoCargaMin} 
+			     	
+				
+			</if>
+			
+			<if test="tiempoCargaMax != null">AND 
+				
+					
+					TIEMPO_CARGA &lt; #{tiempoCargaMax} 
+			     	
+				
+			</if>
+
+			<include refid="Log.WHERE_FILTER_FECHA"/>
+			
+			
+				
+					( AGRUPACION LIKE '$agrupacionList[]$' OR AGRUPACION LIKE '$agrupacionList[]$,%' OR AGRUPACION LIKE '%,$agrupacionList[]$,%' OR AGRUPACION LIKE '%,$agrupacionList[]$' )
+				
+			
+			
+			
+				
+					( FILTRADO LIKE '$filtradoList[]$ = %' OR FILTRADO LIKE '%;$filtradoList[]$ = %' )
+				
+			
+			
+			<if test="grupoIndicador != null">AND 
+				SUBSTR(INDICADOR_ID, 0, 1) = #{grupoIndicador} 
+			</if>
+						
+			
+				ROWNUM &lt; 500
+						
+	</select>
+
+	
+
+	<select id="SelectAll" resultType="LogMapping">
+		SELECT
+			USERNAME,
+			IP,
+			FECHA_CLICK,
+			TIEMPO_CARGA,
+			EJE_ANALISIS_ID,
+			INDICADOR_ID,
+			ANIO,
+			AGRUPACION,
+			FILTRADO,
+			METADATA
+		FROM
+			MD_LOG
+	</select>
+
+	
+
+	<select id="CountAll">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_LOG
+	</select>
+
+	
+
+	<select id="SelectList" parameterType="Log" resultType="LogMapping">
+		SELECT
+			USERNAME,
+			IP,
+			FECHA_CLICK,
+			TIEMPO_CARGA,
+			EJE_ANALISIS_ID,
+			INDICADOR_ID,
+			ANIO,
+			AGRUPACION,
+			FILTRADO,
+			METADATA
+		FROM
+			MD_LOG
+		
+		<where>
+			<include refid="Log.WHERE_FILTER_ALL"/>
+		</where>
+		
+	</select>
+
+	
+
+	<select id="CountList" parameterType="Log">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_LOG
+			
+		<where>
+			<include refid="Log.WHERE_FILTER_ALL"/>
+		</where>
+		
+	</select>
+
+	
+
+	<insert id="Insert" parameterType="Log">
+		INSERT INTO MD_LOG
+			(
+				USERNAME,
+				IP,
+				FECHA_CLICK,
+				TIEMPO_CARGA,
+				EJE_ANALISIS_ID,
+				INDICADOR_ID,
+				ANIO,
+				AGRUPACION,
+				FILTRADO,
+				METADATA
+			)
+		VALUES
+			(
+				#{username},
+				#{ip},
+				#{fechaClick},
+				#{tiempoCarga},
+				#{ejeAnalisisId},
+				#{indicadorId},
+				#{anio},
+				#{agrupacion},
+				#{filtrado},
+				#{metadata}
+			)
+	</insert>
+
+	
+
+	<delete id="Delete" parameterType="Log">
+		DELETE
+			FROM MD_Log
+		
+		<where>
+			<include refid="Log.WHERE_FILTER_ALL"/>
+		</where>
+			
+	</delete>
+
+
+	<delete id="DeleteOlder" parameterType="Log">
+		 
+     	DELETE FROM MD_Log WHERE
+			FECHA_CLICK &lt;= #{fechaClick} 
+  		
+	</delete>
+	
+	<delete id="DeleteNewer" parameterType="Log">
+		 
+     	DELETE FROM MD_Log WHERE
+			FECHA_CLICK &gt; #{fechaClick} 
+  		
+	</delete>
+
+	
+
+	<delete id="DeleteAll">
+		DELETE FROM MD_LOG
+	</delete>
+	
+	
+	
+		<select id="SelectGroupList" parameterType="Log" resultType="LogGroupMapping">
+		SELECT
+			COUNT(*) as TOTAL,
+			$agrupacion$ as AGRUPACION_EL
+		FROM
+			MD_LOG
+			
+		<where>
+			<include refid="Log.WHERE_FILTER_FECHA"/>
+		</where>
+		
+		GROUP BY
+			$agrupacion$
+		
+		ORDER BY TOTAL DESC
+		
+	</select>
+	
+	<select id="SelectGroupHitList" parameterType="Log" resultType="LogGroupMapping">
+		SELECT COUNT(*) as TOTAL, AGRUPACION_EL FROM(
+    		SELECT TO_CHAR(FECHA_CLICK, 'DD-MM-YYYY HH24:MI') as AGRUPACION_EL from MD_LOG
+    		<where>
+	    		<include refid="Log.WHERE_FILTER_ALL"/>
+	    	</where>
+		)
+		GROUP BY AGRUPACION_EL ORDER BY AGRUPACION_EL
+		
+	</select>
+
+</mapper>

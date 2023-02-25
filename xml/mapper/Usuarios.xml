@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Usuarios">
+
+	<typeAlias alias="Usuarios" type="es.msc.aemsc.business.vo.UsuariosVO"/>
+
+	<resultMap id="UsuariosMapping" class="Usuarios">
+		<result property="id"          		column="U_ID"       		jdbcType="INTEGER"     	javaType="java.lang.Integer" />
+		<result property="name"        		column="UNAME"     			jdbcType="STRING"      	javaType="java.lang.String"  />
+		<result property="mail"        		column="MAIL"      			jdbcType="STRING"      	javaType="java.lang.String"  />
+		<result property="password"    		column="PASSWORD"  			jdbcType="STRING"      	javaType="java.lang.String"  />
+		<result property="active"      		column="ACTIVE"   			jdbcType="BIT"         	javaType="java.lang.Boolean" />
+		<result property="padreId"     		column="PADRE_ID"   		jdbcType="INTEGER"     	javaType="java.lang.Integer" />
+		<result property="passwordChanged"  column="PASSWORD_CHANGED"   jdbcType="DATE"    		javaType="java.util.Date" />
+		<result property="lastPasswords"    column="LAST_PASSWORDS"   	jdbcType="STRING"     	javaType="java.lang.String" />
+		<result property="nombreApellidos"	column="NAMES"				jdbcType="STRING"		javaType="java.lang.String" />
+		<result property="token"			column="TOKEN"				jdbcType="STRING"		javaType="java.lang.String" />
+		<result property="customFilter"		column="CUSTOM_FILTER"		jdbcType="STRING"		javaType="java.lang.String" />
+	</resultMap>
+
+
+	<!-- ====== SelectAll ====== -->
+
+	<select id="SelectAll"  resultMap="UsuariosMapping">
+		SELECT
+			U_ID,
+			UNAME,
+			MAIL,
+			PASSWORD,
+			PADRE_ID,
+			ACTIVE,
+			PASSWORD_CHANGED,
+			LAST_PASSWORDS,
+			NAMES,
+			TOKEN,
+			CUSTOM_FILTER
+		FROM
+			MD_USUARIOS
+	</select>
+
+	<!-- ====== CountAll ====== -->
+
+	<select id="CountAll"  resultClass="java.lang.Integer">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_USUARIOS
+	</select>
+
+	<!-- ====== SelectById ====== -->
+
+	<select id="SelectById"  resultMap="UsuariosMapping"  parameterClass="Usuarios">
+		SELECT
+			U_ID,
+			UNAME,
+			MAIL,
+			PASSWORD,
+			PADRE_ID,
+			ACTIVE,
+			PASSWORD_CHANGED,
+			LAST_PASSWORDS,
+			NAMES,
+			TOKEN,
+			CUSTOM_FILTER
+		FROM
+			MD_USUARIOS
+		WHERE
+			U_ID = #id#
+	</select>
+
+	<!-- ====== SelectList ====== -->
+
+	<select id="SelectList"  resultMap="UsuariosMapping"  parameterClass="Usuarios">
+		SELECT
+			U_ID,
+			UNAME,
+			MAIL,
+			PASSWORD,
+			PADRE_ID,
+			ACTIVE,
+			PASSWORD_CHANGED,
+			LAST_PASSWORDS,
+			NAMES,
+			TOKEN,
+			CUSTOM_FILTER
+		FROM
+			MD_USUARIOS
+		<dynamic prepend="WHERE">
+			<isNotNull prepend="AND" property="id">
+				U_ID = #id#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="idList">
+				U_ID in (<iterate property="idList" conjunction=","> $idList[]$ </iterate>)
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="name">
+				UNAME LIKE #name#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="mail">
+				MAIL LIKE #mail#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="password">
+				PASSWORD LIKE #password#
+			</isNotNull>						
+
+			<isNotNull prepend="AND" property="padreId">
+				PADRE_ID = #padreId#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="active">
+				ACTIVE = #active#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="nombreApellidos">
+				NAMES = #nombreApellidos#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="token">
+				TOKEN = #token#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="customFilter">
+				CUSTOM_FILTER = #customFilter#
+			</isNotNull>
+
+		</dynamic>
+		
+	</select>
+
+	<!-- ====== CountList ====== -->
+
+	<select id="CountList"  resultClass="java.lang.Integer"  parameterClass="Usuarios">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_USUARIOS
+		<dynamic prepend="WHERE">
+
+			<isNotNull prepend="AND" property="id">
+				U_ID = #id#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="name">
+				UNAME LIKE #name#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="mail">
+				MAIL LIKE #mail#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="password">
+				PASSWORD LIKE #password#
+			</isNotNull>						
+
+			<isNotNull prepend="AND" property="padreId">
+				PADRE_ID = #padreId#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="active">
+				ACTIVE = #active#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="nombreApellidos">
+				NAMES = #nombreApellidos#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="token">
+				TOKEN = #token#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="customFilter">
+				CUSTOM_FILTER = #customFilter#
+			</isNotNull>
+
+		</dynamic>
+	</select>
+
+	<!-- ====== Insert ====== -->
+
+	<insert id="Insert"  parameterClass="Usuarios">
+		INSERT INTO MD_USUARIOS
+			(
+				U_ID
+				<isNotNull prepend="," property="name">UNAME</isNotNull>
+				<isNotNull prepend="," property="mail">MAIL</isNotNull>
+				<isNotNull prepend="," property="password">PASSWORD</isNotNull>
+				<isNotNull prepend="," property="padreId">PADRE_ID</isNotNull>
+				<isNotNull prepend="," property="active">ACTIVE</isNotNull>
+				<isNotNull prepend="," property="passwordChanged">PASSWORD_CHANGED</isNotNull>
+				<isNotNull prepend="," property="lastPasswords">LAST_PASSWORDS</isNotNull>
+				<isNotNull prepend="," property="nombreApellidos">NAMES</isNotNull>
+				<isNotNull prepend="," property="token">TOKEN</isNotNull>
+				<isNotNull prepend="," property="customFilter">CUSTOM_FILTER</isNotNull>
+			)
+		VALUES
+			(
+				(SELECT max(U_ID) + 1 FROM MD_USUARIOS)
+				<isNotNull prepend="," property="name">#name:STRING#</isNotNull>
+				<isNotNull prepend="," property="mail">#mail:STRING#</isNotNull>
+				<isNotNull prepend="," property="password">#password:STRING#</isNotNull>
+				<isNotNull prepend="," property="padreId">#padreId:INTEGER#</isNotNull>
+				<isNotNull prepend="," property="active">#active:BIT#</isNotNull>
+				<isNotNull prepend="," property="passwordChanged">#passwordChanged:DATE#</isNotNull>
+				<isNotNull prepend="," property="lastPasswords">#lastPasswords:STRING#</isNotNull>
+				<isNotNull prepend="," property="nombreApellidos">#nombreApellidos:STRING#</isNotNull>
+				<isNotNull prepend="," property="token">#token:STRING#</isNotNull>
+				<isNotNull prepend="," property="customFilter">#customFilter:STRING#</isNotNull>
+			)
+	</insert>
+
+	<!-- ====== Update ====== -->
+
+	<update id="Update"  parameterClass="Usuarios">
+		UPDATE MD_USUARIOS
+		SET
+			U_ID = #id#
+			<isNotNull prepend="," property="name">UNAME = #name:STRING#</isNotNull>
+			<isNotNull prepend="," property="mail">MAIL = #mail:STRING#</isNotNull>
+			<isNotNull prepend="," property="password">PASSWORD = #password:STRING#</isNotNull>
+			<isNotNull prepend="," property="padreId">PADRE_ID = #padreId:INTEGER#</isNotNull>
+			<isNotNull prepend="," property="active">ACTIVE   = #active:BIT#</isNotNull>
+			<isNotNull prepend="," property="passwordChanged">PASSWORD_CHANGED = #passwordChanged:DATE#</isNotNull>
+			<isNotNull prepend="," property="lastPasswords">LAST_PASSWORDS = #lastPasswords:STRING#</isNotNull>
+			<isNotNull prepend="," property="nombreApellidos">NAMES = #nombreApellidos:STRING#</isNotNull>
+			<isNotNull prepend="," property="token">TOKEN = #token:STRING#</isNotNull>
+			<isNotNull prepend="," property="customFilter">CUSTOM_FILTER = #customFilter:STRING#</isNotNull>
+		WHERE
+			U_ID = #id#
+	</update>
+
+	<!-- ====== Delete ====== -->
+
+	<delete id="Delete"  parameterClass="Usuarios">
+		DELETE FROM MD_USUARIOS
+		<dynamic prepend="WHERE">
+
+			<isNotNull prepend="AND" property="id">
+				U_ID = #id#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="name">
+				UNAME LIKE #name#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="mail">
+				MAIL LIKE #mail#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="password">
+				PASSWORD LIKE #password#
+			</isNotNull>						
+
+			<isNotNull prepend="AND" property="padreId">
+				PADRE_ID = #padreId#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="active">
+				ACTIVE = #active#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="nombreApellidos">
+				NAMES LIKE #nombreApellidos#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="token">
+				TOKEN LIKE #token#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="customFilter">
+				CUSTOM_FILTER LIKE #customFilter#
+			</isNotNull>
+
+		</dynamic>
+	</delete>
+
+	<!-- ====== DeleteAll ====== -->
+
+	<delete id="DeleteAll">
+		DELETE FROM MD_USUARIOS
+	</delete>
+
+	<delete id="DeleteOrphanRoles">
+		DELETE FROM MD_USUARIOSROLES WHERE U_ID NOT IN (SELECT U_ID FROM MD_USUARIOS)
+	</delete>
+	
+	<delete id="DeleteOrphans">
+		DELETE FROM MD_USUARIOS WHERE PADRE_ID NOT IN (SELECT U_ID FROM MD_USUARIOS)
+	</delete>
+	
+	
+
+</sqlMap>
+

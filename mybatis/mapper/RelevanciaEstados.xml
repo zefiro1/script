@@ -1,0 +1,215 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace="RelevanciaEstados">
+
+	
+
+	
+
+	<resultMap id="RelevanciaEstadosMapping" type="RelevanciaEstados">
+		<result property="valorIndicador" column="VALOR"/>
+		<result property="indicadorId" column="INDICADOR_ID"/>
+		<result property="variableId" column="VARIABLE_ID"/>
+		<result property="estado" column="CODIGO"/>
+		<result property="variableDesc" column="VARIABLE_DESC"/>
+		<result property="estadoDesc" column="ESTADO_DESC"/>
+	</resultMap>
+
+	
+	<select id="SelectAllByIndicadorId" parameterType="java.lang.String" resultType="RelevanciaEstadosMapping">
+		SELECT
+			VIE.valor AS VALOR, 
+			VIE.indicador_id AS INDICADOR_ID,			
+			VIE.variable_id AS VARIABLE_ID,
+			VIE.codigo AS CODIGO,
+			'variable'||VIC.VARIABLE_INFLUENCIA_ID AS VARIABLE_DESC,
+			'variable'||VIC.VARIABLE_INFLUENCIA_ID||'.codigo'||VIC.CODIGO AS ESTADO_DESC
+		FROM 
+			MD_VALOR_INDICADOR_ESTADOS VIE,
+			MD_VARS_INF_CODIGOS VIC,
+			MD_VARS_INF VI
+		WHERE 
+			VIC.codigo = VIE.codigo 
+			AND VIC.variable_influencia_id = VIE.variable_id 
+			AND VI.variable_influencia_id = VIE.variable_id 
+			AND VIE.indicador_id = #{indicadorId}
+		ORDER BY VARIABLE_ID, to_number(CODIGO) ASC
+	</select>	
+
+	
+	<select id="SelectMediaByIndicadorId" parameterType="java.lang.String" resultType="RelevanciaEstadosMapping">
+		SELECT
+			VARIABLE_ID AS VARIABLE_ID,
+			INDICADOR_ID AS INDICADOR_ID,
+			CODIGO AS CODIGO,
+			VALOR AS VALOR,
+			null AS VARIABLE_DESC,
+			null AS ESTADO_DESC
+		FROM 
+			MD_VALOR_INDICADOR_ESTADOS
+		WHERE 
+			VARIABLE_ID is NULL
+			AND INDICADOR_ID = #{indicadorId}
+		ORDER BY VARIABLE_ID, to_number(CODIGO) ASC
+	</select>	
+
+
+	
+
+	<select id="SelectAll" resultType="RelevanciaEstadosMapping">
+		SELECT
+			VARIABLE_ID AS VARIABLE_ID,
+			INDICADOR_ID AS INDICADOR_ID,
+			CODIGO AS CODIGO,
+			VALOR AS VALOR
+		FROM
+			MD_VALOR_INDICADOR_ESTADOS
+		ORDER BY VARIABLE_ID ASC
+	</select>
+
+	
+
+	<select id="CountAll">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_VALOR_INDICADOR_ESTADOS
+
+	</select>
+
+	
+
+	<select id="SelectById" parameterType="RelevanciaEstados" resultType="RelevanciaEstadosMapping">
+		SELECT
+			VARIABLE_ID AS VARIABLE_ID,
+			INDICADOR_ID AS INDICADOR_ID,
+			CODIGO AS CODIGO,
+			VALOR AS VALOR
+		FROM
+			MD_RELEVANCIA_ESTADOS
+		WHERE
+			INDICADOR_ID = #{indicadorId}
+		AND
+			VARIABLE_ID = #{variableId}
+		AND
+			CODIGO = #{estado}
+	</select>
+	
+	
+
+	<select id="SelectList" parameterType="RelevanciaEstados" resultType="RelevanciaEstadosMapping">
+		SELECT
+			VIE.valor AS VALOR, 
+			VIE.indicador_id AS INDICADOR_ID,			
+			VIE.variable_id AS VARIABLE_ID,
+			VIE.codigo AS CODIGO,
+			VI.nombre AS VARIABLE_DESC,			
+			VIC.descripcion AS ESTADO_DESC
+		FROM 
+			MD_VALOR_INDICADOR_ESTADOS VIE,
+			MD_VARS_INF_CODIGOS VIC,
+			MD_VARS_INF VI
+		<where>
+
+			<if test="valorIndicador != null">AND 
+				VALOR = #{valorIndicador}
+			</if>
+
+			<if test="indicadorId != null">AND 
+				INDICADOR_ID = #{indicadorId}
+			</if>
+
+			<if test="variableId != null">AND 
+				VARIABLE_ID = #{variableId}
+			</if>
+
+			<if test="estado != null">AND 
+				CODIGO LIKE #{estado}
+			</if>
+
+		</where>
+		<include refid="includes.ORDER_BY"/>
+	</select>
+
+	
+
+	<select id="CountList" parameterType="RelevanciaEstados">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_VALOR_INDICADOR_ESTADOS
+		<where>
+
+			<if test="valorIndicador != null">AND 
+				VALOR = #{valorIndicador}
+			</if>
+
+			<if test="indicadorId != null">AND 
+				INDICADOR_ID = #{indicadorId}
+			</if>
+
+			<if test="variableId != null">AND 
+				VARIABLE_ID = #{variableId}
+			</if>
+
+			<if test="estado != null">AND 
+				ESTADO LIKE #{estado}
+			</if>
+
+		</where>
+	</select>
+
+	
+
+	<insert id="Insert" parameterType="RelevanciaEstados">
+		INSERT INTO MD_VALOR_INDICADOR_ESTADOS
+			(
+				VARIABLE_ID,
+				INDICADOR_ID,
+				CODIGO,
+				VALOR
+			)
+		VALUES
+			(
+				#{variableId},
+				#{indicadorId},
+				#{estado},							
+				#{valorIndicador}
+			)
+	</insert>
+
+	
+
+	<update id="Update" parameterType="RelevanciaEstados">
+		UPDATE MD_VALOR_INDICADOR_ESTADOS
+		SET
+			VARIABLE_ID = #{variableId},
+			INDICADOR_ID = #{indicadorId},
+			CODIGO = #{estado},
+			VALOR = #{valorIndicador}
+		WHERE
+			INDICADOR_ID = #{indicadorId}
+		AND
+			VARIABLE_ID = #{variableId}
+		AND
+			CODIGO = #{estado}
+	</update>
+
+	
+
+	<delete id="Delete" parameterType="RelevanciaEstados">
+		DELETE FROM MD_VALOR_INDICADOR_ESTADOS
+		WHERE
+			INDICADOR_ID = #{indicadorId}
+		AND
+			VARIABLE_ID = #{variableId}
+		AND
+			CODIGO = #{estado}
+	</delete>
+
+	
+
+	<delete id="DeleteAll">
+		DELETE FROM MD_VALOR_INDICADOR_ESTADOS
+	</delete>
+
+</mapper>

@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="includeEstrategiaCronicidad">
+	<sql id="SELECT_LIST_DESCRIPTIVO">
+		SELECT 
+		<include refid="includes.SELECT_DES_DESCRIPTIVO"/>
+		<isEqual property="indicadorEtiqueta" compareValue="AASHORTTERMDIABETESCHILDCOMP">
+	         poblacion as "denominadorpoblacion_i",$indicadorEtiqueta$ as "numerator_altas_i",edad/NULLIF($indicadorEtiqueta$,0) as "aa_edad_f",estancia/NULLIF($indicadorEtiqueta$,0) as "aa_estancia_f",mortal/NULLIF($indicadorEtiqueta$,0) as "aa_mortalidad_p",10000*$indicadorEtiqueta$/poblacion as "aa_tasa_pm"
+	     </isEqual>
+	     <isEqual property="indicadorEtiqueta" compareValue="AACHRONICPATHOLOGIES">
+	         poblacion as "denominadorpoblacion_i",$indicadorEtiqueta$ as "numerator_altas_i",edad/NULLIF($indicadorEtiqueta$,0) as "aa_edad_f",estancia/NULLIF($indicadorEtiqueta$,0) as "aa_estancia_f",mortal/NULLIF($indicadorEtiqueta$,0) as "aa_mortalidad_p",10000*$indicadorEtiqueta$/poblacion as "aa_tasa_pm"
+	     </isEqual>
+	     <isEqual property="indicadorEtiqueta" compareValue="AAASTHMACHILD">
+	         poblacion as "denominadorpoblacion_i",$indicadorEtiqueta$ as "numerator_altas_i",edad/NULLIF($indicadorEtiqueta$,0) as "aa_edad_f",estancia/NULLIF($indicadorEtiqueta$,0) as "aa_estancia_f",mortal/NULLIF($indicadorEtiqueta$,0) as "aa_mortalidad_p",10000*$indicadorEtiqueta$/poblacion as "aa_tasa_pm"
+	     </isEqual>
+	     <isEqual property="indicadorEtiqueta" compareValue="ESTANCIA_CRONICAS">
+	         $indicadorEtiqueta$/numero_altas as "estancia_media_f",numero_altas as "numero_altas_i",estancia as "numero_estancias_i",edad/NULLIF(numero_altas,0) as "edad_media_f",peso/NULLIF(numero_altas,0) as "peso_medio_f"
+	     </isEqual>
+	     <isEqual property="indicadorEtiqueta" compareValue="ESTANCIA_CRONICAS_DIAS">
+	         100*$indicadorEtiqueta$/estancia as "percentage_cronicas_p",
+	         numero_altas_cronicas as "numero_altas_cronicas_i",
+	         $indicadorEtiqueta$ as "estancias_cronicas_i",
+	         numero_altas as "numero_altas_total_i",
+	         estancia as "numero_estancias_total_i",
+	         edad_cronicas/NULLIF(numero_altas_cronicas,0) as "edad_media_cronicas_f",
+	         peso_cronicas/NULLIF(numero_altas_cronicas,0) as "peso_medio_cronicas_f"
+	     </isEqual>
+	     <isEqual property="indicadorEtiqueta" compareValue="REINGRESOS_CRONICAS">
+	         100*$indicadorEtiqueta$/numero_altas as "tasa_reingresos_p",numero_altas as "numero_altas_i",estancia/NULLIF(numero_altas,0) as "estancia_media_f",edad/NULLIF(numero_altas,0) as "edad_media_f",estancia_reingreso/NULLIF(numero_altas_reingreso,0) as "estancia_media_reingresos_f"
+	     </isEqual>
+		FROM(
+			SELECT      
+	            <include refid="includes.SELECT_COD_DESCRIPTIVO"/>
+	            numero_altas,edad,estancia,peso,mortal,poblacion,
+				<isEqual property="indicadorEtiqueta" compareValue="REINGRESOS_CRONICAS">
+				    estancia_reingreso,
+					numero_altas_reingreso,
+				</isEqual>
+				<isEqual property="indicadorEtiqueta" compareValue="ESTANCIA_CRONICAS_DIAS">
+				    numero_altas_cronicas,
+				    edad_cronicas,
+				    peso_cronicas,
+				</isEqual>
+	            $indicadorEtiqueta$ as $indicadorEtiqueta$
+	        FROM (
+	                SELECT
+	                    <include refid="includes.SELECT_COD_DESCRIPTIVO_G"/>
+	                    sum(numero_altas) as numero_altas,sum(edad) as edad,sum(estancia) as estancia,sum(peso) as peso,sum(mortal) as mortal,sum(poblacion) as poblacion,
+						<isEqual property="indicadorEtiqueta" compareValue="REINGRESOS_CRONICAS">
+						    sum(estancia_reingreso) as estancia_reingreso,
+							sum(numero_altas_reingreso) as numero_altas_reingreso,
+						</isEqual>
+						<isEqual property="indicadorEtiqueta" compareValue="ESTANCIA_CRONICAS_DIAS">
+						    sum(numero_altas_cronicas) as numero_altas_cronicas,
+						    sum(edad_cronicas) as edad_cronicas,
+						    sum(peso_cronicas) as peso_cronicas,
+						</isEqual>
+	                    SUM($indicadorEtiqueta$) as $indicadorEtiqueta$
+	                FROM (
+	                        SELECT 
+	                            <include refid="includes.SELECT_COD_DESCRIPTIVO_CCAA"/>
+	                            count(*) as numero_altas,
+	                            <isEqual property="indicadorEtiqueta" compareValue="AASHORTTERMDIABETESCHILDCOMP">
+	 								sum(CASE WHEN $indicadorEtiqueta$=1 THEN edad ELSE 0 END) as edad,
+	 								sum(CASE WHEN $indicadorEtiqueta$=1 THEN estancia ELSE 0 END) as estancia,
+		                    		sum(CASE WHEN $indicadorEtiqueta$=1 THEN peso ELSE 0 END) as peso,
+		                    		sum(CASE WHEN $indicadorEtiqueta$=1 THEN mortal ELSE 0 END) as mortal,
+	                                SUM($indicadorEtiqueta$) as $indicadorEtiqueta$
+	                            </isEqual>
+	                            <isEqual property="indicadorEtiqueta" compareValue="AACHRONICPATHOLOGIES">
+	 								sum(CASE WHEN $indicadorEtiqueta$=1 THEN edad ELSE 0 END) as edad,
+	 								sum(CASE WHEN $indicadorEtiqueta$=1 THEN estancia ELSE 0 END) as estancia,
+		                    		sum(CASE WHEN $indicadorEtiqueta$=1 THEN peso ELSE 0 END) as peso,
+		                    		sum(CASE WHEN $indicadorEtiqueta$=1 THEN mortal ELSE 0 END) as mortal,
+	                                SUM($indicadorEtiqueta$) as $indicadorEtiqueta$
+	                            </isEqual>
+	                            <isEqual property="indicadorEtiqueta" compareValue="AAASTHMACHILD">
+	 								sum(CASE WHEN $indicadorEtiqueta$=1 THEN edad ELSE 0 END) as edad,
+	 								sum(CASE WHEN $indicadorEtiqueta$=1 THEN estancia ELSE 0 END) as estancia,
+		                    		sum(CASE WHEN $indicadorEtiqueta$=1 THEN peso ELSE 0 END) as peso,
+		                    		sum(CASE WHEN $indicadorEtiqueta$=1 THEN mortal ELSE 0 END) as mortal,
+	                                SUM($indicadorEtiqueta$) as $indicadorEtiqueta$
+	                            </isEqual>
+	                            <isEqual property="indicadorEtiqueta" compareValue="ESTANCIA_CRONICAS">
+	                                sum(edad) as edad,
+	                                sum(estancia) as estancia,
+	                                sum(peso) as peso,
+	                                sum(mortal) as mortal,
+	                                SUM($indicadorEtiqueta$) as $indicadorEtiqueta$
+	                            </isEqual>
+	                            <isEqual property="indicadorEtiqueta" compareValue="ESTANCIA_CRONICAS_DIAS">
+	                                sum(edad) as edad,
+	                                sum(estancia) as estancia,
+	                                sum(peso) as peso,
+	                                sum(mortal) as mortal,
+	                                SUM(ESTANCIA_CRONICAS) as $indicadorEtiqueta$,
+	                                sum(CASE WHEN ESTANCIA_CRONICAS is not null THEN 1 ELSE 0 END) as numero_altas_cronicas,
+	                                sum(CASE WHEN ESTANCIA_CRONICAS is not null THEN EDAD ELSE 0 END) as edad_cronicas,
+	                                sum(CASE WHEN ESTANCIA_CRONICAS is not null THEN PESO ELSE 0 END) as peso_cronicas
+	                            </isEqual>
+	                            <isEqual property="indicadorEtiqueta" compareValue="REINGRESOS_CRONICAS">
+	                                sum(edad) as edad,
+	                                sum(estancia) as estancia,
+	                                sum(peso) as peso,
+	                                sum(mortal) as mortal,
+	                                sum(CASE WHEN REINGRESOS_CRONICAS>0 THEN estancia ELSE 0 END) as estancia_reingreso,
+	                                sum(CASE WHEN REINGRESOS_CRONICAS>0 THEN 1 ELSE 0 END) as numero_altas_reingreso,
+	                                SUM($indicadorEtiqueta$) as $indicadorEtiqueta$
+	                            </isEqual>
+	                        FROM
+	                           <include refid="includes.FROM_TABLE_CLAUSE"/>
+	                        WHERE 
+	                        	<isNotEqual property="indicadorEtiqueta" compareValue="ESTANCIA_CRONICAS_DIAS">
+	                        		$indicadorEtiqueta$ IS NOT NULL AND
+	                        	</isNotEqual>
+	                        Anio=$anio$ 
+	                        <include refid="includes.WHERE_AND_GROUPBY_DESCRIPTIVO"/>
+					) altas 
+					<include refid="includeEstrategia.POBLACION_JOIN"/>
+					<include refid="includes.GROUP_BY_LIST"/>
+				) altas <include refid="includes.WHERE_ALLCOD_NULL"/>
+		) altas 
+		<include refid="includes.INNER_JOIN_DESCRIPTIVO"/>
+	</sql>
+	
+	<sql id="SELECT_LIST_SERIE_TEMPORAL">
+		<include refid="includes.INICIAL_SERIE_TEMPORAL"/>
+			SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_G"/> 
+			    altas.Anio,
+		    	<isEqual property="indicadorEtiqueta" compareValue="ESTANCIA_CRONICAS_DIAS">
+		    	    SUM(estancia) as numero_altas,
+				</isEqual>
+				<isEqual property="indicadorEtiqueta" compareValue="AASHORTTERMDIABETESCHILDCOMP">
+				    SUM(poblacion) as numero_altas,
+				</isEqual>
+				<isEqual property="indicadorEtiqueta" compareValue="AACHRONICPATHOLOGIES">
+				    SUM(poblacion) as numero_altas,
+				</isEqual>
+				<isEqual property="indicadorEtiqueta" compareValue="AAASTHMACHILD">
+				    SUM(poblacion) as numero_altas,
+				</isEqual>
+				<isNotEqual property="indicadorEtiqueta" compareValue="ESTANCIA_CRONICAS_DIAS">
+				    <isNotEqual property="indicadorEtiqueta" compareValue="AASHORTTERMDIABETESCHILDCOMP">
+				        <isNotEqual property="indicadorEtiqueta" compareValue="AACHRONICPATHOLOGIES">
+				            <isNotEqual property="indicadorEtiqueta" compareValue="AAASTHMACHILD">
+		    	    			SUM(numero_altas) as numero_altas,
+		    	    		</isNotEqual>
+		    	    	</isNotEqual>
+		    	    </isNotEqual>
+				</isNotEqual>
+		    	SUM($indicadorEtiqueta$)/100 as numero_altas_ind
+			FROM(
+				SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_CCAA"/> 
+				    Anio,COUNT(*) as numero_altas,
+					<isEqual property="indicadorEtiqueta" compareValue="AASHORTTERMDIABETESCHILDCOMP">
+                         10000*SUM($indicadorEtiqueta$) as $indicadorEtiqueta$
+                     </isEqual>
+                     <isEqual property="indicadorEtiqueta" compareValue="AACHRONICPATHOLOGIES">
+                         10000*SUM($indicadorEtiqueta$) as $indicadorEtiqueta$
+                     </isEqual>
+                     <isEqual property="indicadorEtiqueta" compareValue="AAASTHMACHILD">
+                         10000*SUM($indicadorEtiqueta$) as $indicadorEtiqueta$
+                     </isEqual>
+                     <isEqual property="indicadorEtiqueta" compareValue="ESTANCIA_CRONICAS">
+                         SUM($indicadorEtiqueta$) as $indicadorEtiqueta$
+                     </isEqual>
+                     <isEqual property="indicadorEtiqueta" compareValue="ESTANCIA_CRONICAS_DIAS">
+                         SUM(ESTANCIA) as estancia,
+                         100*SUM(ESTANCIA_CRONICAS) as $indicadorEtiqueta$
+                     </isEqual>
+                     <isEqual property="indicadorEtiqueta" compareValue="REINGRESOS_CRONICAS">
+                         100*SUM($indicadorEtiqueta$) as $indicadorEtiqueta$
+                     </isEqual>
+				FROM
+					<include refid="includes.FROM_TABLE_CLAUSE"/>
+				WHERE
+					<isEqual property="indicadorEtiqueta" compareValue="ESTANCIA_CRONICAS_DIAS">
+	                	1=1
+	                </isEqual> 
+					<isNotEqual property="indicadorEtiqueta" compareValue="ESTANCIA_CRONICAS_DIAS">
+	                	$indicadorEtiqueta$ IS NOT NULL
+	                </isNotEqual>
+					<include refid="includes.FILTRO_ANIOS_SERIE_TEMPORAL"/>
+					<include refid="includes.WHERE_AND_GROUPBY_DESCRIPTIVO"/>, Anio
+			) altas 
+			<include refid="includeEstrategia.POBLACION_JOIN_TEMPORAL"/>
+			<include refid="includes.GROPY_BY_LIST2"/>
+					altas.Anio
+		<include refid="includes.FINAL_SERIE_TEMPORAL"/>	    
+	</sql>
+	
+</sqlMap>

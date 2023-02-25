@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="IndicadoresEjesAnalisisAnios">
+
+	<typeAlias alias="IndicadoresEjesAnalisisAnios" type="es.msc.aemsc.business.vo.IndicadoresEjesAnalisisAniosVO"/>
+
+	<resultMap id="IndicadoresEjesAnalisisAniosMapping" class="IndicadoresEjesAnalisisAnios">
+		<result property="indicadorId"       column="INDICADOR_ID"             jdbcType="INTEGER"   javaType="java.lang.Integer" />
+		<result property="ejeAnalisisId"     column="EJE_ANALISIS_ID"          jdbcType="TINYINT"   javaType="java.lang.Short"   />
+		<result property="anio"			     column="ANIO"                     jdbcType="TINYINT"   javaType="java.lang.Short"   />
+		<result property="indicadorDesc"     column="INDICADOR_DESC"           jdbcType="STRING"    javaType="java.lang.String"  />
+		<result property="ejeAnalisisDesc"   column="EJE_ANALISIS_DESC"        jdbcType="STRING"    javaType="java.lang.String"  />
+	</resultMap>
+
+
+	<!-- ====== SelectAll ====== -->
+
+	<select id="SelectAll"  resultMap="IndicadoresEjesAnalisisAniosMapping">
+		SELECT
+			EJI.INDICADOR_ID,
+			EJI.EJE_ANALISIS_ID,
+			EJI.ANIO,
+			I.NOMBRE_COMPLETO AS INDICADOR_DESC,
+			EJ.NOMBRE AS EJE_ANALISIS_DESC
+		FROM
+			MD_EJES_ANALISIS_INDICADORES EJI,
+			MD_INDICADORES I,
+			MD_EJES_ANALISIS EJ
+		WHERE
+			EJ.EJE_ANALISIS_ID = EJI.EJE_ANALISIS_ID AND
+			I.INDICADOR_ID = EJI.INDICADOR_ID  
+	</select>
+
+	<!-- ====== CountAll ====== -->
+
+	<select id="CountAll"  resultClass="java.lang.Integer">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_EJES_ANALISIS_INDICADORES
+	</select>
+
+	<!-- ====== SelectById ====== -->
+
+	<select id="SelectById"  resultMap="IndicadoresEjesAnalisisAniosMapping"  parameterClass="IndicadoresEjesAnalisisAnios">
+		SELECT
+			EJI.INDICADOR_ID,
+			EJI.EJE_ANALISIS_ID,
+			EJI.ANIO,
+			I.NOMBRE_COMPLETO AS INDICADOR_DESC,
+			EJ.NOMBRE AS EJE_ANALISIS_DESC
+		FROM
+			MD_EJES_ANALISIS_INDICADORES EJI,
+			MD_INDICADORES I,
+			MD_EJES_ANALISIS EJ
+		WHERE
+			EJ.EJE_ANALISIS_ID = EJI.EJE_ANALISIS_ID AND
+			I.INDICADOR_ID = EJI.INDICADOR_ID AND  
+			I.INDICADOR_ID = #indicadorId# AND
+			EJ.EJE_ANALISIS_ID = #ejeAnalisisId# AND
+			EJI.ANIO = #anio#
+	</select>
+
+	<!-- ====== SelectList ====== -->
+
+	<select id="SelectList"  resultMap="IndicadoresEjesAnalisisAniosMapping"  parameterClass="IndicadoresEjesAnalisisAnios">
+		SELECT
+			EJI.INDICADOR_ID,
+			EJI.EJE_ANALISIS_ID,
+			EJI.ANIO,
+			I.NOMBRE_COMPLETO AS INDICADOR_DESC,
+			EJ.NOMBRE AS EJE_ANALISIS_DESC
+		FROM
+			MD_EJES_ANALISIS_INDICADORES EJI,
+			MD_INDICADORES I,
+			MD_EJES_ANALISIS EJ
+		WHERE
+			EJ.EJE_ANALISIS_ID = EJI.EJE_ANALISIS_ID AND
+			I.INDICADOR_ID = EJI.INDICADOR_ID  
+			
+			<isNotNull prepend="AND" property="indicadorId">
+				EJI.INDICADOR_ID = #indicadorId#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="ejeAnalisisId">
+				EJI.EJE_ANALISIS_ID = #ejeAnalisisId#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="anio">
+				EJI.ANIO = #anio#
+			</isNotNull>
+			
+	</select>
+
+	<!-- ====== CountList ====== -->
+
+	<select id="CountList"  resultClass="java.lang.Integer"  parameterClass="IndicadoresEjesAnalisisAnios">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_EJES_ANALISIS_INDICADORES EJI
+
+		<dynamic prepend="WHERE">
+
+			<isNotNull prepend="AND" property="indicadorId">
+				EJI.INDICADOR_ID = #indicadorId#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="ejeAnalisisId">
+				EJI.EJE_ANALISIS_ID = #ejeAnalisisId#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="anio">
+				EJI.ANIO = #anio#
+			</isNotNull>
+					
+		</dynamic>
+	</select>
+
+	<!-- ====== Insert ====== -->
+
+	<insert id="Insert"  parameterClass="IndicadoresEjesAnalisisAnios">
+		INSERT INTO MD_EJES_ANALISIS_INDICADORES
+			(
+				INDICADOR_ID,
+				EJE_ANALISIS_ID,
+				ANIO
+			)
+		VALUES
+			(
+				#indicadorId:INTEGER#,
+				#ejeAnalisisId:TINYINT#,
+				#anio:TINYINT#
+			)
+	</insert>
+
+	<!-- ====== Update ====== -->
+
+	<update id="Update"  parameterClass="IndicadoresEjesAnalisisAnios">
+		UPDATE MD_EJES_ANALISIS_INDICADORES
+		SET
+			INDICADOR_ID = #indicadorId:INTEGER#,
+			EJE_ANALISIS_ID = #ejeAnalisisId:TINYINT#,
+			ANIO = #anio:TINYINT#
+		WHERE
+			INDICADOR_ID = #indicadorId#
+		AND
+			EJE_ANALISIS_ID = #ejeAnalisisId#
+		AND
+			ANIO = #anio#
+	</update>
+
+	<!-- ====== Delete ====== -->
+
+	<delete id="Delete"  parameterClass="IndicadoresEjesAnalisisAnios">
+		DELETE FROM MD_EJES_ANALISIS_INDICADORES
+		WHERE
+			INDICADOR_ID = #indicadorId#
+		AND
+			EJE_ANALISIS_ID = #ejeAnalisisId#
+		AND
+			ANIO = #anio#	</delete>
+
+	<!-- ====== DeleteAll ====== -->
+
+	<delete id="DeleteAll">
+		DELETE FROM MD_EJES_ANALISIS_INDICADORES
+	</delete>
+
+</sqlMap>
+

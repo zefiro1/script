@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="includeEM_preoperatoriaTotal">
+	<sql id="SELECT_LIST_DESCRIPTIVO">
+		SELECT 
+		<include refid="includes.SELECT_DES_DESCRIPTIVO"/>	    
+		numero_altas_kirurgicas_i as "numero_altas_kirurgicas_i", estancia_media_f as "estancia_media_f",empreoperatoria_f as "empreoperatoria_f",altasprogramada_i as "altasprogramada_i",estancia_mediaprogramada_f as "estancia_mediaprogramada_f",empreoperatoriaprogramada_f as "empreoperatoriaprogramada_f",altas_urgente_i as "altas_urgente_i",estancia_media_urgente_f as "estancia_media_urgente_f",empreoperatoria_urgente_f as "empreoperatoria_urgente_f"
+		FROM(
+			SELECT
+				<include refid="includes.SELECT_COD_DESCRIPTIVO"/>	    
+	            numero_altas AS numero_altas_kirurgicas_i,
+	            estancias/NULLIF(1.0*numero_altas,0) AS estancia_media_f,
+	            estanciaspreoperatoria/NULLIF(1.0*altas_preoperatorias,0) AS empreoperatoria_f,
+	            numero_altasprogramadas AS altasprogramada_i,
+	            estanciasprogramadas/NULLIF(1.0*numero_altasprogramadas,0) AS estancia_mediaprogramada_f,
+	            estpreop_programadas/NULLIF(1.0*altas_preopprogramadas,0) AS empreoperatoriaprogramada_f,
+	            numero_altas_urgentes AS altas_urgente_i,
+	            estancias_urgentes/NULLIF(1.0*numero_altas_urgentes,0) AS estancia_media_urgente_f,
+	            estpreop_urgentes/NULLIF(1.0*altas_preoperatoriasurgentes,0) AS empreoperatoria_urgente_f
+				FROM (
+					SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_G"/> 
+	                    SUM(numero_altas) as numero_altas,
+	                    SUM(estancias) as estancias,
+	                    SUM(estanciaspreoperatoria) as estanciaspreoperatoria,
+	                    SUM(altas_preoperatorias) as altas_preoperatorias,
+	                    SUM(CASE WHEN TIPO_INGRESO_IMP=2 THEN numero_altas ELSE 0.0 END) as numero_altasprogramadas,
+	                    SUM(CASE WHEN TIPO_INGRESO_IMP=2 THEN estancias ELSE 0.0 END) as estanciasprogramadas,
+	                    SUM(CASE WHEN TIPO_INGRESO_IMP=2 THEN estanciaspreoperatoria ELSE 0.0 END) as estpreop_programadas,
+	                    SUM(CASE WHEN TIPO_INGRESO_IMP=2 THEN altas_preoperatorias ELSE 0.0 END) as altas_preopprogramadas,
+	                    SUM(CASE WHEN TIPO_INGRESO_IMP=1 THEN numero_altas ELSE 0.0 END) as numero_altas_urgentes,
+	                    SUM(CASE WHEN TIPO_INGRESO_IMP=1 THEN estancias ELSE 0.0 END) as estancias_urgentes,
+	                    SUM(CASE WHEN TIPO_INGRESO_IMP=1 THEN estanciaspreoperatoria ELSE 0.0 END) as estpreop_urgentes,
+	                    SUM(CASE WHEN TIPO_INGRESO_IMP=1 THEN altas_preoperatorias ELSE 0.0 END) as altas_preoperatoriasurgentes
+					FROM (
+						SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_CCAA"/> 
+                            tipo_ingreso as TIPO_INGRESO_IMP,
+                            COUNT(*) as numero_altas,
+                            SUM(Estancia) as estancias,
+                            SUM(EstanciaPreoperatoria) as estanciaspreoperatoria,
+                            COUNT(EstanciaPreoperatoria) as altas_preoperatorias
+						FROM
+							<include refid="includes.FROM_TABLE_CLAUSE"/>
+						WHERE Anio=$anio$ 
+							<include refid="includes.GROPY_BY_COMMA_DESCRIPTIVO"/>
+								tipo_ingreso
+					) altas <include refid="includes.GROUP_BY_LIST"/>
+				) altas <include refid="includes.WHERE_ALLCOD_NULL"/>
+		) altas 
+		<include refid="includes.INNER_JOIN_DESCRIPTIVO"/>	    
+	</sql>
+	<sql id="SELECT_LIST_SERIE_TEMPORAL">
+				<include refid="includes.INICIAL_SERIE_TEMPORAL"/>
+						SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_G"/> 
+						    Anio,
+						    <isNotEqual property="temporalSerieColumn.column" compareValue="RECORDS_QUIRURGIC">
+						    	SUM(numero_altas) as numero_altas,
+						    	SUM(estanciaspreoperaoria)/100.0 as numero_altas_ind
+						    </isNotEqual>
+						    <isEqual property="temporalSerieColumn.column" compareValue="RECORDS_QUIRURGIC">
+						    	SUM(numero_altas) as numero_altas,
+						    	SUM(numero_altas) as numero_altas_ind
+						    </isEqual>
+						FROM(
+							SELECT <include refid="includes.SELECT_COD_DESCRIPTIVO_CCAA"/> 
+							    Anio,
+							    <isEqual property="temporalSerieColumn.column" compareValue="DEFAULT">
+							    	COUNT(EstanciaPreoperatoria) as numero_altas,
+							    	SUM(EstanciaPreoperatoria) as estanciaspreoperaoria
+							    </isEqual>
+							    <isEqual property="temporalSerieColumn.column" compareValue="RECORDS_QUIRURGIC">
+							    	COUNT(EstanciaPreoperatoria) as numero_altas,
+							    	COUNT(EstanciaPreoperatoria) as estanciaspreoperaoria
+							    </isEqual>
+							    <isEqual property="temporalSerieColumn.column" compareValue="PREOPERATIVE_STAY_SCHEDULED">
+							    	SUM(CASE WHEN tipo_ingreso=2 AND EstanciaPreoperatoria IS NOT NULL THEN 1 ELSE 0.0 END) as numero_altas,
+							    	SUM(CASE WHEN tipo_ingreso=2 AND EstanciaPreoperatoria IS NOT NULL THEN EstanciaPreoperatoria ELSE 0.0 END) as estanciaspreoperaoria
+							    </isEqual>
+							    <isEqual property="temporalSerieColumn.column" compareValue="PREOPERATIVE_STAY_URGENT">
+							    	SUM(CASE WHEN tipo_ingreso=1 AND EstanciaPreoperatoria IS NOT NULL THEN 1 ELSE 0.0 END) as numero_altas,
+							    	SUM(CASE WHEN tipo_ingreso=1 AND EstanciaPreoperatoria IS NOT NULL THEN EstanciaPreoperatoria ELSE 0.0 END) as estanciaspreoperaoria
+							    </isEqual>
+							FROM
+								<include refid="includes.FROM_TABLE_CLAUSE"/>
+							WHERE (1=1) 
+								<include refid="includes.FILTRO_ANIOS_SERIE_TEMPORAL"/>
+								<include refid="includes.GROPY_BY_COMMA_DESCRIPTIVO"/>
+								Anio
+						) altas <include refid="includes.GROPY_BY_LIST2"/>
+								Anio
+					<include refid="includes.FINAL_SERIE_TEMPORAL"/>	    
+	</sql>
+
+</sqlMap>

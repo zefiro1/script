@@ -1,0 +1,293 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace="CorreccionIndividual">
+
+	
+
+	
+
+	<resultMap id="CorreccionIndividualMapping" type="CorreccionIndividual">
+		<result property="tipoHospital" column="TIPO_HOSPITAL"/>
+		<result property="clusterHospital" column="CLUSTER_HOSPITAL"/>
+		<result property="valorOriginal" column="VALOR_ORIGINAL"/>
+		<result property="valorCorregido" column="VALOR_CORREGIDO"/>
+		<result property="correccion" column="CORRECCION"/>
+		<result property="indicadorId" column="INDICADOR_ID"/>
+		<result property="tipoHospitalDesc" column="TIPO_HOSPITAL_DESC"/>		
+		<result property="clusterHospitalDesc" column="CLUSTER_HOSPITAL_DESC"/>
+		<result property="hospital" column="NOMBRE_HOSPITAL"/>
+		<result property="codigoHospital" column="CODIGO_HOSPITAL"/>
+		<result property="codigoCcaa" column="CODIGO_CCAA"/>
+		<result property="descCcaa" column="DESC_CCAA"/>
+		<result property="anio" column="ANIO"/>
+	</resultMap>
+
+	
+
+	<select id="SelectAllByIndicadorId" parameterType="java.lang.String" resultType="CorreccionIndividualMapping">
+		SELECT 
+		    CE.TIPO_HOSPITAL AS TIPO_HOSPITAL,
+		    CE.CLUSTER_HOSPITAL AS CLUSTER_HOSPITAL,
+		    CE.VALOR_ORIGINAL AS VALOR_ORIGINAL, 
+		    CE.VALOR_CORREGIDO AS VALOR_CORREGIDO, 
+		    CE.CORRECCION AS CORRECCION,
+		    CE.INDICADOR_ID AS INDICADOR_ID,
+		    'variable'||VIC1.VARIABLE_INFLUENCIA_ID||'.codigo'||VIC1.CODIGO AS TIPO_HOSPITAL_DESC,
+			'variable'||VIC2.VARIABLE_INFLUENCIA_ID||'.codigo'||VIC2.CODIGO AS CLUSTER_HOSPITAL_DESC,
+		    H.DESCRIPCION AS NOMBRE_HOSPITAL,
+		    H.CODIGO_HOSPITAL AS CODIGO_HOSPITAL,
+		    'variable3'||'.codigo'||C.CODIGO_CCAA AS CODIGO_CCAA,
+		    'variable3'||'.codigo'||C.CODIGO_CCAA AS DESC_CCAA,
+		    CE.ANIO AS ANIO
+		FROM 
+		    MD_CORRECCION_INDIVIDUAL CE, 
+		    MD_VARS_INF_CODIGOS VIC1,
+		    MD_VARS_INF_CODIGOS VIC2,
+		    MD_HOSPITALES H,
+		    MD_CCAA C,
+            MD_PROVINCIAS P
+		WHERE
+		    VIC1.CODIGO LIKE CE.TIPO_HOSPITAL AND
+		    VIC2.CODIGO LIKE CE.CLUSTER_HOSPITAL AND
+		    VIC1.VARIABLE_INFLUENCIA_ID = 1 AND
+		    VIC2.VARIABLE_INFLUENCIA_ID = 12 AND
+		    CE.CODIGO_HOSPITAL = H.CODIGO_HOSPITAL AND
+		    H.PROVINCIA_HOSPITAL = P.CODIGO_PROVINCIA AND
+			P.CODIGO_CCAA = C.CODIGO_CCAA AND
+			CE.INDICADOR_ID = #{indicadorId}
+			CE.ANIO = #{anio}
+	</select>
+	
+
+	
+
+	<select id="SelectAll" resultType="CorreccionIndividualMapping">
+		SELECT
+			TIPO_HOSPITAL,
+			CLUSTER_HOSPITAL,
+			VALOR_ORIGINAL,
+			VALOR_CORREGIDO,
+			CORRECCION,
+			INDICADOR_ID,
+			VIC1.VALOR AS TIPO_HOSPITAL_DESC,
+		    VIC2.VALOR AS CLUSTER_HOSPITAL_DESC,			
+			H.DESCRIPCION AS NOMBRE_HOSPITAL,
+		    H.CODIGO_HOSPITAL AS CODIGO_HOSPITAL,
+			C.CODIGO_CCAA AS CODIGO_CCAA,
+			C.DESCRIPCION AS DESC_CCAA,
+			CE.ANIO AS ANIO
+		FROM
+			MD_CORRECCION_INDIVIDUAL CE, 
+			MD_VARS_INF_CODIGOS VIC1,
+			MD_VARS_INF_CODIGOS VIC2,			
+			MD_HOSPITALES H,
+			MD_CCAA C,
+			MD_PROVINCIAS P
+		WHERE
+		    VIC1.CODIGO LIKE CE.TIPO_HOSPITAL AND
+		    VIC2.CODIGO LIKE CE.CLUSTER_HOSPITAL AND
+		    VIC1.VARIABLE_INFLUENCIA_ID = 1 AND
+		    VIC2.VARIABLE_INFLUENCIA_ID = 12 AND
+			CE.CODIGO_HOSPITAL = H.CODIGO_HOSPITAL AND
+		    H.PROVINCIA_HOSPITAL = P.CODIGO_PROVINCIA AND
+			P.CODIGO_CCAA = C.CODIGO_CCAA
+	</select>
+
+	
+
+	<select id="CountAll">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_CORRECCION_INDIVIDUAL
+	</select>
+
+	
+
+	<select id="SelectList" parameterType="CorreccionIndividual" resultType="CorreccionIndividualMapping">
+		SELECT
+		    CE.TIPO_HOSPITAL AS TIPO_HOSPITAL,
+		    CE.CLUSTER_HOSPITAL AS CLUSTER_HOSPITAL,
+		    CE.VALOR_ORIGINAL AS VALOR_ORIGINAL, 
+		    CE.VALOR_CORREGIDO AS VALOR_CORREGIDO, 
+		    CE.CORRECCION AS CORRECCION,
+		    CE.INDICADOR_ID AS INDICADOR_ID,
+		    'variable'||VIC1.VARIABLE_INFLUENCIA_ID||'.codigo'||VIC1.CODIGO AS TIPO_HOSPITAL_DESC,
+			'variable'||VIC2.VARIABLE_INFLUENCIA_ID||'.codigo'||VIC2.CODIGO AS CLUSTER_HOSPITAL_DESC,
+		    H.DESCRIPCION AS NOMBRE_HOSPITAL,
+		    H.CODIGO_HOSPITAL AS CODIGO_HOSPITAL,
+		    C.CODIGO_CCAA AS CODIGO_CCAA,
+		    C.DESCRIPCION AS DESC_CCAA,
+		    CE.ANIO AS ANIO
+		FROM
+		    MD_CORRECCION_INDIVIDUAL CE, 
+		    MD_VARS_INF_CODIGOS VIC1,
+		    MD_VARS_INF_CODIGOS VIC2,
+		    MD_HOSPITALES H,
+		    MD_CCAA C,
+	            MD_PROVINCIAS P
+		WHERE
+		    VIC1.CODIGO LIKE CE.TIPO_HOSPITAL AND
+		    VIC2.CODIGO LIKE CE.CLUSTER_HOSPITAL AND
+		    VIC1.VARIABLE_INFLUENCIA_ID = 1 AND
+		    VIC2.VARIABLE_INFLUENCIA_ID = 12 AND		
+			CE.CODIGO_HOSPITAL = H.CODIGO_HOSPITAL	AND
+			H.PROVINCIA_HOSPITAL = P.CODIGO_PROVINCIA AND
+			P.CODIGO_CCAA = C.CODIGO_CCAA
+
+			<if test="tipoHospital != null">AND 
+				CE.TIPO_HOSPITAL LIKE #{tipoHospital}
+			</if>
+
+			<if test="clusterHospital != null">AND 
+				CE.CLUSTER_HOSPITAL LIKE #{clusterHospital}
+			</if>
+
+			<if test="valorOriginal != null">AND 
+				CE.VALOR_ORIGINAL = #{valorOriginal}
+			</if>
+
+			<if test="valorCorregido != null">AND 
+				CE.VALOR_CORREGIDO = #{valorCorregido}
+			</if>
+
+			<if test="correccion != null">AND 
+				CE.CORRECCION = #{correccion}
+			</if>
+
+			<if test="indicadorId != null">AND 
+				CE.INDICADOR_ID = #{indicadorId}
+			</if>
+			
+			<if test="anio != null">AND 
+				CE.ANIO = #{anio}
+			</if>
+
+			<if test="codigoCcaa != null">AND 
+				P.CODIGO_CCAA = #{codigoCcaa}
+			</if>
+
+	</select>
+
+	
+
+	<select id="CountList" parameterType="CorreccionIndividual">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_CORRECCION_INDIVIDUAL
+		<where>
+
+			<if test="tipoHospital != null">AND 
+				TIPO_HOSPITAL LIKE #{tipoHospital}
+			</if>
+
+			<if test="clusterHospital != null">AND 
+				CLUSTER_HOSPITAL LIKE #{clusterHospital}
+			</if>
+
+			<if test="valorOriginal != null">AND 
+				VALOR_ORIGINAL = #{valorOriginal}
+			</if>
+
+			<if test="valorCorregido != null">AND 
+				VALOR_CORREGIDO = #{valorCorregido}
+			</if>
+
+			<if test="correccion != null">AND 
+				CORRECCION = #{correccion}
+			</if>
+
+			<if test="indicadorId != null">AND 
+				INDICADOR_ID = #{indicadorId}
+			</if>
+			
+			<if test="anio != null">AND 
+				CE.ANIO = #{anio}
+			</if>
+
+		</where>
+	</select>
+
+	
+
+	<insert id="Insert" parameterType="CorreccionIndividual">
+		INSERT INTO MD_CORRECCION_INDIVIDUAL
+			(	
+				TIPO_HOSPITAL,
+				CLUSTER_HOSPITAL,
+				VALOR_ORIGINAL,
+				VALOR_CORREGIDO,
+				CORRECCION,
+				INDICADOR_ID,
+				ANIO
+			)
+		VALUES
+			(
+				#{tipoHospital},
+				#{clusterHospital},
+				#{valorOriginal},
+				#{valorCorregido},
+				#{correccion},
+				#{indicadorId},
+				#{anio}
+			)
+	</insert>
+
+	
+
+	<update id="Update" parameterType="CorreccionIndividual">
+		UPDATE MD_CORRECCION_INDIVIDUAL
+		SET
+			TIPO_HOSPITAL = #{tipoHospital},
+			CLUSTER_HOSPITAL = #{clusterHospital},
+			VALOR_ORIGINAL = #{valorOriginal},
+			VALOR_CORREGIDO = #{valorCorregido},
+			CORRECCION = #{correccion},
+			INDICADOR_ID = #{indicadorId},
+			ANIO = #{anio}
+		WHERE
+			TIPO_HOSPITAL = #{tipoHospital}
+		AND
+			CLUSTER_HOSPITAL = #{clusterHospital}
+		AND
+			VALOR_ORIGINAL = #{valorOriginal}
+		AND
+			VALOR_CORREGIDO = #{valorCorregido}
+		AND
+			INDICADOR_ID = #{indicadorId}
+		AND
+			ANIO = #{anio}
+	</update>
+
+	
+
+	<delete id="Delete" parameterType="CorreccionIndividual">
+		DELETE FROM MD_CORRECCION_INDIVIDUAL
+		WHERE (1=1)
+		<if test="tipoHospital != null">AND 
+			TIPO_HOSPITAL = #{tipoHospital}
+		</if>		
+		<if test="clusterHospital != null">AND 
+			CLUSTER_HOSPITAL = #{clusterHospital}
+		</if>
+		<if test="valorOriginal != null">AND 
+			VALOR_ORIGINAL = #{valorOriginal}
+		</if>
+		<if test="valorCorregido != null">AND 
+			VALOR_CORREGIDO = #{valorCorregido}
+		</if>
+		<if test="indicadorId != null">AND 
+			INDICADOR_ID = #{indicadorId}
+		</if>
+		<if test="anio != null">AND 
+			ANIO = #{anio}
+		</if>
+	</delete>
+
+	
+
+	<delete id="DeleteAll">
+		DELETE FROM MD_CORRECCION_INDIVIDUAL
+	</delete>
+
+</mapper>

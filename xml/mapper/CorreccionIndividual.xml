@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="CorreccionIndividual">
+
+	<typeAlias alias="CorreccionIndividual" type="es.msc.aemsc.business.vo.CorreccionIndividualVO"/>
+
+	<!--
+	<cacheModel id="CorreccionIndividualCache" type="LRU">
+		<flushInterval hours="24"/>
+		<flushOnExecute statement="CorreccionIndividual.Insert"/>
+		<flushOnExecute statement="CorreccionIndividual.Update"/>
+		<flushOnExecute statement="CorreccionIndividual.Delete"/>
+		<flushOnExecute statement="CorreccionIndividual.DeleteAll"/>
+		<property name="size" value="1000" />
+	</cacheModel>
+	-->
+
+	<resultMap id="CorreccionIndividualMapping" class="CorreccionIndividual">
+		<result property="tipoHospital"       column="TIPO_HOSPITAL"      jdbcType="VARCHAR"   javaType="java.lang.String"  />
+		<result property="clusterHospital"    column="CLUSTER_HOSPITAL"   jdbcType="VARCHAR"   javaType="java.lang.String"  />
+		<result property="valorOriginal"      column="VALOR_ORIGINAL"     jdbcType="REAL"      javaType="java.lang.Float"   />
+		<result property="valorCorregido"     column="VALOR_CORREGIDO"    jdbcType="REAL"      javaType="java.lang.Float"   />
+		<result property="correccion"         column="CORRECCION"         jdbcType="REAL"      javaType="java.lang.Float"   />
+		<result property="indicadorId"        column="INDICADOR_ID"       jdbcType="INTEGER"   javaType="java.lang.Integer" />
+		<result property="tipoHospitalDesc"   column="TIPO_HOSPITAL_DESC" jdbcType="VARCHAR"   javaType="java.lang.String"  />		
+		<result property="clusterHospitalDesc"	column="CLUSTER_HOSPITAL_DESC"	jdbcType="VARCHAR"   javaType="java.lang.String"  />
+		<result property="hospital"	          column="NOMBRE_HOSPITAL"	  jdbcType="VARCHAR"   javaType="java.lang.String"  />
+		<result property="codigoHospital"	  column="CODIGO_HOSPITAL"	  jdbcType="VARCHAR"   javaType="java.lang.String"  />
+		<result property="codigoCcaa"   	  column="CODIGO_CCAA"   	  jdbcType="INTEGER"   javaType="java.lang.Integer"  />
+		<result property="descCcaa"      	  column="DESC_CCAA"       	  jdbcType="VARCHAR"   javaType="java.lang.String"  />
+		<result property="anio"           	  column="ANIO"           	  jdbcType="INTEGER"   javaType="java.lang.Integer" />
+	</resultMap>
+
+	<!-- ====== CORRECCION INDIVIDUAL para un indicador ====== -->
+
+	<select id="SelectAllByIndicadorId"  resultMap="CorreccionIndividualMapping" parameterClass="java.lang.String">
+		SELECT 
+		    CE.TIPO_HOSPITAL AS TIPO_HOSPITAL,
+		    CE.CLUSTER_HOSPITAL AS CLUSTER_HOSPITAL,
+		    CE.VALOR_ORIGINAL AS VALOR_ORIGINAL, 
+		    CE.VALOR_CORREGIDO AS VALOR_CORREGIDO, 
+		    CE.CORRECCION AS CORRECCION,
+		    CE.INDICADOR_ID AS INDICADOR_ID,
+		    'variable'||VIC1.VARIABLE_INFLUENCIA_ID||'.codigo'||VIC1.CODIGO AS TIPO_HOSPITAL_DESC,
+			'variable'||VIC2.VARIABLE_INFLUENCIA_ID||'.codigo'||VIC2.CODIGO AS CLUSTER_HOSPITAL_DESC,
+		    H.DESCRIPCION AS NOMBRE_HOSPITAL,
+		    H.CODIGO_HOSPITAL AS CODIGO_HOSPITAL,
+		    'variable3'||'.codigo'||C.CODIGO_CCAA AS CODIGO_CCAA,
+		    'variable3'||'.codigo'||C.CODIGO_CCAA AS DESC_CCAA,
+		    CE.ANIO AS ANIO
+		FROM 
+		    MD_CORRECCION_INDIVIDUAL CE, 
+		    MD_VARS_INF_CODIGOS VIC1,
+		    MD_VARS_INF_CODIGOS VIC2,
+		    MD_HOSPITALES H,
+		    MD_CCAA C,
+            MD_PROVINCIAS P
+		WHERE
+		    VIC1.CODIGO LIKE CE.TIPO_HOSPITAL AND
+		    VIC2.CODIGO LIKE CE.CLUSTER_HOSPITAL AND
+		    VIC1.VARIABLE_INFLUENCIA_ID = 1 AND
+		    VIC2.VARIABLE_INFLUENCIA_ID = 12 AND
+		    CE.CODIGO_HOSPITAL = H.CODIGO_HOSPITAL AND
+		    H.PROVINCIA_HOSPITAL = P.CODIGO_PROVINCIA AND
+			P.CODIGO_CCAA = C.CODIGO_CCAA AND
+			CE.INDICADOR_ID = #indicadorId#
+			CE.ANIO = #anio#
+	</select>
+	
+
+	<!-- ====== SelectAll ====== -->
+
+	<select id="SelectAll"  resultMap="CorreccionIndividualMapping">
+		SELECT
+			TIPO_HOSPITAL,
+			CLUSTER_HOSPITAL,
+			VALOR_ORIGINAL,
+			VALOR_CORREGIDO,
+			CORRECCION,
+			INDICADOR_ID,
+			VIC1.VALOR AS TIPO_HOSPITAL_DESC,
+		    VIC2.VALOR AS CLUSTER_HOSPITAL_DESC,			
+			H.DESCRIPCION AS NOMBRE_HOSPITAL,
+		    H.CODIGO_HOSPITAL AS CODIGO_HOSPITAL,
+			C.CODIGO_CCAA AS CODIGO_CCAA,
+			C.DESCRIPCION AS DESC_CCAA,
+			CE.ANIO AS ANIO
+		FROM
+			MD_CORRECCION_INDIVIDUAL CE, 
+			MD_VARS_INF_CODIGOS VIC1,
+			MD_VARS_INF_CODIGOS VIC2,			
+			MD_HOSPITALES H,
+			MD_CCAA C,
+			MD_PROVINCIAS P
+		WHERE
+		    VIC1.CODIGO LIKE CE.TIPO_HOSPITAL AND
+		    VIC2.CODIGO LIKE CE.CLUSTER_HOSPITAL AND
+		    VIC1.VARIABLE_INFLUENCIA_ID = 1 AND
+		    VIC2.VARIABLE_INFLUENCIA_ID = 12 AND
+			CE.CODIGO_HOSPITAL = H.CODIGO_HOSPITAL AND
+		    H.PROVINCIA_HOSPITAL = P.CODIGO_PROVINCIA AND
+			P.CODIGO_CCAA = C.CODIGO_CCAA
+	</select>
+
+	<!-- ====== CountAll ====== -->
+
+	<select id="CountAll"  resultClass="java.lang.Integer">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_CORRECCION_INDIVIDUAL
+	</select>
+
+	<!-- ====== SelectList ====== -->
+
+	<select id="SelectList"  resultMap="CorreccionIndividualMapping"  parameterClass="CorreccionIndividual">
+		SELECT
+		    CE.TIPO_HOSPITAL AS TIPO_HOSPITAL,
+		    CE.CLUSTER_HOSPITAL AS CLUSTER_HOSPITAL,
+		    CE.VALOR_ORIGINAL AS VALOR_ORIGINAL, 
+		    CE.VALOR_CORREGIDO AS VALOR_CORREGIDO, 
+		    CE.CORRECCION AS CORRECCION,
+		    CE.INDICADOR_ID AS INDICADOR_ID,
+		    'variable'||VIC1.VARIABLE_INFLUENCIA_ID||'.codigo'||VIC1.CODIGO AS TIPO_HOSPITAL_DESC,
+			'variable'||VIC2.VARIABLE_INFLUENCIA_ID||'.codigo'||VIC2.CODIGO AS CLUSTER_HOSPITAL_DESC,
+		    H.DESCRIPCION AS NOMBRE_HOSPITAL,
+		    H.CODIGO_HOSPITAL AS CODIGO_HOSPITAL,
+		    C.CODIGO_CCAA AS CODIGO_CCAA,
+		    C.DESCRIPCION AS DESC_CCAA,
+		    CE.ANIO AS ANIO
+		FROM
+		    MD_CORRECCION_INDIVIDUAL CE, 
+		    MD_VARS_INF_CODIGOS VIC1,
+		    MD_VARS_INF_CODIGOS VIC2,
+		    MD_HOSPITALES H,
+		    MD_CCAA C,
+	            MD_PROVINCIAS P
+		WHERE
+		    VIC1.CODIGO LIKE CE.TIPO_HOSPITAL AND
+		    VIC2.CODIGO LIKE CE.CLUSTER_HOSPITAL AND
+		    VIC1.VARIABLE_INFLUENCIA_ID = 1 AND
+		    VIC2.VARIABLE_INFLUENCIA_ID = 12 AND		
+			CE.CODIGO_HOSPITAL = H.CODIGO_HOSPITAL	AND
+			H.PROVINCIA_HOSPITAL = P.CODIGO_PROVINCIA AND
+			P.CODIGO_CCAA = C.CODIGO_CCAA
+
+			<isNotNull prepend="AND" property="tipoHospital">
+				CE.TIPO_HOSPITAL LIKE #tipoHospital#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="clusterHospital">
+				CE.CLUSTER_HOSPITAL LIKE #clusterHospital#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="valorOriginal">
+				CE.VALOR_ORIGINAL = #valorOriginal#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="valorCorregido">
+				CE.VALOR_CORREGIDO = #valorCorregido#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="correccion">
+				CE.CORRECCION = #correccion#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="indicadorId">
+				CE.INDICADOR_ID = #indicadorId#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="anio">
+				CE.ANIO = #anio#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="codigoCcaa">
+				P.CODIGO_CCAA = #codigoCcaa#
+			</isNotNull>
+
+	</select>
+
+	<!-- ====== CountList ====== -->
+
+	<select id="CountList"  resultClass="java.lang.Integer"  parameterClass="CorreccionIndividual">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_CORRECCION_INDIVIDUAL
+		<dynamic prepend="WHERE">
+
+			<isNotNull prepend="AND" property="tipoHospital">
+				TIPO_HOSPITAL LIKE #tipoHospital#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="clusterHospital">
+				CLUSTER_HOSPITAL LIKE #clusterHospital#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="valorOriginal">
+				VALOR_ORIGINAL = #valorOriginal#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="valorCorregido">
+				VALOR_CORREGIDO = #valorCorregido#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="correccion">
+				CORRECCION = #correccion#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="indicadorId">
+				INDICADOR_ID = #indicadorId#
+			</isNotNull>
+			
+			<isNotNull prepend="AND" property="anio">
+				CE.ANIO = #anio#
+			</isNotNull>
+
+		</dynamic>
+	</select>
+
+	<!-- ====== Insert ====== -->
+
+	<insert id="Insert"  parameterClass="CorreccionIndividual">
+		INSERT INTO MD_CORRECCION_INDIVIDUAL
+			(	
+				TIPO_HOSPITAL,
+				CLUSTER_HOSPITAL,
+				VALOR_ORIGINAL,
+				VALOR_CORREGIDO,
+				CORRECCION,
+				INDICADOR_ID,
+				ANIO
+			)
+		VALUES
+			(
+				#tipoHospital:VARCHAR#,
+				#clusterHospital:VARCHAR#,
+				#valorOriginal:REAL#,
+				#valorCorregido:REAL#,
+				#correccion:REAL#,
+				#indicadorId:INTEGER#,
+				#anio:INTEGER#
+			)
+	</insert>
+
+	<!-- ====== Update ====== -->
+
+	<update id="Update"  parameterClass="CorreccionIndividual">
+		UPDATE MD_CORRECCION_INDIVIDUAL
+		SET
+			TIPO_HOSPITAL = #tipoHospital:VARCHAR#,
+			CLUSTER_HOSPITAL = #clusterHospital:VARCHAR#,
+			VALOR_ORIGINAL = #valorOriginal:REAL#,
+			VALOR_CORREGIDO = #valorCorregido:REAL#,
+			CORRECCION = #correccion:REAL#,
+			INDICADOR_ID = #indicadorId:INTEGER#,
+			ANIO = #anio:INTEGER#
+		WHERE
+			TIPO_HOSPITAL = #tipoHospital#
+		AND
+			CLUSTER_HOSPITAL = #clusterHospital#
+		AND
+			VALOR_ORIGINAL = #valorOriginal#
+		AND
+			VALOR_CORREGIDO = #valorCorregido#
+		AND
+			INDICADOR_ID = #indicadorId#
+		AND
+			ANIO = #anio#
+	</update>
+
+	<!-- ====== Delete ====== -->
+
+	<delete id="Delete"  parameterClass="CorreccionIndividual">
+		DELETE FROM MD_CORRECCION_INDIVIDUAL
+		WHERE (1=1)
+		<isNotNull prepend="AND" property="tipoHospital">
+			TIPO_HOSPITAL = #tipoHospital#
+		</isNotNull>		
+		<isNotNull prepend="AND" property="clusterHospital">
+			CLUSTER_HOSPITAL = #clusterHospital#
+		</isNotNull>
+		<isNotNull prepend="AND" property="valorOriginal">
+			VALOR_ORIGINAL = #valorOriginal#
+		</isNotNull>
+		<isNotNull prepend="AND" property="valorCorregido">
+			VALOR_CORREGIDO = #valorCorregido#
+		</isNotNull>
+		<isNotNull prepend="AND" property="indicadorId">
+			INDICADOR_ID = #indicadorId#
+		</isNotNull>
+		<isNotNull prepend="AND" property="anio">
+			ANIO = #anio#
+		</isNotNull>
+	</delete>
+
+	<!-- ====== DeleteAll ====== -->
+
+	<delete id="DeleteAll">
+		DELETE FROM MD_CORRECCION_INDIVIDUAL
+	</delete>
+
+</sqlMap>
+

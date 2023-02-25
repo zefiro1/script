@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="AnalisisIndicador">
+
+	<typeAlias alias="AnalisisIndicador" type="es.msc.aemsc.business.vo.IndicadorParamsVO"/>
+	
+	<!-- ====== SelectList ====== -->
+	<select id="SelectList" remapResults="true" parameterClass="AnalisisIndicador" resultClass="java.util.LinkedHashMap">
+		<isNotNull property="grupoIndicadorEtiqueta">
+
+			<isEqual property="grupoIndicadorEtiqueta" compareValue="mortalidad">
+				<include refid="includeMortalidad.SELECT_LIST"/>
+			</isEqual>
+
+			<isEqual property="grupoIndicadorEtiqueta" compareValue="estanciaMedia">
+				<include refid="includeEstanciaMedia.SELECT_LIST"/>
+			</isEqual>
+
+			<isEqual property="grupoIndicadorEtiqueta" compareValue="reingresos">
+				<include refid="includeReingreso.SELECT_LIST"/>
+			</isEqual>
+
+			<isEqual property="grupoIndicadorEtiqueta" compareValue="complicaciones">
+				<include refid="includeComplicacionMedica.SELECT_LIST"/>
+			</isEqual>
+			
+			<isEqual property="grupoIndicadorEtiqueta" compareValue="frecuentacion">
+				<include refid="includeFrecuentacion.SELECT_LIST"/>
+			</isEqual>
+
+			<isEqual property="grupoIndicadorEtiqueta" compareValue="frecuentacion_np">
+				<include refid="includeFrecuentacion.SELECT_LIST"/>
+			</isEqual>
+
+			<isEqual property="grupoIndicadorEtiqueta" compareValue="nosocomial">
+				<include refid="includeInfeccionNosocomial.SELECT_LIST"/>
+			</isEqual>
+
+			<isEqual property="grupoIndicadorEtiqueta" compareValue="cesareas">
+				<include refid="includeCesareas.SELECT_LIST"/>
+			</isEqual>
+
+			<isEqual property="grupoIndicadorEtiqueta" compareValue="em_preoperatoria">
+				<include refid="includeEM_preoperatoria.SELECT_LIST"/>
+			</isEqual>
+
+			<isEqual property="grupoIndicadorEtiqueta" compareValue="ambulatorizacion_quirurgica">
+				<include refid="includeAmbulatorizacion_quirurgica.SELECT_LIST"/>
+			</isEqual>
+
+			<isEqual property="grupoIndicadorEtiqueta" compareValue="avoidable_admission">
+				<include refid="includeAvoidableAdmission.SELECT_LIST"/>
+			</isEqual>
+			
+			<isEqual property="grupoIndicadorEtiqueta" compareValue="estrategiaCronicidad">
+				<include refid="includeEstrategiaCronicidad.SELECT_LIST"/>
+			</isEqual>
+			
+			<isEqual property="grupoIndicadorEtiqueta" compareValue="estrategiaInfarto">
+				<include refid="includeEstrategiaInfarto.SELECT_LIST"/>
+			</isEqual>
+			
+			<isEqual property="grupoIndicadorEtiqueta" compareValue="estrategiaDiabetes">
+				<include refid="includeEstrategiaDiabetes.SELECT_LIST"/>
+			</isEqual>
+			
+			<isEqual property="grupoIndicadorEtiqueta" compareValue="coste">
+				<include refid="includeCoste.SELECT_LIST"/>
+			</isEqual>
+			
+		</isNotNull>
+	</select>
+	
+	<select id="SelectGrouping" resultClass="java.util.LinkedHashMap" remapResults="true" parameterClass="AnalisisIndicador">
+		SELECT
+			<isEqual property="hospitalCount" compareValue="true" close="," >
+				count(distinct CODIGO_HOSPITAL) as HOSPITALES_COUNT
+			</isEqual> 	
+			<iterate property="groupByList" conjunction="," close=",">
+					$groupByList[].nombre$
+			</iterate>			
+			<iterate property="indicators">
+			    <isEqual property="indicators[].grupoIndicadorEtiqueta" compareValue="estrategiaInfarto">
+					<isEqual property="indicators[].indicadorEtiqueta" compareValue="AMIHOSPITALIZATION">
+				         COUNT(DISTINCT (CASE WHEN $indicators[].indicadorEtiqueta$=1 THEN CONCAT(CONCAT(codigo_hospital,'-'),historia) ELSE NULL END)) as tasa_$indicators[].indicador$,
+				     </isEqual>
+					<isNotEqual property="indicators[].indicadorEtiqueta" compareValue="AMIHOSPITALIZATION">
+				         SUM($indicators[].indicadorEtiqueta$)/nullif(SUM(CASE WHEN $indicators[].indicadorEtiqueta$ is not null THEN 1 ELSE 0.0 END), 0) as tasa_$indicators[].indicador$,
+				     </isNotEqual>
+			    </isEqual>
+			    <isEqual property="indicators[].grupoIndicadorEtiqueta" compareValue="estrategiaDiabetes">
+					<isEqual property="indicators[].indicadorEtiqueta" compareValue="KETOACIDOSIS">
+				         SUM($indicators[].indicadorEtiqueta$) as tasa_$indicators[].indicador$,
+				     </isEqual>
+					<isEqual property="indicators[].indicadorEtiqueta" compareValue="DIABETESVITRECTOMY">
+				         SUM(CASE WHEN CODIGO_GRUPO_EDAD_GRANDE&gt;1 AND CODIGO_CCAA_HOSPITAL NOT IN (18,19) THEN $indicators[].indicadorEtiqueta$ ELSE 0 END) as tasa_$indicators[].indicador$,
+				     </isEqual>
+					<isEqual property="indicators[].indicadorEtiqueta" compareValue="AMPUTATIONDIABETES">
+				         SUM(CASE WHEN CODIGO_GRUPO_EDAD_GRANDE&gt;1 AND CODIGO_CCAA_HOSPITAL NOT IN (18,19) THEN $indicators[].indicadorEtiqueta$ ELSE 0 END) as tasa_$indicators[].indicador$,
+				     </isEqual>
+					<isEqual property="indicators[].indicadorEtiqueta" compareValue="DIABETESCOMPLICATIONS">
+				         SUM(CASE WHEN CODIGO_GRUPO_EDAD_GRANDE&gt;1 AND CODIGO_CCAA_HOSPITAL NOT IN (18,19) THEN $indicators[].indicadorEtiqueta$ ELSE 0 END) as tasa_$indicators[].indicador$,
+				     </isEqual>
+					<isEqual property="indicators[].indicadorEtiqueta" compareValue="AMIDIABETES">
+				         SUM(CASE WHEN CODIGO_GRUPO_EDAD_GRANDE&gt;1 AND CODIGO_CCAA_HOSPITAL NOT IN (18,19) THEN $indicators[].indicadorEtiqueta$ ELSE 0 END) as tasa_$indicators[].indicador$,
+				     </isEqual>
+					<isEqual property="indicators[].indicadorEtiqueta" compareValue="ICTUSDIABETES">
+				         SUM(CASE WHEN CODIGO_GRUPO_EDAD_GRANDE&gt;1 AND CODIGO_CCAA_HOSPITAL NOT IN (18,19) THEN $indicators[].indicadorEtiqueta$ ELSE 0 END) as tasa_$indicators[].indicador$,
+				     </isEqual>
+				     <isEqual property="indicators[].indicadorEtiqueta" compareValue="DIABETESPREGNANCYCOMP">
+				         SUM($indicators[].indicadorEtiqueta$)/nullif(SUM(CASE WHEN $indicators[].indicadorEtiqueta$ is not null THEN 1 ELSE 0.0 END), 0) as tasa_$indicators[].indicador$,
+				     </isEqual>
+			    </isEqual>
+			    <isEqual property="indicators[].grupoIndicadorEtiqueta" compareValue="estrategiaCronicidad">
+					<isEqual property="indicators[].indicadorEtiqueta" compareValue="AASHORTTERMDIABETESCHILDCOMP">
+				         SUM($indicators[].indicadorEtiqueta$) as tasa_$indicators[].indicador$,
+				     </isEqual>
+				     <isEqual property="indicators[].indicadorEtiqueta" compareValue="AACHRONICPATHOLOGIES">
+				         SUM($indicators[].indicadorEtiqueta$) as tasa_$indicators[].indicador$,
+				     </isEqual>
+				     <isEqual property="indicators[].indicadorEtiqueta" compareValue="AAASTHMACHILD">
+				         SUM($indicators[].indicadorEtiqueta$) as tasa_$indicators[].indicador$,
+				     </isEqual>
+				     <isEqual property="indicators[].indicadorEtiqueta" compareValue="ESTANCIA_CRONICAS">
+				         SUM($indicators[].indicadorEtiqueta$)/nullif(SUM(CASE WHEN $indicators[].indicadorEtiqueta$ is not null THEN 1 ELSE 0.0 END), 0) as tasa_$indicators[].indicador$,
+				     </isEqual>
+				     <isEqual property="indicators[].indicadorEtiqueta" compareValue="ESTANCIA_CRONICAS_DIAS">
+				         SUM(ESTANCIA_CRONICAS)/SUM(estancia) as tasa_$indicators[].indicador$,
+				     </isEqual>
+				     <isEqual property="indicators[].indicadorEtiqueta" compareValue="REINGRESOS_CRONICAS">
+				         SUM($indicators[].indicadorEtiqueta$)/nullif(SUM(CASE WHEN $indicators[].indicadorEtiqueta$ is not null THEN 1 ELSE 0.0 END), 0) as tasa_$indicators[].indicador$,
+				     </isEqual>
+			    </isEqual>
+				<isEqual property="indicators[].grupoIndicadorEtiqueta" compareValue="reingresos">
+					SUM(CASE WHEN $indicators[].indicadorEtiqueta$ &gt; 0 THEN 1 ELSE 0.0 END)/nullif(SUM(CASE WHEN $indicators[].indicadorEtiqueta$ is not null THEN 1 ELSE 0.0 END), 0) as tasa_$indicators[].indicador$,
+				</isEqual>
+				<isEqual property="indicators[].grupoIndicadorEtiqueta" compareValue="complicaciones">
+				    100*SUM($indicators[].indicadorEtiqueta$)/nullif(SUM(CASE WHEN $indicators[].indicadorEtiqueta$ is not null THEN 1 ELSE 0.0 END), 0) as tasa_$indicators[].indicador$,
+				</isEqual>
+				<isEqual property="indicators[].grupoIndicadorEtiqueta" compareValue="mortalidad">
+				    100*SUM($indicators[].indicadorEtiqueta$)/nullif(SUM(CASE WHEN $indicators[].indicadorEtiqueta$ is not null THEN 1 ELSE 0.0 END), 0) as tasa_$indicators[].indicador$,
+				</isEqual>
+				<isEqual property="indicators[].grupoIndicadorEtiqueta" compareValue="avoidable_admission">
+				    SUM($indicators[].indicadorEtiqueta$) as tasa_$indicators[].indicador$,
+				</isEqual>
+				<isNotEqual property="indicators[].grupoIndicadorEtiqueta" compareValue="estrategiaCronicidad">
+			    <isNotEqual property="indicators[].grupoIndicadorEtiqueta" compareValue="estrategiaInfarto">
+		        <isNotEqual property="indicators[].grupoIndicadorEtiqueta" compareValue="estrategiaDiabetes">
+				<isNotEqual property="indicators[].grupoIndicadorEtiqueta" compareValue="reingresos">
+				<isNotEqual property="indicators[].grupoIndicadorEtiqueta" compareValue="complicaciones">
+				<isNotEqual property="indicators[].grupoIndicadorEtiqueta" compareValue="mortalidad">
+				<isNotEqual property="indicators[].grupoIndicadorEtiqueta" compareValue="avoidable_admission">
+				    SUM($indicators[].indicadorEtiqueta$)/nullif(SUM(CASE WHEN $indicators[].indicadorEtiqueta$ is not null THEN 1 ELSE 0.0 END), 0) as tasa_$indicators[].indicador$,
+				</isNotEqual>
+				</isNotEqual>
+				</isNotEqual>
+				</isNotEqual>
+				</isNotEqual>
+				</isNotEqual>
+				</isNotEqual>
+			</iterate>
+			anio
+		FROM
+			$table$ altas
+		WHERE 1=1
+			<include refid="includes.WHERE_AND_GROUPBY_ROLLUP_DESCRIPTIVO"/>, anio
+		ORDER BY anio
+			<iterate property="groupByList" conjunction="," prepend=",">
+				COALESCE($groupByList[].nombre$,-1)
+			</iterate>
+ 	</select>
+	
+</sqlMap>

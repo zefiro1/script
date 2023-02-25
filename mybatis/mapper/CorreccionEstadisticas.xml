@@ -1,0 +1,271 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace="CorreccionEstadisticas">
+
+	
+
+	
+
+	<resultMap id="CorreccionEstadisticasMapping" type="CorreccionEstadisticas">
+		<result property="variable1" column="VARIABLE_1"/>
+		<result property="variable2" column="VARIABLE_2"/>
+		<result property="variable3" column="VARIABLE_3"/>
+		<result property="desvOriginal" column="DESV_ORIGINAL"/>
+		<result property="cvOriginal" column="CV_ORIGINAL"/>
+		<result property="riOriginal" column="RI_ORIGINAL"/>
+		<result property="desvCorregido" column="DESV_CORREGIDO"/>
+		<result property="cvCorregido" column="CV_CORREGIDO"/>
+		<result property="riCorregido" column="RI_CORREGIDO"/>
+		<result property="indicadorId" column="INDICADOR_ID"/>
+		<result property="varExplicada" column="VAR_EXPLICADA"/>
+		<result property="anio" column="ANIO"/>		
+	</resultMap>
+
+
+	
+
+	<select id="SelectAll" resultType="CorreccionEstadisticasMapping">
+		SELECT
+			VARIABLE_1,
+			VARIABLE_2,
+			VARIABLE_3,
+			DESV_ORIGINAL,
+			CV_ORIGINAL,
+			RI_ORIGINAL,
+			DESV_CORREGIDO,
+			CV_CORREGIDO,
+			RI_CORREGIDO,
+			INDICADOR_ID,
+			VAR_EXPLICADA,
+			ANIO
+		FROM
+			MD_CORRECCION_ESTADISTICAS
+	</select>
+
+	
+
+	<select id="CountAll">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_CORRECCION_ESTADISTICAS
+	</select>
+
+	
+
+	<select id="SelectById" parameterType="CorreccionEstadisticas" resultType="CorreccionEstadisticasMapping">
+		SELECT
+			VARIABLE_1,
+			VARIABLE_2,
+			VARIABLE_3,
+			DESV_ORIGINAL,
+			CV_ORIGINAL,
+			RI_ORIGINAL,
+			DESV_CORREGIDO,
+			CV_CORREGIDO,
+			RI_CORREGIDO,
+			INDICADOR_ID,
+			VAR_EXPLICADA,
+			ANIO
+		FROM
+			MD_CORRECCION_ESTADISTICAS
+		WHERE
+			INDICADOR_ID = #{indicadorId}
+	</select>
+
+	
+
+	<select id="SelectList" parameterType="CorreccionEstadisticas" resultType="CorreccionEstadisticasMapping">
+		SELECT
+			VARIABLE_1,
+			VARIABLE_2,
+			VARIABLE_3,
+			DESV_ORIGINAL,
+			CV_ORIGINAL,
+			RI_ORIGINAL,
+			DESV_CORREGIDO,
+			CV_CORREGIDO,
+			RI_CORREGIDO,
+			INDICADOR_ID,
+			VAR_EXPLICADA,
+			ANIO
+		FROM
+			MD_CORRECCION_ESTADISTICAS
+		<where>
+
+			<if test="variable1 != null">AND 
+				VARIABLE_1 = #{variable1}
+			</if>
+
+			<if test="variable2 != null">AND 
+				VARIABLE_2 = #{variable2}
+			</if>
+
+			<if test="variable3 != null">AND 
+				VARIABLE_3 = #{variable3}
+			</if>
+
+			<if test="desvOriginal != null">AND 
+				DESV_ORIGINAL = #{desvOriginal}
+			</if>
+
+			<if test="cvOriginal != null">AND 
+				CV_ORIGINAL = #{cvOriginal}
+			</if>
+
+			<if test="riOriginal != null">AND 
+				RI_ORIGINAL = #{riOriginal}
+			</if>
+
+			<if test="desvCorregido != null">AND 
+				DESV_CORREGIDO = #{desvCorregido}
+			</if>
+
+			<if test="cvCorregido != null">AND 
+				CV_CORREGIDO = #{cvCorregido}
+			</if>
+
+			<if test="riCorregido != null">AND 
+				RI_CORREGIDO = #{riCorregido}
+			</if>
+
+			<if test="indicadorId != null">AND 
+				INDICADOR_ID = #{indicadorId}
+			</if>
+
+			<if test="anio != null">AND 
+				ANIO = #{anio}
+			</if>
+		</where>
+	</select>
+
+	
+
+	<select id="CountList" parameterType="CorreccionEstadisticas">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_CORRECCION_ESTADISTICAS
+		<where>
+
+			<if test="variable1 != null">AND 
+				VARIABLE_1 = #{variable1}
+			</if>
+
+			<if test="variable2 != null">AND 
+				VARIABLE_2 = #{variable2}
+			</if>
+
+			<if test="variable3 != null">AND 
+				VARIABLE_3 = #{variable3}
+			</if>
+
+			<if test="desvOriginal != null">AND 
+				DESV_ORIGINAL = #{desvOriginal}
+			</if>
+
+			<if test="cvOriginal != null">AND 
+				CV_ORIGINAL = #{cvOriginal}
+			</if>
+
+			<if test="riOriginal != null">AND 
+				RI_ORIGINAL = #{riOriginal}
+			</if>
+
+			<if test="desvCorregido != null">AND 
+				DESV_CORREGIDO = #{desvCorregido}
+			</if>
+
+			<if test="cvCorregido != null">AND 
+				CV_CORREGIDO = #{cvCorregido}
+			</if>
+
+			<if test="riCorregido != null">AND 
+				RI_CORREGIDO = #{riCorregido}
+			</if>
+
+			<if test="indicadorId != null">AND 
+				INDICADOR_ID = #{indicadorId}
+			</if>
+
+			<if test="anio != null">AND 
+				ANIO = #{anio}
+			</if>
+		</where>
+	</select>
+
+	
+
+	<insert id="Insert" parameterType="CorreccionEstadisticas">
+		INSERT INTO MD_CORRECCION_ESTADISTICAS
+			(
+				VARIABLE_1,
+				VARIABLE_2,
+				VARIABLE_3,
+				DESV_ORIGINAL,
+				CV_ORIGINAL,
+				RI_ORIGINAL,
+				DESV_CORREGIDO,
+				CV_CORREGIDO,
+				RI_CORREGIDO,
+				INDICADOR_ID,
+				VAR_EXPLICADA,
+				ANIO
+			)
+		VALUES
+			(
+				#{variable1},
+				#{variable2},
+				#{variable3},
+				#{desvOriginal},
+				#{cvOriginal},
+				#{riOriginal},
+				#{desvCorregido},
+				#{cvCorregido},
+				#{riCorregido},
+				#{indicadorId},
+				#{varExplicada},
+				#{anio}
+			)
+	</insert>
+
+	
+
+	<update id="Update" parameterType="CorreccionEstadisticas">
+		UPDATE MD_CORRECCION_ESTADISTICAS
+		SET
+			VARIABLE_1 = #{variable1},
+			VARIABLE_2 = #{variable2},
+			VARIABLE_3 = #{variable3},
+			DESV_ORIGINAL = #{desvOriginal},
+			CV_ORIGINAL = #{cvOriginal},
+			RI_ORIGINAL = #{riOriginal},
+			DESV_CORREGIDO = #{desvCorregido},
+			CV_CORREGIDO = #{cvCorregido},
+			RI_CORREGIDO = #{riCorregido},
+			INDICADOR_ID = #{indicadorId},
+			VAR_EXPLICADA = #{varExplicada},
+			ANIO = #{anio}
+		WHERE
+			INDICADOR_ID = #{indicadorId}
+	</update>
+
+	
+
+	<delete id="Delete" parameterType="CorreccionEstadisticas">
+		DELETE FROM MD_CORRECCION_ESTADISTICAS
+		WHERE 1=1
+			
+				INDICADOR_ID = #{indicadorId}
+			
+			
+				ANIO = #{anio}
+			
+	</delete>
+
+	
+
+	<delete id="DeleteAll">
+		DELETE FROM MD_CORRECCION_ESTADISTICAS
+	</delete>
+
+</mapper>

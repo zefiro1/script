@@ -1,0 +1,220 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace="VariablesInfluenciaCodigos">
+
+	
+	
+
+	<resultMap id="VariablesInfluenciaCodigosMapping" type="VariablesInfluenciaCodigos">
+		<result property="variableInfluenciaId" column="VARIABLE_INFLUENCIA_ID"/>
+		<result property="codigo" column="CODIGO"/>
+		<result property="valor" column="VALOR"/>
+		<result property="orden" column="ORDEN"/>
+		<result property="descripcion" column="DESCRIPCION"/>
+		<result property="variableInfluenciaDesc" column="VARIABLE_INFLUENCIA_DESC"/>
+	</resultMap>
+	
+	<resultMap id="HospitalMapping" type="HospitalVO">
+		<result property="codigo" column="CODIGO_HOSPITAL"/>
+		<result property="descripcion" column="DESCRIPCION"/>
+		<result property="grupo" column="GRUPO_HOSPITAL"/>
+		<result property="provincia" column="PROVINCIA_HOSPITAL"/>
+		<result property="cluster" column="CLUSTER_HOSPITAL"/>
+		<result property="tipo" column="TIPO_HOSPITAL"/>
+	</resultMap>
+
+	
+
+	<select id="SelectAll" resultType="VariablesInfluenciaCodigosMapping">
+		SELECT
+			VI.VARIABLE_INFLUENCIA_ID,
+			VI.CODIGO,
+			VI.VALOR,
+			VI.ORDEN,
+			VI.DESCRIPCION,
+			V.NOMBRE AS VARIABLE_INFLUENCIA_DESC
+		FROM
+			MD_VARS_INF_CODIGOS VI,
+			MD_VARS_INF V
+		WHERE
+			V.VARIABLE_INFLUENCIA_ID = VI.VARIABLE_INFLUENCIA_ID
+	</select>
+
+	
+
+	<select id="CountAll">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_VARS_INF_CODIGOS
+	</select>
+
+	
+
+	<select id="SelectById" parameterType="VariablesInfluenciaCodigos" resultType="VariablesInfluenciaCodigosMapping">
+		SELECT
+			VI.VARIABLE_INFLUENCIA_ID,
+			VI.CODIGO,
+			VI.VALOR,
+			VI.ORDEN,
+			VI.DESCRIPCION,
+			V.NOMBRE AS VARIABLE_INFLUENCIA_DESC
+		FROM
+			MD_VARS_INF_CODIGOS VI,
+			MD_VARS_INF V
+		WHERE
+			V.VARIABLE_INFLUENCIA_ID = VI.VARIABLE_INFLUENCIA_ID AND
+			VI.VARIABLE_INFLUENCIA_ID = #{variableInfluenciaId} AND
+			VI.CODIGO LIKE #{codigo}
+	</select>
+
+	
+
+	<select id="SelectList" parameterType="VariablesInfluenciaCodigos" resultType="VariablesInfluenciaCodigosMapping">
+		SELECT
+			VI.VARIABLE_INFLUENCIA_ID,
+			VI.CODIGO,
+			VI.VALOR,
+			VI.ORDEN,
+			VI.DESCRIPCION,
+			V.NOMBRE AS VARIABLE_INFLUENCIA_DESC
+		FROM
+			MD_VARS_INF_CODIGOS VI,
+			MD_VARS_INF V
+			
+		WHERE
+			V.VARIABLE_INFLUENCIA_ID = VI.VARIABLE_INFLUENCIA_ID
+
+			<if test="variableInfluenciaId != null">AND 
+				VI.VARIABLE_INFLUENCIA_ID = #{variableInfluenciaId}
+			</if>
+
+			<if test="codigo != null">AND 
+				VI.CODIGO LIKE #{codigo}
+			</if>
+
+			<if test="valor != null">AND 
+				VI.VALOR LIKE #{valor}
+			</if>
+
+			<if test="orden != null">AND 
+				VI.ORDEN = #{orden}
+			</if>
+			
+			<if test="descripcion != null">AND 
+				VI.DESCRIPCION LIKE #{descripcion}
+			</if>			
+			
+	</select>
+
+	
+
+	<select id="CountList" parameterType="VariablesInfluenciaCodigos">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_VARS_INF_CODIGOS
+		<where>
+
+			<if test="variableInfluenciaId != null">AND 
+				VI.VARIABLE_INFLUENCIA_ID = #{variableInfluenciaId}
+			</if>
+
+			<if test="codigo != null">AND 
+				VI.CODIGO LIKE #{codigo}
+			</if>
+
+			<if test="valor != null">AND 
+				VI.VALOR LIKE #{valor}
+			</if>
+
+			<if test="orden != null">AND 
+				VI.ORDEN = #{orden}
+			</if>
+			
+			<if test="descripcion != null">AND 
+				VI.DESCRIPCION LIKE #{descripcion}
+			</if>				
+		</where>
+	</select>
+
+	
+
+	<insert id="Insert" parameterType="VariablesInfluenciaCodigos">
+		INSERT INTO MD_VARS_INF_CODIGOS
+			(
+				VARIABLE_INFLUENCIA_ID,
+				CODIGO,
+				VALOR,
+				ORDEN,
+				DESCRIPCION
+			)
+		VALUES
+			(
+				#{variableInfluenciaId},
+				#{codigo},
+				#{valor},
+				#{orden},
+				#{descripcion}
+			)
+	</insert>
+
+	
+
+	<update id="Update" parameterType="VariablesInfluenciaCodigos">
+		UPDATE MD_VARS_INF_CODIGOS
+		SET
+			VARIABLE_INFLUENCIA_ID = #{variableInfluenciaId},
+			CODIGO = #{codigo},
+			VALOR = #{valor},
+			ORDEN = #{orden},
+			DESCRIPCION = #{descripcion}
+		WHERE
+			VARIABLE_INFLUENCIA_ID = #{variableInfluenciaId}
+		AND
+			CODIGO LIKE #{codigo}
+	</update>
+
+	
+
+	<delete id="Delete" parameterType="VariablesInfluenciaCodigos">
+		DELETE FROM MD_VARS_INF_CODIGOS
+		WHERE
+			VARIABLE_INFLUENCIA_ID = #{variableInfluenciaId}
+		
+			
+				AND CODIGO LIKE #{codigo}
+			
+				
+	</delete>
+	
+	
+
+	<delete id="DeleteAll">
+		CODIGO LIKE #{codigo}
+	</delete>
+
+	<delete id="DeleteHospitales">
+		DELETE FROM MD_HOSPITALES
+	</delete>
+
+	<select id="SelectHospitales" resultType="HospitalMapping">
+		SELECT * FROM MD_HOSPITALES
+	</select>
+	
+	<insert id="InsertHospital" parameterType="HospitalVO">
+		INSERT INTO MD_HOSPITALES
+			(
+				CODIGO_HOSPITAL,DESCRIPCION,GRUPO_HOSPITAL,PROVINCIA_HOSPITAL,CLUSTER_HOSPITAL,TIPO_HOSPITAL
+
+			)
+		VALUES
+			(
+				#{codigo},
+				#{descripcion},
+				#{grupo},
+				#{provincia},
+				#{cluster},
+				#{tipo}
+			)
+	</insert>
+</mapper>

@@ -1,0 +1,230 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace="VariablesInfluenciaIndicadores">
+
+	
+
+	
+
+	<resultMap id="VariablesInfluenciaIndicadoresMapping" type="VariablesInfluenciaIndicadores">
+		<result property="indicadorId" column="INDICADOR_ID"/>
+		<result property="variableInfluenciaId" column="VARIABLE_INFLUENCIA_ID"/>
+		<result property="aplicaFiltro" column="APLICA_FILTRO"/>
+		<result property="aplicaAgrupacion" column="APLICA_AGRUPACION"/>
+		<result property="influyeBayes" column="INFLUYE_BAYES"/>
+		<result property="corrigeBayes" column="CORRIGE_BAYES"/>
+		<result property="peso" column="PESO"/>
+		<result property="orden" column="ORDEN"/>
+		<result property="indicadorDesc" column="INDICADOR_DESC"/>
+		<result property="variableInfluenciaDesc" column="VARIABLE_INFLUENCIA_DESC"/>
+	</resultMap>
+
+
+	
+
+	<select id="SelectAll" resultType="VariablesInfluenciaIndicadoresMapping">
+		SELECT
+			VI.INDICADOR_ID,
+			VI.VARIABLE_INFLUENCIA_ID,
+			VI.APLICA_FILTRO,
+			VI.APLICA_AGRUPACION,
+			VI.INFLUYE_BAYES,
+			VI.CORRIGE_BAYES,
+			VI.PESO,
+			VI.ORDEN,
+			I.NOMBRE_COMPLETO AS INDICADOR_DESC,
+			V.NOMBRE AS VARIABLE_INFLUENCIA_DESC
+		FROM
+			MD_VARS_INF_INDICADORES VI,
+			MD_INDICADORES I,
+			MD_VARS_INF V
+		WHERE
+			V.VARIABLE_INFLUENCIA_ID = VI.VARIABLE_INFLUENCIA_ID AND
+			I.INDICADOR_ID = VI.INDICADOR_ID  
+	</select>
+
+	
+
+	<select id="CountAll">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_VARS_INF_INDICADORES
+	</select>
+
+	
+
+	<select id="SelectById" parameterType="VariablesInfluenciaIndicadores" resultType="VariablesInfluenciaIndicadoresMapping">
+		SELECT
+			VI.INDICADOR_ID,
+			VI.VARIABLE_INFLUENCIA_ID,
+			VI.APLICA_FILTRO,
+			VI.APLICA_AGRUPACION,
+			VI.INFLUYE_BAYES,
+			VI.CORRIGE_BAYES,
+			VI.PESO,
+			VI.ORDEN,
+			I.NOMBRE_COMPLETO AS INDICADOR_DESC,
+			V.NOMBRE AS VARIABLE_INFLUENCIA_DESC
+		FROM
+			MD_VARS_INF_INDICADORES VI,
+			MD_INDICADORES I,
+			MD_VARS_INF V
+		WHERE
+			VI.INDICADOR_ID = #{indicadorId}
+		AND
+			VI.VARIABLE_INFLUENCIA_ID = #{variableInfluenciaId} AND
+			V.VARIABLE_INFLUENCIA_ID = VI.VARIABLE_INFLUENCIA_ID AND
+			I.INDICADOR_ID = VI.INDICADOR_ID
+	</select>
+
+	
+
+	<select id="SelectList" parameterType="VariablesInfluenciaIndicadores" resultType="VariablesInfluenciaIndicadoresMapping">
+		SELECT
+			VI.INDICADOR_ID,
+			VI.VARIABLE_INFLUENCIA_ID,
+			VI.APLICA_FILTRO,
+			VI.APLICA_AGRUPACION,
+			VI.INFLUYE_BAYES,
+			VI.CORRIGE_BAYES,
+			VI.PESO,
+			VI.ORDEN,
+			I.NOMBRE_COMPLETO AS INDICADOR_DESC,
+			V.NOMBRE AS VARIABLE_INFLUENCIA_DESC
+		FROM
+			MD_VARS_INF_INDICADORES VI,
+			MD_INDICADORES I,
+			MD_VARS_INF V
+			
+		WHERE
+			V.VARIABLE_INFLUENCIA_ID = VI.VARIABLE_INFLUENCIA_ID AND
+			I.INDICADOR_ID = VI.INDICADOR_ID
+			
+			<if test="indicadorId != null">AND 
+				VI.INDICADOR_ID = #{indicadorId}
+			</if>
+
+			<if test="variableInfluenciaId != null">AND 
+				VI.VARIABLE_INFLUENCIA_ID = #{variableInfluenciaId}
+			</if>
+
+			<if test="aplicaFiltro != null">AND 
+				VI.APLICA_FILTRO = #{aplicaFiltro}
+			</if>
+
+			<if test="aplicaAgrupacion != null">AND 
+				VI.APLICA_AGRUPACION = #{aplicaAgrupacion}
+			</if>
+
+			<if test="influyeBayes != null">AND 
+				VI.INFLUYE_BAYES = #{influyeBayes}
+			</if>
+
+			<if test="corrigeBayes != null">AND 
+				VI.CORRIGE_BAYES = #{corrigeBayes}
+			</if>
+			
+			<if test="peso != null">AND 
+				VI.PESO = #{peso}
+			</if>
+			
+	</select>
+
+	
+
+	<select id="CountList" parameterType="VariablesInfluenciaIndicadores">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_VARS_INF_INDICADORES
+		<where>
+
+			<if test="indicadorId != null">AND 
+				INDICADOR_ID = #{indicadorId}
+			</if>
+
+			<if test="variableInfluenciaId != null">AND 
+				VARIABLE_INFLUENCIA_ID = #{variableInfluenciaId}
+			</if>
+
+			<if test="aplicaFiltro != null">AND 
+				APLICA_FILTRO = #{aplicaFiltro}
+			</if>
+
+			<if test="influyeBayes != null">AND 
+				INFLUYE_BAYES = #{influyeBayes}
+			</if>
+			
+			<if test="corrigeBayes != null">AND 
+				CORRIGE_BAYES = #{corrigeBayes}
+			</if>
+			
+			<if test="peso != null">AND 
+				PESO = #{peso}
+			</if>			
+		</where>
+	</select>
+
+	
+
+	<insert id="Insert" parameterType="VariablesInfluenciaIndicadores">
+		INSERT INTO MD_VARS_INF_INDICADORES
+			(
+				INDICADOR_ID,
+				VARIABLE_INFLUENCIA_ID,
+				APLICA_FILTRO,
+				APLICA_AGRUPACION,
+				INFLUYE_BAYES,
+				CORRIGE_BAYES,
+				PESO,
+				ORDEN
+			)
+		VALUES
+			(
+				#{indicadorId},
+				#{variableInfluenciaId},
+				#{aplicaFiltro},
+				#{aplicaAgrupacion},
+				#{influyeBayes},
+				#{corrigeBayes},
+				#{peso},
+				#{orden}
+			)
+	</insert>
+
+	
+
+	<update id="Update" parameterType="VariablesInfluenciaIndicadores">
+		UPDATE MD_VARS_INF_INDICADORES
+		SET
+			INDICADOR_ID = #{indicadorId},
+			VARIABLE_INFLUENCIA_ID = #{variableInfluenciaId},
+			APLICA_FILTRO = #{aplicaFiltro},
+			APLICA_AGRUPACION = #{aplicaAgrupacion},
+			INFLUYE_BAYES = #{influyeBayes},
+			CORRIGE_BAYES = #{corrigeBayes},
+			PESO = #{peso},
+			ORDEN = #{orden}
+		WHERE
+			INDICADOR_ID = #{indicadorId}
+		AND
+			VARIABLE_INFLUENCIA_ID = #{variableInfluenciaId}
+	</update>
+
+	
+
+	<delete id="Delete" parameterType="VariablesInfluenciaIndicadores">
+		DELETE FROM MD_VARS_INF_INDICADORES
+		WHERE
+			INDICADOR_ID = #{indicadorId}
+		AND
+			VARIABLE_INFLUENCIA_ID = #{variableInfluenciaId}
+	</delete>
+
+	
+
+	<delete id="DeleteAll">
+		DELETE FROM MD_VARS_INF_INDICADORES
+	</delete>
+
+</mapper>

@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="RelevanciaEstadosDecremento">
+
+	<typeAlias alias="RelevanciaEstadosDecremento" type="es.msc.aemsc.business.vo.RelevanciaEstadosDecrementoVO"/>
+
+	<!--
+	<cacheModel id="RelevanciaEstadosDecrementoCache" type="LRU">
+		<flushInterval hours="24"/>
+		<flushOnExecute statement="RelevanciaEstadosDecremento.Insert"/>
+		<flushOnExecute statement="RelevanciaEstadosDecremento.Update"/>
+		<flushOnExecute statement="RelevanciaEstadosDecremento.Delete"/>
+		<flushOnExecute statement="RelevanciaEstadosDecremento.DeleteAll"/>
+		<property name="size" value="1000" />
+	</cacheModel>
+	-->
+
+	<resultMap id="RelevanciaEstadosDecrementoMapping" class="RelevanciaEstadosDecremento">
+		<result property="valorIndicador"       column="VALOR_INDICADOR"      jdbcType="DOUBLE"    javaType="java.lang.Double"  />
+		<result property="variacionAbsoluta"    column="VARIACION_ABSOLUTA"   jdbcType="DOUBLE"    javaType="java.lang.Double"  />
+		<result property="variacionRelativa"    column="VARIACION_RELATIVA"   jdbcType="DOUBLE"    javaType="java.lang.Double"  />
+		<result property="frecuencia"           column="FRECUENCIA"           jdbcType="DOUBLE"    javaType="java.lang.Double"  />
+		<result property="indicadorId"          column="INDICADOR_ID"         jdbcType="INTEGER"   javaType="java.lang.Integer" />
+		<result property="variableId"           column="VARIABLE_ID"          jdbcType="TINYINT"   javaType="java.lang.Short"   />
+		<result property="estado"               column="ESTADO"               jdbcType="INTEGER"   javaType="java.lang.Integer"  />
+		<result property="variableDesc"			column="VARIABLE_DESC"	  	  jdbcType="VARCHAR"   javaType="java.lang.String"  />
+		<result property="estadoDesc"			column="ESTADO_DESC"	  	  jdbcType="VARCHAR"   javaType="java.lang.String"  />
+	</resultMap>
+
+
+	<!-- ====== RELEVANCIA DE ESTADOS DE VARIABLES DE INFLUENCIA que producen un decremento mayor en el indicador dado ====== -->
+	<select id="SelectAllByIndicadorId"  resultMap="RelevanciaEstadosDecrementoMapping" parameterClass="java.lang.String">
+		SELECT 
+			RED.VALOR_INDICADOR AS VALOR_INDICADOR, 
+			RED.VARIACION_ABSOLUTA AS VARIACION_ABSOLUTA, 
+			RED.VARIACION_RELATIVA AS VARIACION_RELATIVA, 
+			RED.FRECUENCIA AS FRECUENCIA,
+			RED.INDICADOR_ID AS INDICADOR_ID,
+			RED.VARIABLE_ID AS VARIABLE_ID,
+			RED.ESTADO AS ESTADO,
+			'variable'||VIC.VARIABLE_INFLUENCIA_ID AS VARIABLE_DESC,
+			'variable'||VIC.VARIABLE_INFLUENCIA_ID||'.codigo'||VIC.CODIGO AS ESTADO_DESC
+		FROM 
+			MD_RELEVANCIA_ESTADOS_DEC RED
+		INNER JOIN MD_VARS_INF VI
+		ON VI.VARIABLE_INFLUENCIA_ID = RED.VARIABLE_ID
+		INNER JOIN MD_VARS_INF_CODIGOS VIC
+		ON VIC.CODIGO = RED.ESTADO
+		AND VIC.VARIABLE_INFLUENCIA_ID = VI.VARIABLE_INFLUENCIA_ID
+		AND RED.INDICADOR_ID = #indicadorId#  
+	</select>
+
+	<!-- ====== SelectAll ====== -->
+
+	<select id="SelectAll"  resultMap="RelevanciaEstadosDecrementoMapping">
+		SELECT
+			VALOR_INDICADOR,
+			VARIACION_ABSOLUTA,
+			VARIACION_RELATIVA,
+			FRECUENCIA,
+			INDICADOR_ID,
+			VARIABLE_ID,
+			ESTADO
+		FROM
+			MD_RELEVANCIA_ESTADOS_DEC
+	</select>
+
+	<!-- ====== CountAll ====== -->
+
+	<select id="CountAll"  resultClass="java.lang.Integer">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_RELEVANCIA_ESTADOS_DEC
+	</select>
+
+	<!-- ====== SelectById ====== -->
+
+	<select id="SelectById"  resultMap="RelevanciaEstadosDecrementoMapping"  parameterClass="RelevanciaEstadosDecremento">
+		SELECT
+			VALOR_INDICADOR,
+			VARIACION_ABSOLUTA,
+			VARIACION_RELATIVA,
+			FRECUENCIA,
+			INDICADOR_ID,
+			VARIABLE_ID,
+			ESTADO
+		FROM
+			MD_RELEVANCIA_ESTADOS_DEC
+		WHERE
+			INDICADOR_ID = #indicadorId#
+		AND
+			VARIABLE_ID = #variableId#
+		AND
+			ESTADO = #estado#
+	</select>
+
+	<!-- ====== SelectList ====== -->
+
+	<select id="SelectList"  resultMap="RelevanciaEstadosDecrementoMapping"  parameterClass="RelevanciaEstadosDecremento">
+		SELECT
+			VALOR_INDICADOR,
+			VARIACION_ABSOLUTA,
+			VARIACION_RELATIVA,
+			FRECUENCIA,
+			INDICADOR_ID,
+			VARIABLE_ID,
+			ESTADO
+		FROM
+			MD_RELEVANCIA_ESTADOS_DEC
+		<dynamic prepend="WHERE">
+
+			<isNotNull prepend="AND" property="valorIndicador">
+				VALOR_INDICADOR = #valorIndicador#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="variacionAbsoluta">
+				VARIACION_ABSOLUTA = #variacionAbsoluta#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="variacionRelativa">
+				VARIACION_RELATIVA = #variacionRelativa#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="frecuencia">
+				FRECUENCIA = #frecuencia#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="indicadorId">
+				INDICADOR_ID = #indicadorId#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="variableId">
+				VARIABLE_ID = #variableId#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="estado">
+				ESTADO LIKE #estado#
+			</isNotNull>
+
+		</dynamic>
+		<include refid="includes.ORDER_BY" />
+	</select>
+
+	<!-- ====== CountList ====== -->
+
+	<select id="CountList"  resultClass="java.lang.Integer"  parameterClass="RelevanciaEstadosDecremento">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			MD_RELEVANCIA_ESTADOS_DEC
+		<dynamic prepend="WHERE">
+
+			<isNotNull prepend="AND" property="valorIndicador">
+				VALOR_INDICADOR = #valorIndicador#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="variacionAbsoluta">
+				VARIACION_ABSOLUTA = #variacionAbsoluta#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="variacionRelativa">
+				VARIACION_RELATIVA = #variacionRelativa#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="frecuencia">
+				FRECUENCIA = #frecuencia#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="indicadorId">
+				INDICADOR_ID = #indicadorId#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="variableId">
+				VARIABLE_ID = #variableId#
+			</isNotNull>
+
+			<isNotNull prepend="AND" property="estado">
+				ESTADO LIKE #estado#
+			</isNotNull>
+
+		</dynamic>
+	</select>
+
+	<!-- ====== Insert ====== -->
+
+	<insert id="Insert"  parameterClass="RelevanciaEstadosDecremento">
+		INSERT INTO MD_RELEVANCIA_ESTADOS_DEC
+			(
+				VALOR_INDICADOR,
+				VARIACION_ABSOLUTA,
+				VARIACION_RELATIVA,
+				FRECUENCIA,
+				INDICADOR_ID,
+				VARIABLE_ID,
+				ESTADO
+			)
+		VALUES
+			(
+				#valorIndicador:DOUBLE#,
+				#variacionAbsoluta:DOUBLE#,
+				#variacionRelativa:DOUBLE#,
+				#frecuencia:DOUBLE#,
+				#indicadorId:INTEGER#,
+				#variableId:TINYINT#,
+				#estado:VARCHAR#
+			)
+	</insert>
+
+	<!-- ====== Update ====== -->
+
+	<update id="Update"  parameterClass="RelevanciaEstadosDecremento">
+		UPDATE MD_RELEVANCIA_ESTADOS_DEC
+		SET
+			VALOR_INDICADOR = #valorIndicador:DOUBLE#,
+			VARIACION_ABSOLUTA = #variacionAbsoluta:DOUBLE#,
+			VARIACION_RELATIVA = #variacionRelativa:DOUBLE#,
+			FRECUENCIA = #frecuencia:DOUBLE#,
+			INDICADOR_ID = #indicadorId:INTEGER#,
+			VARIABLE_ID = #variableId:TINYINT#,
+			ESTADO = #estado:VARCHAR#
+		WHERE
+			INDICADOR_ID = #indicadorId#
+		AND
+			VARIABLE_ID = #variableId#
+		AND
+			ESTADO = #estado#
+	</update>
+
+	<!-- ====== Delete ====== -->
+
+	<delete id="Delete"  parameterClass="RelevanciaEstadosDecremento">
+		DELETE FROM MD_RELEVANCIA_ESTADOS_DEC
+		WHERE
+			INDICADOR_ID = #indicadorId#
+		AND
+			VARIABLE_ID = #variableId#
+		AND
+			ESTADO = #estado#
+	</delete>
+
+	<!-- ====== DeleteAll ====== -->
+
+	<delete id="DeleteAll">
+		DELETE FROM MD_RELEVANCIA_ESTADOS_DEC
+	</delete>
+
+</sqlMap>
+

@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="includeAvoidableAdmissionSpecial">
+	<sql id="SELECT_LIST_DESCRIPTIVO">
+		SELECT 
+			<include refid="includes.SELECT_DES_DESCRIPTIVO"/>
+			indicator as "numerator_altas_i",
+			<isEqual property="populationGroupBy" compareValue="">
+				numero_altas as "denominador_i",
+			</isEqual>
+			<isNotEqual property="populationGroupBy" compareValue="">
+				poblacion as "denominadorpoblacion_i",
+			</isNotEqual>
+			<isEqual property="populationGroupBy" compareValue="">
+				100*indicator / NULLIF(numero_altas,0) as "aa_tasa_p",
+			</isEqual>
+			<isNotEqual property="populationGroupBy" compareValue="">
+				10000*indicator / NULLIF(poblacion,0) as "aa_tasa_pm",
+				10000*(adj_indicator_num/NULLIF(1.0*adj_den,0))*(numero_altas/NULLIF(poblacion,0)) as "aa_tasaadj_pm",
+			</isNotEqual>				
+			indicator_a / NULLIF(indicator,0) as "aa_edad_f",
+			indicator_s / NULLIF(indicator,0) as "aa_estancia_f",
+			100*indicator_m / NULLIF(indicator,0) as "aa_mortalidad_p"
+		FROM(
+			SELECT altas.* <isNotEqual property="populationGroupBy" compareValue="" prepend=",">poblacion.poblacion</isNotEqual> FROM(
+	   			SELECT
+	   				<isEqual property="hospitalCount" compareValue="true" close="," >
+						count(distinct CODIGO_HOSPITAL) as HOSPITALES_COUNT
+					</isEqual>
+					<iterate property="groupByList" conjunction="," close=",">
+						$groupByList[].nombre$
+					</iterate>
+					SUM(CASE WHEN $indicadorEtiqueta$ IS NOT NULL THEN 1 ELSE 0.0 END) as numero_altas,
+			    	SUM(CASE WHEN $indicadorEtiqueta$=1 THEN 1 ELSE 0.0 END) as indicator,
+   					SUM(CASE WHEN $indicadorEtiqueta$=1 THEN Edad ELSE 0.0 END) as indicator_a,
+   					SUM(CASE WHEN $indicadorEtiqueta$=1 THEN Estancia ELSE 0.0 END) as indicator_s,
+   					SUM(CASE WHEN $indicadorEtiqueta$=1 THEN MORTAL ELSE 0.0 END) as indicator_m
+   					<isEqual property="populationGroupBy" compareValue="codigo_ccaa_hospital">
+   						,SUM((CASE WHEN $indicadorEtiqueta$=1 THEN 1 ELSE 0.0 END)*(POBLACION_STD/POBLACION_CCAA)) as adj_indicator_num,
+   						SUM(POBLACION_STD/POBLACION_CCAA) AS adj_den
+					</isEqual>
+					<isEqual property="populationGroupBy" compareValue="codigo_provincia_hospital">
+						,SUM((CASE WHEN $indicadorEtiqueta$=1 THEN 1 ELSE 0.0 END)*(POBLACION_STD/POBLACION_PROV)) as adj_indicator_num,
+						SUM(POBLACION_STD/POBLACION_PROV) AS adj_den
+					</isEqual>
+				FROM
+					<include refid="includes.FROM_TABLE_CLAUSE"/>
+				WHERE Anio=$anio$
+					<include refid="includes.WHERE_AND_GROUPBY_ROLLUP_DESCRIPTIVO"/>
+			) altas
+				<isEqual property="populationGroupBy" compareValue="codigo_ccaa_hospital">
+					INNER JOIN (
+		   				SELECT CODIGO_CCAA,SUM(POBLACION) as POBLACION FROM POBLACION_NUEVO 
+		   				WHERE ANIO=$anio$ AND 
+						<isEqual property="indicadorEtiqueta" compareValue="AACHRONICRESPIRATORYFAILURE">
+		   					CODIGO_GRUPO_EDAD>=4
+		   				</isEqual>
+		   				<isEqual property="indicadorEtiqueta" compareValue="AAASTHMAYOUNGADULT">
+	   						CODIGO_GRUPO_EDAD=4
+	   					</isEqual>
+		   				<isNotEqual property="indicadorEtiqueta" compareValue="AACHRONICRESPIRATORYFAILURE">
+		   				    <isNotEqual property="indicadorEtiqueta" compareValue="AAASTHMAYOUNGADULT">
+		   						CODIGO_GRUPO_EDAD>=3
+		   					</isNotEqual>
+		   				</isNotEqual>  
+						<iterate property="filtersList" conjunction="AND" open="AND">
+							<isEqual property="filtersList[].excluye" compareValue="true">
+								<iterate property="filtersList[].valoresList" conjunction="AND" open="(" close=")">
+									<isEqual property="filtersList[].nombre" compareValue="codigo_ccaa_hospital">
+										CODIGO_CCAA != $filtersList[].valoresList[].value$
+									</isEqual>
+									<isEqual property="filtersList[].nombre" compareValue="codigo_grupo_edad">
+										CODIGO_GRUPO_EDAD != $filtersList[].valoresList[].value$
+									</isEqual>
+									<isEqual property="filtersList[].nombre" compareValue="sexo">
+										CODIGO_SEXO != $filtersList[].valoresList[].value$
+									</isEqual>
+								</iterate>
+							</isEqual>
+							<isEqual property="filtersList[].excluye" compareValue="false">
+								<iterate property="filtersList[].valoresList" conjunction="OR" open="(" close=")">
+									<isEqual property="filtersList[].nombre" compareValue="codigo_ccaa_hospital">
+										CODIGO_CCAA = $filtersList[].valoresList[].value$
+									</isEqual>
+									<isEqual property="filtersList[].nombre" compareValue="codigo_grupo_edad">
+										CODIGO_GRUPO_EDAD = $filtersList[].valoresList[].value$
+									</isEqual>
+									<isEqual property="filtersList[].nombre" compareValue="sexo">
+										CODIGO_SEXO = $filtersList[].valoresList[].value$
+									</isEqual>
+								</iterate>
+							</isEqual>
+		   				</iterate>
+		   				GROUP BY ROLLUP(CODIGO_CCAA)
+					) poblacion on (altas.codigo_ccaa_hospital = poblacion.CODIGO_CCAA OR (altas.codigo_ccaa_hospital is null AND poblacion.CODIGO_CCAA is null))
+				</isEqual>
+				<isEqual property="populationGroupBy" compareValue="codigo_provincia_hospital">
+					INNER JOIN (
+		   				SELECT CODIGO_PROVINCIA,SUM(POBLACION) as POBLACION FROM POBLACION_NUEVO_PROV
+		   				WHERE ANIO=$anio$ AND 
+		   				<isEqual property="indicadorEtiqueta" compareValue="AACHRONICRESPIRATORYFAILURE">
+		   					CODIGO_GRUPO_EDAD>=4
+		   				</isEqual>
+						<isEqual property="indicadorEtiqueta" compareValue="AAASTHMAYOUNGADULT">
+	   						CODIGO_GRUPO_EDAD=4
+	   					</isEqual>
+		   				<isNotEqual property="indicadorEtiqueta" compareValue="AACHRONICRESPIRATORYFAILURE">
+		   				    <isNotEqual property="indicadorEtiqueta" compareValue="AAASTHMAYOUNGADULT">
+		   						CODIGO_GRUPO_EDAD>=3
+		   					</isNotEqual>
+		   				</isNotEqual>  
+						<iterate property="filtersList" conjunction="AND">
+							<isEqual property="filtersList[].excluye" compareValue="true">
+								<iterate property="filtersList[].valoresList" conjunction="AND" open="(" close=")">
+									<isEqual property="filtersList[].nombre" compareValue="codigo_provincia_hospital">
+										CODIGO_PROVINCIA != $filtersList[].valoresList[].value$
+									</isEqual>
+									<isEqual property="filtersList[].nombre" compareValue="codigo_grupo_edad">
+										CODIGO_GRUPO_EDAD != $filtersList[].valoresList[].value$
+									</isEqual>
+									<isEqual property="filtersList[].nombre" compareValue="codigo_sexo">
+										CODIGO_SEXO != $filtersList[].valoresList[].value$
+									</isEqual>
+								</iterate>
+							</isEqual>
+							<isEqual property="filtersList[].excluye" compareValue="false">
+								<iterate property="filtersList[].valoresList" conjunction="OR" open="(" close=")">
+									<isEqual property="filtersList[].nombre" compareValue="codigo_provincia_hospital">
+										CODIGO_PROVINCIA = $filtersList[].valoresList[].value$
+									</isEqual>
+									<isEqual property="filtersList[].nombre" compareValue="codigo_grupo_edad">
+										CODIGO_GRUPO_EDAD = $filtersList[].valoresList[].value$
+									</isEqual>
+									<isEqual property="filtersList[].nombre" compareValue="codigo_sexo">
+										CODIGO_SEXO = $filtersList[].valoresList[].value$
+									</isEqual>
+								</iterate>
+							</isEqual>
+		   				</iterate>
+		   				GROUP BY ROLLUP(CODIGO_PROVINCIA)
+					) poblacion on (altas.codigo_provincia_hospital = poblacion.CODIGO_PROVINCIA OR (altas.codigo_provincia_hospital is null AND poblacion.CODIGO_PROVINCIA is null))
+				</isEqual>
+		)altas
+		<include refid="includes.INNER_JOIN_DESCRIPTIVO"/>
+	</sql>
+
+	<sql id="SELECT_LIST_SERIE_TEMPORAL">
+		SELECT 
+			<include refid="includes.SELECT_DES_DESCRIPTIVO"/>	    
+			<iterate property="anios" conjunction=",">
+				<isNotEqual property="ejeAnalisisEtiqueta" compareValue="valor_base">
+				    <isEqual property="temporalSerieColumn.column" compareValue="DEFAULT">
+					    <isEqual property="populationGroupBy" compareValue="">
+							100*
+						</isEqual>
+						<isNotEqual property="populationGroupBy" compareValue="">
+						    10000*
+						</isNotEqual>
+						indicator_$anios[]$ / NULLIF(numero_altas_$anios[]$,0) as "tasaind_$anios[]$_f"
+					</isEqual>
+					<isEqual property="temporalSerieColumn.column" compareValue="RECORDS_NUMERATOR">
+					    indicator_$anios[]$ as "tasaind_$anios[]$_i"
+					</isEqual>
+				</isNotEqual>
+				<isEqual property="ejeAnalisisEtiqueta" compareValue="valor_base">
+					(indicator_$anios[]$ / NULLIF(numero_altas_$anios[]$,0)) / 
+					NULLIF((indicator_$anioBase$ / NULLIF(numero_altas_$anioBase$,0)),0) 
+					as "tasaind_$anios[]$_f"
+				</isEqual>
+			</iterate>		
+		FROM (
+			SELECT 
+				<include refid="includes.SELECT_COD_DESCRIPTIVO_G"/>	    
+				<iterate property="anios" conjunction=",">
+					SUM(CASE WHEN Anio=$anios[]$ THEN 1.0*indicator ELSE 0.0 END) as indicator_$anios[]$
+				</iterate>
+  				<isEqual property="populationGroupBy" compareValue="" open=",">
+  				    <iterate property="anios" conjunction=",">
+						SUM(CASE WHEN Anio=$anios[]$ THEN 1.0*numero_altas ELSE 0.0 END) as numero_altas_$anios[]$
+  				    </iterate>
+  				</isEqual>
+			FROM(
+				SELECT
+					<isEqual property="hospitalCount" compareValue="true" close="," >
+						count(distinct CODIGO_HOSPITAL) as HOSPITALES_COUNT
+					</isEqual>
+					<iterate property="groupByList" conjunction="," close=",">
+						$groupByList[].nombre$
+					</iterate>
+				    Anio,
+			    	SUM(CASE WHEN $indicadorEtiqueta$=1 THEN 1 ELSE 0.0 END) as indicator
+	  				<isEqual property="populationGroupBy" compareValue="" open=",">
+  				    	SUM(CASE WHEN $indicadorEtiqueta$ IS NOT NULL THEN 1 ELSE 0.0 END) as numero_altas
+	  				</isEqual>
+				FROM
+					<include refid="includes.FROM_TABLE_CLAUSE"/>
+				WHERE (1=1) 
+					<include refid="includes.FILTRO_ANIOS_SERIE_TEMPORAL"/>
+					<include refid="includes.GROPY_BY_COMMA_DESCRIPTIVO"/>
+					Anio
+			) altas <include refid="includes.GROUP_BY_LIST"/>
+		) altas 
+			<isEqual property="populationGroupBy" compareValue="codigo_ccaa_hospital">
+				INNER JOIN (
+	   				SELECT CODIGO_CCAA,
+	   				<iterate property="anios" conjunction=",">
+						<isEqual property="indicadorEtiqueta" compareValue="AACHRONICRESPIRATORYFAILURE">
+	   						SUM(CASE WHEN CODIGO_GRUPO_EDAD>=4 AND ANIO=$anios[]$ THEN POBLACION ELSE 0.0 END) as numero_altas_$anios[]$
+	   					</isEqual>
+	   					<isEqual property="indicadorEtiqueta" compareValue="AAASTHMAYOUNGADULT">
+	   						SUM(CASE WHEN CODIGO_GRUPO_EDAD=3 AND ANIO=$anios[]$ THEN POBLACION ELSE 0.0 END) as numero_altas_$anios[]$
+	   					</isEqual>
+	   					<isNotEqual property="indicadorEtiqueta" compareValue="AACHRONICRESPIRATORYFAILURE">
+	   					    <isNotEqual property="indicadorEtiqueta" compareValue="AAASTHMAYOUNGADULT">
+		   						SUM(CASE WHEN CODIGO_GRUPO_EDAD>=3 AND ANIO=$anios[]$ THEN POBLACION ELSE 0.0 END) as numero_altas_$anios[]$
+		   					</isNotEqual>
+		   				</isNotEqual>
+   					</iterate>
+	   				FROM POBLACION_NUEVO 
+	   				WHERE ANIO in (<iterate property="anios" conjunction=","> $anios[]$ </iterate>) 
+					<iterate property="filtersList" conjunction="AND" open="AND">
+						<isEqual property="filtersList[].excluye" compareValue="true">
+							<iterate property="filtersList[].valoresList" conjunction="AND" open="(" close=")">
+								<isEqual property="filtersList[].nombre" compareValue="codigo_ccaa_hospital">
+									CODIGO_CCAA != $filtersList[].valoresList[].value$
+								</isEqual>
+								<isEqual property="filtersList[].nombre" compareValue="codigo_grupo_edad">
+									CODIGO_GRUPO_EDAD != $filtersList[].valoresList[].value$
+								</isEqual>
+								<isEqual property="filtersList[].nombre" compareValue="sexo">
+									CODIGO_SEXO != $filtersList[].valoresList[].value$
+								</isEqual>
+							</iterate>
+						</isEqual>
+						<isEqual property="filtersList[].excluye" compareValue="false">
+							<iterate property="filtersList[].valoresList" conjunction="OR" open="(" close=")">
+								<isEqual property="filtersList[].nombre" compareValue="codigo_ccaa_hospital">
+									CODIGO_CCAA = $filtersList[].valoresList[].value$
+								</isEqual>
+								<isEqual property="filtersList[].nombre" compareValue="codigo_grupo_edad">
+									CODIGO_GRUPO_EDAD = $filtersList[].valoresList[].value$
+								</isEqual>
+								<isEqual property="filtersList[].nombre" compareValue="sexo">
+									CODIGO_SEXO = $filtersList[].valoresList[].value$
+								</isEqual>
+							</iterate>
+						</isEqual>
+	   				</iterate>
+	   				GROUP BY ROLLUP(CODIGO_CCAA)
+				) poblacion on (altas.codigo_ccaa_hospital = poblacion.CODIGO_CCAA OR (altas.codigo_ccaa_hospital is null AND poblacion.CODIGO_CCAA is null))
+			</isEqual>
+			<isEqual property="populationGroupBy" compareValue="codigo_provincia_hospital">
+				INNER JOIN (
+	   				SELECT CODIGO_PROVINCIA,
+					<iterate property="anios" conjunction=",">
+						<isEqual property="indicadorEtiqueta" compareValue="AACHRONICRESPIRATORYFAILURE">
+	   						SUM(CASE WHEN CODIGO_GRUPO_EDAD>=4 AND ANIO=$anios[]$ THEN POBLACION ELSE 0.0 END) as numero_altas_$anios[]$
+	   					</isEqual>
+	   					<isNotEqual property="indicadorEtiqueta" compareValue="AACHRONICRESPIRATORYFAILURE">
+		   					SUM(CASE WHEN CODIGO_GRUPO_EDAD>=3 AND ANIO=$anios[]$ THEN POBLACION ELSE 0.0 END) as numero_altas_$anios[]$
+		   				</isNotEqual>
+   					</iterate>
+	   				FROM POBLACION_NUEVO_PROV
+	   				WHERE ANIO in (<iterate property="anios" conjunction=","> $anios[]$ </iterate>) 
+					<iterate property="filtersList" conjunction="AND">
+						<isEqual property="filtersList[].excluye" compareValue="true">
+							<iterate property="filtersList[].valoresList" conjunction="AND" open="(" close=")">
+								<isEqual property="filtersList[].nombre" compareValue="codigo_provincia_hospital">
+									CODIGO_PROVINCIA != $filtersList[].valoresList[].value$
+								</isEqual>
+								<isEqual property="filtersList[].nombre" compareValue="codigo_grupo_edad">
+									CODIGO_GRUPO_EDAD != $filtersList[].valoresList[].value$
+								</isEqual>
+								<isEqual property="filtersList[].nombre" compareValue="codigo_sexo">
+									CODIGO_SEXO != $filtersList[].valoresList[].value$
+								</isEqual>
+							</iterate>
+						</isEqual>
+						<isEqual property="filtersList[].excluye" compareValue="false">
+							<iterate property="filtersList[].valoresList" conjunction="OR" open="(" close=")">
+								<isEqual property="filtersList[].nombre" compareValue="codigo_provincia_hospital">
+									CODIGO_PROVINCIA = $filtersList[].valoresList[].value$
+								</isEqual>
+								<isEqual property="filtersList[].nombre" compareValue="codigo_grupo_edad">
+									CODIGO_GRUPO_EDAD = $filtersList[].valoresList[].value$
+								</isEqual>
+								<isEqual property="filtersList[].nombre" compareValue="codigo_sexo">
+									CODIGO_SEXO = $filtersList[].valoresList[].value$
+								</isEqual>
+							</iterate>
+						</isEqual>
+	   				</iterate>
+	   				GROUP BY ROLLUP(CODIGO_PROVINCIA)
+				) poblacion on (altas.codigo_provincia_hospital = poblacion.CODIGO_PROVINCIA OR (altas.codigo_provincia_hospital is null AND poblacion.CODIGO_PROVINCIA is null))
+			</isEqual>
+		<include refid="includes.INNER_JOIN_DESCRIPTIVO"/>
+	</sql>
+</sqlMap>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE sqlMap PUBLIC  "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="includeRealizacionAjuste">
+
+	<sql id="SELECT_LIST_DESCRIPTIVO">
+		SELECT
+			<include refid="includes.SELECT_DES_DESCRIPTIVO"/>
+			SUM(numerador) as "numerador_procedure_i",
+			SUM(poblacion) as "poblacion_i",
+			10000*SUM(numerador)/SUM(poblacion) as "tasa_f",
+			10000*SUM(numerador*(estandar_rat/poblacion_rat))/SUM(poblacion) AS "tasa_ajustada_f"
+		FROM(
+			SELECT 
+				SUM(CASE WHEN (
+				 	$indicadorEtiqueta$ = 1
+					<include refid="includeRealizacion.FILTER_NOPOPULATION_PREFIXED"/>
+				) THEN 1 ELSE 0 END) as numerador,
+	   			<isNotEqual property="typeOfPopulationAdjustment" compareValue="codigo_provincia_hospital">
+	   			 	(SUM(POBLACION_CCAA_HOSP)/count(*)) AS poblacion,
+					RATIO_TO_REPORT(POBLACION_CCAA_HOSP) OVER(PARTITION BY <include refid="includes.SELECT_COUNT_COD_DESCRIPTIVO"/>) AS poblacion_rat,
+				</isNotEqual>
+				<isEqual property="typeOfPopulationAdjustment" compareValue="codigo_provincia_hospital">
+					(SUM(POBLACION_PROV_HOSP)/count(*)) AS poblacion,
+					RATIO_TO_REPORT(POBLACION_PROV_HOSP) OVER(PARTITION BY <include refid="includes.SELECT_COUNT_COD_DESCRIPTIVO"/>) AS poblacion_rat,									
+				</isEqual>
+				RATIO_TO_REPORT(POBLACION_STD) OVER(PARTITION BY <include refid="includes.SELECT_COUNT_COD_DESCRIPTIVO"/>) AS estandar_rat
+				<dynamic prepend=","><include refid="includes.SELECT_COUNT_COD_DESCRIPTIVO"/></dynamic>
+			FROM 
+				REALIZACION altas						
+			WHERE 
+				altas.Anio=$anio$
+				<isEqual property="indicadorEtiqueta" compareValue="Histerectomia">
+					AND altas.sexo=2
+				</isEqual>
+				<include refid="includeRealizacion.FILTER_POPULATION_PREFIXED"/>
+			GROUP BY
+				ROLLUP(<include refid="includes.SELECT_COUNT_COD_DESCRIPTIVO"/>)
+				<dynamic prepend=",">
+		   			<isNotEqual property="typeOfPopulationAdjustment" compareValue="codigo_provincia_hospital"> 
+						POBLACION_CCAA_HOSP,1000*CODIGO_CCAA_HOSPITAL+(SEXO*CODIGO_GRUPO_EDAD),
+					</isNotEqual>
+					<isEqual property="typeOfPopulationAdjustment" compareValue="codigo_provincia_hospital"> 
+						POBLACION_PROV_HOSP,1000*CODIGO_PROVINCIA_HOSPITAL+(SEXO*CODIGO_GRUPO_EDAD),
+					</isEqual>
+					POBLACION_STD
+				</dynamic>
+		) altas
+		GROUP BY 
+			<include refid="includes.SELECT_COUNT_COD_DESCRIPTIVO"/>
+		<include refid="includes.INNER_JOIN_DESCRIPTIVO"/>
+	</sql>
+
+	<sql id="SELECT_LIST_SERIE_TEMPORAL">
+		<include refid="includes.INICIAL_SERIE_TEMPORAL"/>
+		SELECT
+			altas.Anio,
+			100*SUM(CASE WHEN (
+			 	$indicadorEtiqueta$ = 1
+				<include refid="includeRealizacion.FILTER_NOPOPULATION_PREFIXED"/>
+			) THEN 1 ELSE 0 END) as numero_altas_ind,
+			<isNotEqual property="typeOfPopulationAdjustment" compareValue="codigo_provincia_hospital">
+				SUM(DISTINCT POBLACION_CCAA_HOSP) as numero_altas
+			</isNotEqual>
+			<isEqual property="typeOfPopulationAdjustment" compareValue="codigo_provincia_hospital"> 
+				SUM(DISTINCT POBLACION_PROV_HOSP) as numero_altas
+			</isEqual>
+			<dynamic prepend=","><include refid="includes.SELECT_COUNT_COD_DESCRIPTIVO"/></dynamic>
+		FROM REALIZACION altas
+		WHERE 
+			<iterate property="anios" conjunction="," prepend="altas.anio" open=" in(" close=")">
+				$anios[]$
+			</iterate>
+			<isEqual property="indicadorEtiqueta" compareValue="Histerectomia">
+				AND altas.sexo=2
+			</isEqual>
+			<include refid="includeRealizacion.FILTER_POPULATION_PREFIXED"/>
+		GROUP BY
+			altas.anio<dynamic prepend=","><include refid="includes.SELECT_COUNT_COD_DESCRIPTIVO"/></dynamic>
+		<include refid="includes.FINAL_SERIE_TEMPORAL"/>
+	</sql>
+
+</sqlMap>
