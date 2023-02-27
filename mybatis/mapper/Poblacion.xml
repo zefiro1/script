@@ -1,0 +1,178 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><mapper namespace="Poblacion">
+
+	
+
+	
+
+	<resultMap id="PoblacionMapping" type="Poblacion">
+		<result property="codigoProvincia" column="CODIGO_PROVINCIA"/>
+		<result property="total" column="TOTAL"/>
+		<result property="varones" column="VARONES"/>
+		<result property="mujeres" column="MUJERES"/>
+		<result property="anio" column="ANIO"/>
+	</resultMap>
+
+
+	
+
+	<select id="SelectAll" resultType="PoblacionMapping">
+		SELECT
+			CODIGO_PROVINCIA,
+			TOTAL,
+			VARONES,
+			MUJERES,
+			ANIO
+		FROM
+			POBLACION
+	</select>
+
+	
+
+	<select id="CountAll" resultType="java.lang.Integer">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			POBLACION
+	</select>
+
+	
+
+	<select id="SelectById" parameterType="Poblacion" resultType="PoblacionMapping">
+		SELECT
+			CODIGO_PROVINCIA,
+			TOTAL,
+			VARONES,
+			MUJERES,
+			ANIO
+		FROM
+			POBLACION
+		WHERE
+			CODIGO_PROVINCIA = #{codigoProvincia}
+		AND
+			ANIO = #{anio}
+	</select>
+
+	
+
+	<select id="SelectList" parameterType="Poblacion" resultType="PoblacionMapping">
+		SELECT
+			CODIGO_PROVINCIA,
+			TOTAL,
+			VARONES,
+			MUJERES,
+			ANIO
+		FROM
+			POBLACION
+		<where>
+
+			<if test="codigoProvincia != null">AND 
+				CODIGO_PROVINCIA = #{codigoProvincia}
+			</if>
+
+			<if test="total != null">AND 
+				TOTAL = #{total}
+			</if>
+
+			<if test="varones != null">AND 
+				VARONES = #{varones}
+			</if>
+
+			<if test="mujeres != null">AND 
+				MUJERES = #{mujeres}
+			</if>
+
+			<if test="anio != null">AND 
+				ANIO = #{anio}
+			</if>
+
+		</where>
+		<include refid="includes.ORDER_BY"/>
+	</select>
+
+	
+
+	<select id="CountList" parameterType="Poblacion" resultType="java.lang.Integer">
+		SELECT
+			COUNT(*) AS COUNT
+		FROM
+			POBLACION
+		<where>
+
+			<if test="codigoProvincia != null">AND 
+				CODIGO_PROVINCIA = #{codigoProvincia}
+			</if>
+
+			<if test="total != null">AND 
+				TOTAL = #{total}
+			</if>
+
+			<if test="varones != null">AND 
+				VARONES = #{varones}
+			</if>
+
+			<if test="mujeres != null">AND 
+				MUJERES = #{mujeres}
+			</if>
+
+			<if test="anio != null">AND 
+				ANIO = #{anio}
+			</if>
+
+		</where>
+	</select>
+
+	
+
+	<insert id="Insert" parameterType="Poblacion">
+		INSERT INTO POBLACION
+			(
+				CODIGO_PROVINCIA,
+				TOTAL,
+				VARONES,
+				MUJERES,
+				ANIO
+			)
+		VALUES
+			(
+				#{codigoProvincia},
+				#{total},
+				#{varones},
+				#{mujeres},
+				#{anio}
+			)
+	</insert>
+
+	
+
+	<update id="Update" parameterType="Poblacion">
+		UPDATE POBLACION
+		SET
+			CODIGO_PROVINCIA = #{codigoProvincia},
+			TOTAL = #{total},
+			VARONES = #{varones},
+			MUJERES = #{mujeres},
+			ANIO = #{anio}
+		WHERE
+			CODIGO_PROVINCIA = #{codigoProvincia}
+		AND
+			ANIO = #{anio}
+	</update>
+
+	
+
+	<delete id="Delete" parameterType="Poblacion">
+		DELETE FROM POBLACION
+		WHERE
+			CODIGO_PROVINCIA = #{codigoProvincia}
+		AND
+			ANIO = #{anio}
+	</delete>
+
+	
+
+	<delete id="DeleteAll">
+		DELETE FROM POBLACION
+	</delete>
+
+</mapper>

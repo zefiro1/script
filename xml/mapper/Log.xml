@@ -116,7 +116,6 @@
 					( AGRUPACION LIKE '$agrupacionList[]$' OR AGRUPACION LIKE '$agrupacionList[]$,%' OR AGRUPACION LIKE '%,$agrupacionList[]$,%' OR AGRUPACION LIKE '%,$agrupacionList[]$' )
 				</iterate>
 			</isNotNull>
-			
 			<isNotNull property="filtradoList" >
 				<iterate prepend="AND" property="filtradoList" open="(" close=")" conjunction="OR">
 					( FILTRADO LIKE '$filtradoList[]$ = %' OR FILTRADO LIKE '%;$filtradoList[]$ = %' )
@@ -292,4 +291,3 @@
 	</select>
 
 </sqlMap>
-

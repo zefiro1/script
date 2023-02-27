@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace="VariablesInfluenciaIndicadores">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><mapper namespace="VariablesInfluenciaIndicadores">
 
 	
 
@@ -44,7 +44,7 @@
 
 	
 
-	<select id="CountAll">
+	<select id="CountAll" resultType="java.lang.Integer">
 		SELECT
 			COUNT(*) AS COUNT
 		FROM
@@ -132,7 +132,7 @@
 
 	
 
-	<select id="CountList" parameterType="VariablesInfluenciaIndicadores">
+	<select id="CountList" parameterType="VariablesInfluenciaIndicadores" resultType="java.lang.Integer">
 		SELECT
 			COUNT(*) AS COUNT
 		FROM

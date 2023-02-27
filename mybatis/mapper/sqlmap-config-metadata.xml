@@ -5,36 +5,36 @@
 
 	
 
-	<mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace=""/>
+	<mapper namespace=""/>
 	
-	<mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace=""/>
-	<mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace=""/>
-	<mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace=""/>		
-	<mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace=""/>
-	<mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace=""/>	
-	<mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace=""/>
-	<mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace=""/>
-	<mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace=""/>
-	<mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace=""/>
-	<mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace=""/>
-	<mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace=""/>
-	<mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace=""/>
+	<mapper namespace=""/>
+	<mapper namespace=""/>
+	<mapper namespace=""/>		
+	<mapper namespace=""/>
+	<mapper namespace=""/>	
+	<mapper namespace=""/>
+	<mapper namespace=""/>
+	<mapper namespace=""/>
+	<mapper namespace=""/>
+	<mapper namespace=""/>
+	<mapper namespace=""/>
+	<mapper namespace=""/>
 
-	<mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace=""/>
-	<mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace=""/>
-	<mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace=""/>
-	<mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace=""/>
+	<mapper namespace=""/>
+	<mapper namespace=""/>
+	<mapper namespace=""/>
+	<mapper namespace=""/>
 		
-	<mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace=""/>
-	<mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace=""/>
-	<mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace=""/>
-	<mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace=""/>
-	<mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace=""/>
+	<mapper namespace=""/>
+	<mapper namespace=""/>
+	<mapper namespace=""/>
+	<mapper namespace=""/>
+	<mapper namespace=""/>
 
 	
-	<mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace=""/>
+	<mapper namespace=""/>
 	
 	 
-	<mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace=""/>
+	<mapper namespace=""/>
 
 

@@ -36,12 +36,31 @@
             </xsl:if>
             <xsl:apply-templates />
         </result>
-    </xsl:template>
-    <xsl:template match="//isNotNull[@prepend='AND']">
-        <if test="{@property} != null">
-            <xsl:text>AND </xsl:text>     
-            <xsl:apply-templates />
+    </xsl:template>  
 
+    <xsl:template match="//isNotNull">
+    <xsl:choose>
+        <xsl:when test="@prepend='AND'">
+          <if test="{@property} != null">
+            <xsl:text>AND </xsl:text>
+            <xsl:apply-templates />
+          </if>
+        </xsl:when>
+        <xsl:when test="@prepend=','">
+          <if test="{@property} != null">
+              <xsl:apply-templates />
+              <xsl:text> = </xsl:text>
+                <xsl:value-of select="concat('#{', @property, '}')" />
+            <xsl:text>, </xsl:text>
+          </if>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:template>    
+
+
+    <xsl:template match="//isNull">
+        <if test="{@property} == null">
+            <xsl:apply-templates />
         </if>
     </xsl:template>
     <xsl:template match="//include">
@@ -49,6 +68,17 @@
     </xsl:template>
     <!-- Transforma dynamic en where -->
     <xsl:template match="dynamic[@prepend='WHERE']">
+        <where>
+            <xsl:apply-templates />
+        </where>
+    </xsl:template>
+    <xsl:template match="dynamic[@prepend='AND']">
+        <where>
+            <xsl:text>AND </xsl:text>
+            <xsl:apply-templates />
+        </where>
+    </xsl:template>
+    <xsl:template match="dynamic">
         <where>
             <xsl:apply-templates />
         </where>
@@ -97,10 +127,26 @@
                 <xsl:attribute name="parameterType">
                     <xsl:value-of select="@parameterMap" />
                 </xsl:attribute>
-            </xsl:if>
+            </xsl:if>  
+         
             <xsl:if test="@resultMap">
                 <xsl:attribute name="resultType">
                     <xsl:value-of select="@resultMap" />
+                </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="@resultType">
+                <xsl:attribute name="resultType">
+                    <xsl:value-of select="@resultType" />
+                </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="@parameterType">
+                <xsl:attribute name="parameterType">
+                    <xsl:value-of select="@parameterType" />
+                </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="@resultClass">
+                <xsl:attribute name="resultType">
+                    <xsl:value-of select="@resultClass" />
                 </xsl:attribute>
             </xsl:if>
             <xsl:apply-templates />
@@ -120,6 +166,21 @@
                     <xsl:value-of select="@resultMap" />
                 </xsl:attribute>
             </xsl:if>
+            <xsl:if test="@resultType">
+                <xsl:attribute name="resultType">
+                    <xsl:value-of select="@resultType" />
+                </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="@parameterType">
+                <xsl:attribute name="parameterType">
+                    <xsl:value-of select="@parameterType" />
+                </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="@resultClass">
+                <xsl:attribute name="resultType">
+                    <xsl:value-of select="@resultClass" />
+                </xsl:attribute>
+            </xsl:if>
             <xsl:apply-templates />
         </select>
     </xsl:template>
@@ -127,6 +188,16 @@
     <!-- Mantiene el select-->
     <xsl:template match="insert">
         <insert id="{@id}">
+            <xsl:if test="@resultType">
+                <xsl:attribute name="resultType">
+                    <xsl:value-of select="@resultType" />
+                </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="@parameterType">
+                <xsl:attribute name="parameterType">
+                    <xsl:value-of select="@parameterType" />
+                </xsl:attribute>
+            </xsl:if>
             <xsl:if test="@parameterClass">
                 <xsl:attribute name="parameterType">
                     <xsl:value-of select="@parameterClass" />
@@ -135,6 +206,11 @@
             <xsl:if test="@resultMap">
                 <xsl:attribute name="resultType">
                     <xsl:value-of select="@resultMap" />
+                </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="@resultClass">
+                <xsl:attribute name="resultType">
+                    <xsl:value-of select="@resultClass" />
                 </xsl:attribute>
             </xsl:if>
             <xsl:apply-templates />
@@ -143,6 +219,16 @@
     <!-- Mantiene el update-->
     <xsl:template match="update">
         <update id="{@id}">
+            <xsl:if test="@resultType">
+                <xsl:attribute name="resultType">
+                    <xsl:value-of select="@resultType" />
+                </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="@parameterType">
+                <xsl:attribute name="parameterType">
+                    <xsl:value-of select="@parameterType" />
+                </xsl:attribute>
+            </xsl:if>
             <xsl:if test="@parameterClass">
                 <xsl:attribute name="parameterType">
                     <xsl:value-of select="@parameterClass" />
@@ -151,6 +237,11 @@
             <xsl:if test="@resultMap">
                 <xsl:attribute name="resultType">
                     <xsl:value-of select="@resultMap" />
+                </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="@resultClass">
+                <xsl:attribute name="resultType">
+                    <xsl:value-of select="@resultClass" />
                 </xsl:attribute>
             </xsl:if>
             <xsl:apply-templates />
@@ -159,6 +250,16 @@
     <!-- Mantiene el DELETE-->
     <xsl:template match="delete">
         <delete id="{@id}">
+            <xsl:if test="@resultType">
+                <xsl:attribute name="resultType">
+                    <xsl:value-of select="@resultType" />
+                </xsl:attribute>
+            </xsl:if>
+            <xsl:if test="@parameterType">
+                <xsl:attribute name="parameterType">
+                    <xsl:value-of select="@parameterType" />
+                </xsl:attribute>
+            </xsl:if>
             <xsl:if test="@parameterClass">
                 <xsl:attribute name="parameterType">
                     <xsl:value-of select="@parameterClass" />
@@ -169,21 +270,41 @@
                     <xsl:value-of select="@resultMap" />
                 </xsl:attribute>
             </xsl:if>
+            <xsl:if test="@resultClass">
+                <xsl:attribute name="resultType">
+                    <xsl:value-of select="@resultClass" />
+                </xsl:attribute>
+            </xsl:if>
             <xsl:apply-templates />
         </delete>
     </xsl:template>
- <!-- Cambia los elementos isEqual padres por choose -->
- <xsl:template match="isEqual">
-    <if test="{@property} == '{@compareValue}'">
-      <xsl:apply-templates />
-    </if>
-  </xsl:template>
-  
-  <xsl:template match="isEqual/isEqual">
-    <if test="{@property} == '{@compareValue}'">
-      <xsl:apply-templates  />
-    </if>
-  </xsl:template>
-  
 
+    <xsl:template match="isEqual">
+        <if test="{@property} == '{@compareValue}'">
+            <xsl:apply-templates />
+        </if>
+    </xsl:template>
+
+    <xsl:template match="isEqual/isEqual">
+        <if test="{@property} == '{@compareValue}'">
+            <xsl:apply-templates />
+        </if>
+    </xsl:template>
+    <xsl:template match="isNotEmpty">
+        <if test="{@property} != ''">
+            <xsl:apply-templates />
+        </if>
+    </xsl:template>    
+    <xsl:template match="//isGreaterThan">
+        <if test="{@property} &gt; '{@compareValue}'">
+            <xsl:apply-templates />
+        </if>
+    </xsl:template>    
+    <xsl:template match="//isLessThan">
+        <if test="{@property} &lt; '{@compareValue}'">
+            <xsl:apply-templates />
+        </if>
+    </xsl:template>
+    
+    
 </xsl:stylesheet>

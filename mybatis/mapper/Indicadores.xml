@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><mapper xmlns:mybatis="http://mybatis.org/dtd/mybatis-3-mapper.dtd" namespace="Indicadores">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><mapper namespace="Indicadores">
 
 	
 		
@@ -51,7 +51,7 @@
 
 	
 
-	<select id="CountAll">
+	<select id="CountAll" resultType="java.lang.Integer">
 		SELECT
 			COUNT(*) AS COUNT
 		FROM
@@ -135,7 +135,7 @@
 
 	
 
-	<select id="CountList" parameterType="Indicadores">
+	<select id="CountList" parameterType="Indicadores" resultType="java.lang.Integer">
 		SELECT
 			COUNT(*) AS COUNT
 		FROM
@@ -247,40 +247,40 @@
 		select 
     		count(distinct CODIGO_HOSPITAL) as NUM_HOSPITALES,count(*) as NUM_ALTAS, 
     		avg(PESO) as PESO_MEDIO, median(PESO) as PESO_MEDIANO,
-    		
+    		<if test="anio &gt; '2015'">
     		    100*sum(CASE WHEN (CODIGO_GRD_APR in (955, 956)) THEN 1 ELSE 0 END)/count(*) as GRDS_INESPECIFICOS,
-    		
-    		
+    		</if>
+    		<if test="anio &lt; '2016'">
     			100*sum(CASE WHEN (CODIGO_GRD in (468,469,470,476,477)) THEN 1 ELSE 0 END)/count(*) as GRDS_INESPECIFICOS,
-    		
+    		</if>
     		null as CLUSTER_HOSPITAL, null as TIPO_HOSPITAL,
     		null as CLUSTER_HOSPITAL_DESC, null as TIPO_HOSPITAL_DESC,
     		avg(NUMERO_DIAGNOSTICOS) as NUMERO_DIAGNOSTICOS,
     		avg(NUMERO_PROCEDIMIENTOS) as NUMERO_PROCEDIMIENTOS
  		from complicaciones where ANIO=#{anio}
- 		
+ 		<if test="filtro.label == 'SNS'">
  			AND CODIGO_TIPO_HOSPITAL=$filtro.value$
- 		
- 		
+ 		</if>
+ 		<if test="filtro.label == 'NO_SNS'">
  			AND CODIGO_TIPO_HOSPITAL=$filtro.value$
- 		
+ 		</if>
  	</select>
 	 	
- 	<select id="FichaTecnicaClusterHospitalCommon">
+ 	<sql id="FichaTecnicaClusterHospitalCommon">
  			
- 	</select> 	
+ 	</sql> 	
  	<select id="FichaTecnicaClusterHospital" parameterType="es.msc.aemsc.business.dao.ibatis.FiltroHospitalParameter" resultType="FichaTecnicaMapping">
 		select
 			count(distinct CODIGO_HOSPITAL) as NUM_HOSPITALES,
 			count(*) as NUM_ALTAS,
 			avg(PESO) as PESO_MEDIO,
 			median(PESO) as PESO_MEDIANO,
-			
+			<if test="anio &gt; '2015'">
 				100*sum(CASE WHEN (CODIGO_GRD_APR in (955, 956)) THEN 1 ELSE 0 END)/count(*) as GRDS_INESPECIFICOS,    		    
-    		
-    		
+    		</if>
+    		<if test="anio &lt; '2016'">
     			100*sum(CASE WHEN (CODIGO_GRD in (468,469,470,476,477)) THEN 1 ELSE 0 END)/count(*) as GRDS_INESPECIFICOS,
-    		
+    		</if>
 			null as TIPO_HOSPITAL,
 			null as TIPO_HOSPITAL_DESC,
 			C.CODIGO_CLUSTER_HOSPITAL as CLUSTER_HOSPITAL,
@@ -291,12 +291,12 @@
 		where 
 			ANIO=#{anio}
 			AND C.CODIGO_CLUSTER_HOSPITAL = T.CODIGO_CLUSTER_HOSPITAL
-		
+		<if test="filtro.label == 'SNS'">
  			AND CODIGO_TIPO_HOSPITAL=$filtro.value$
- 		
- 		
+ 		</if>
+ 		<if test="filtro.label == 'NO_SNS'">
  			AND CODIGO_TIPO_HOSPITAL=$filtro.value$
- 		
+ 		</if>
 		group by C.CODIGO_CLUSTER_HOSPITAL
 	</select>
  	
@@ -306,12 +306,12 @@
 			count(*) as NUM_ALTAS,
 			avg(PESO) as PESO_MEDIO,
 			median(PESO) as PESO_MEDIANO,
-			
+			<if test="anio &gt; '2015'">
     			100*sum(CASE WHEN (CODIGO_GRD_APR in (955, 956)) THEN 1 ELSE 0 END)/count(*) as GRDS_INESPECIFICOS,
-    		
-    		
+    		</if>
+    		<if test="anio &lt; '2016'">
 			    100*sum(CASE WHEN (CODIGO_GRD in (468,469,470,476,477)) THEN 1 ELSE 0 END)/count(*) as GRDS_INESPECIFICOS,    		    
-    		
+    		</if>
 			null as CLUSTER_HOSPITAL,
 			CODIGO as TIPO_HOSPITAL,
 			null as CLUSTER_HOSPITAL_DESC,
@@ -322,16 +322,16 @@
 		where 
 			ANIO=#{anio}
 			AND C.CODIGO = CODIGO_GRUPO_HOSPITAL
-		
+		<if test="filtro.label == 'SNS'">
  			AND CODIGO_TIPO_HOSPITAL=$filtro.value$
- 		
- 		
+ 		</if>
+ 		<if test="filtro.label == 'NO_SNS'">
  			AND CODIGO_TIPO_HOSPITAL=$filtro.value$
- 		
+ 		</if>
 		group by C.CODIGO
 	</select>
  	
-	<select id="SelectPoblacionStdHospital">
+	<select id="SelectPoblacionStdHospital" resultType="java.util.LinkedHashMap">
 		SELECT
 			CODIGO_SEXO,
 			CODIGO_GRUPO_EDAD_Q,
@@ -341,7 +341,7 @@
 		group by cube(CODIGO_SEXO, CODIGO_GRUPO_EDAD_Q)
 	</select>
 
- 	<select id="Procedimientos" parameterType="es.msc.aemsc.business.vo.IndicadorParamsVO">
+ 	<select id="Procedimientos" parameterType="es.msc.aemsc.business.vo.IndicadorParamsVO" resultType="java.util.LinkedHashMap">
 		SELECT
 			PROCEDIMIENTO AS "procedimiento",
 			PROCEDIMIENTO AS "procedimiento_desc",

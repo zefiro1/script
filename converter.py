@@ -7,10 +7,10 @@ from lxml import etree
 xslt_file = 'ibatis2mybatis.xslt'
 
 # Ruta al archivo de salida
-output_folder = 'mybatis/include/'
+output_folder = 'mybatis/mapper/'
 
 # Lista de archivos XML
-xml_files = glob.glob('xml/include/*.xml')
+xml_files = glob.glob('xml/mapper/*.xml')
 
 # Lista de documentos XML
 xml_docs = []
@@ -30,8 +30,9 @@ transformer = etree.XSLT(xslt_doc)
 for i, xml_doc in enumerate(xml_docs):
     result = transformer(xml_doc)
     result_str = str(result)
-    regex = r"#(\w+)(?::\w+)?[#}]"
+    regex = r"#(\w+)(?::\w+)?[#}]" 
     output = re.sub(regex, r'#{\1}', result_str)
+    output = re.sub(r'#\{(\w+)} = #{\1}', r'#{\1}', output) 
     type_aliases = xml_doc.xpath('//typeAlias')
     new_doc = etree.Element('typeAliases')
     for type_alias in type_aliases:
